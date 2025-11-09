@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>To-Do Viewer</title>
+  </head>
+  <body>
+    <h1>My To-Dos</h1>
+    <ul id="todo-list"></ul>
+
+    <script>
+      fetch("/todos")
+        .then(res => res.json())
+        .then(todos => {
+          const list = document.getElementById('todo-list');
+          todos.forEach(todo => {
+            const li = document.createElement("li");
+            li.textContent = `${todo.id}: ${todo.title} [${todo.completed ? "X": " "}]`;
+            list.appendChild(li);
+          });
+        });
+    </script>
+  </body>
+</html>

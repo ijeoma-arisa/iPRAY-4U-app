@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 
@@ -7,7 +7,7 @@ todos = []
 
 @app.route("/")
 def home():
-  return jsonify({"message": "Welcome to the To-Do API!"})
+  return render_template("index.html")
 
 @app.route("/todos", methods=["GET"])
 def get_todos():
