@@ -1,4 +1,14 @@
 from typing import Optional
+from enum import Enum
+
+class Relationship(Enum):
+  # TO DO: Add a way to designate it as favorite
+  FAMILY = "Family"
+  FRIENDS = "Friends"
+  MINISTRY = "Ministry"
+  # TO DO: Implement custom feature
+  CUSTOM = "Custom"
+  
 
 class PrayerRequest:
   def __init__(self, text: Optional[str] = None, has_prayed: bool = False):
@@ -20,7 +30,7 @@ class PrayerRequest:
   
     
 class Person:  
-  def __init__(self, id: str, name: str, relationship: str):
+  def __init__(self, id: str, name: str, relationship: Relationship):
     # TO DO: Generate id
     self._id = id
     self._name = name
@@ -32,7 +42,7 @@ class Person:
     return f"Person(id={self._id}, name={self._name}, relationship={self._relationship}, prayer_requests={self._prayer_requests})"
   
   def __str__(self):
-    return f"""{self._name} ({self._relationship})
+    return f"""{self._name} ({self._relationship.value})
   Prayer Requests: {self._prayer_requests}"""
   
   def __eq__(self, person):
@@ -52,7 +62,7 @@ class Person:
   def get_name(self) -> str:
     return self._name
   
-  def set_relationship(self, relationship) -> None:
+  def set_relationship(self, relationship: Relationship) -> None:
     self._relationship = relationship
     
   def get_relationship(self) -> str:
