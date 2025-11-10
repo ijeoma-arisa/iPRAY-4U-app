@@ -90,19 +90,5 @@ class Person:
         "relationship": self._relationship.value,
         "prayer_requests": [prayer.to_dict() for prayer in self._prayer_requests]
       }
-  
-# class PrayerRequest:
-#   def __init__(self, owner: Person, prayer: Prayer):
-#     self._owner = owner
-#     self._prayer = prayer
-    
-#   def get_owner(self) -> Person:
-#     return self._owner
-  
-#   def set_owner(self, person: Person) -> None:
-#     self._owner 
-    
-  
 
-  
     
