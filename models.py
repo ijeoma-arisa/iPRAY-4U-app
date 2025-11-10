@@ -26,6 +26,9 @@ class Prayer:
       
   def has_prayed(self) -> bool:
     return self._has_prayed
+  
+  def to_dict(self) -> dict:
+    return {"text": self._text, "has_prayed": self._has_prayed}
 
 
 class Person:  
@@ -64,7 +67,7 @@ class Person:
   def set_relationship(self, relationship: Relationship) -> None:
     self._relationship = relationship
     
-  def get_relationship(self) -> str:
+  def get_relationship(self) -> Relationship:
     return self._relationship
   
   def get_prayer_requests(self) -> list[Prayer]:
@@ -79,8 +82,25 @@ class Person:
           self._prayer_requests.pop(i)
           return True
       return False
+    
+  def to_dict(self) -> dict:
+    return {
+        "id": self._id,
+        "name": self._name,
+        "relationship": self._relationship.value,
+        "prayer_requests": [prayer.to_dict() for prayer in self._prayer_requests]
+      }
   
-      
+# class PrayerRequest:
+#   def __init__(self, owner: Person, prayer: Prayer):
+#     self._owner = owner
+#     self._prayer = prayer
+    
+#   def get_owner(self) -> Person:
+#     return self._owner
+  
+#   def set_owner(self, person: Person) -> None:
+#     self._owner 
     
   
 
