@@ -1,10 +1,10 @@
 import unittest
 
-from models import PrayerRequest
+from models import Prayer
 
-class TestPrayerRequest(unittest.TestCase):
+class TestPrayer(unittest.TestCase):
   def setUp(self):
-    self.pr = PrayerRequest()
+    self.pr = Prayer()
   
   def test_initial_state(self):
     self.assertIsNone(self.pr.get_text())

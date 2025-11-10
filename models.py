@@ -8,9 +8,9 @@ class Relationship(Enum):
   MINISTRY = "Ministry"
   # TO DO: Implement custom feature
   CUSTOM = "Custom"
-  
 
-class PrayerRequest:
+
+class Prayer:
   def __init__(self, text: Optional[str] = None, has_prayed: bool = False):
     self._text = text
     self._has_prayed = has_prayed
@@ -27,8 +27,7 @@ class PrayerRequest:
   def has_prayed(self) -> bool:
     return self._has_prayed
 
-  
-    
+
 class Person:  
   def __init__(self, id: str, name: str, relationship: Relationship):
     # TO DO: Generate id
@@ -68,10 +67,10 @@ class Person:
   def get_relationship(self) -> str:
     return self._relationship
   
-  def get_prayer_requests(self) -> list[PrayerRequest]:
+  def get_prayer_requests(self) -> list[Prayer]:
     return self._prayer_requests
     
-  def add_prayer_request(self, prayer_request: PrayerRequest) -> None:
+  def add_prayer_request(self, prayer_request: Prayer) -> None:
     self._prayer_requests.append(prayer_request)
     
   def delete_prayer_request(self, prayer_request_id: str) -> bool:

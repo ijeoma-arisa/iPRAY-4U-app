@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, render_template
-from models import Person
+from models import Person, PrayerRequest
 
 app = Flask(__name__)
 
