@@ -10,6 +10,19 @@ class Person:
     self.relationship = relationship
     self.prayer_requests = []
     
+  def __repr__(self):
+    # TO DO: Fix the prayer_requests output
+    return f"Person(id={self.id}, name={self.name}, relationship={self.relationship}, prayer_requests={self.prayer_requests})"
+  
+  def __str__(self):
+    return f"""{self.name} ({self.relationship})
+  Prayer Requests: {self.prayer_requests}"""
+  
+  def __eq__(self, person):
+    if person is Person and self.id == person.id:
+      return True
+    return False
+    
   def set_id(self, id: str):
     self.id = id
     
