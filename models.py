@@ -10,9 +10,14 @@ class PrayerRequest:
   
   def set_text(self, text: str):
     self._text = text
-    
+  
+  def set_prayed(self, prayed: bool) -> None:
+    self._has_prayed = prayed
+      
   def has_prayed(self) -> bool:
     return self._has_prayed
+
+  
     
 class Person:  
   def __init__(self, id: str, name: str, relationship: str):
