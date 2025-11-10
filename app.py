@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, render_template
+from models import Person
 
 app = Flask(__name__)
 
