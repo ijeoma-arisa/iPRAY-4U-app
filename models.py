@@ -14,57 +14,55 @@ class PrayerRequest:
   def has_prayed(self) -> bool:
     return self._has_prayed
     
-    
-
 class Person:  
   def __init__(self, id: str, name: str, relationship: str):
     # TO DO: Generate id
-    self.id = id
-    self.name = name
-    self.relationship = relationship
-    self.prayer_requests = []
+    self._id = id
+    self._name = name
+    self._relationship = relationship
+    self._prayer_requests = []
     
   def __repr__(self):
     # TO DO: Fix the prayer_requests output
-    return f"Person(id={self.id}, name={self.name}, relationship={self.relationship}, prayer_requests={self.prayer_requests})"
+    return f"Person(id={self._id}, name={self._name}, relationship={self._relationship}, prayer_requests={self._prayer_requests})"
   
   def __str__(self):
-    return f"""{self.name} ({self.relationship})
-  Prayer Requests: {self.prayer_requests}"""
+    return f"""{self._name} ({self._relationship})
+  Prayer Requests: {self._prayer_requests}"""
   
   def __eq__(self, person):
-    if person is Person and self.id == person.id:
+    if person is Person and self._id == person.id:
       return True
     return False
     
   def set_id(self, id: str):
-    self.id = id
+    self._id = id
     
   def get_id(self) -> str:
-    return self.id
+    return self._id
   
   def set_name(self, name: str) -> None:
-    self.name = name
+    self._name = name
     
   def get_name(self) -> str:
-    return self.name
+    return self._name
   
   def set_relationship(self, relationship) -> None:
-    self.relationship = relationship
+    self._relationship = relationship
     
   def get_relationship(self) -> str:
-    return self.relationship
+    return self._relationship
   
   def get_prayer_requests(self) -> list[PrayerRequest]:
-    return self.prayer_requests
+    return self._prayer_requests
     
   def add_prayer_request(self, prayer_request: PrayerRequest) -> None:
-    self.prayer_requests.append(prayer_request)
+    self._prayer_requests.append(prayer_request)
     
   def delete_prayer_request(self, prayer_request_id: str) -> bool:
-      for i, prayer_request in self.prayer_requests:
+      for i, prayer_request in self._prayer_requests:
         if prayer_request.id == prayer_request_id:
-          self.prayer_requests.pop(i)
+          self._prayer_requests.pop(i)
           return True
       return False
   
