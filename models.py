@@ -1,6 +1,20 @@
+from typing import Optional
+
 class PrayerRequest:
-  def __init__(self):
-    pass
+  def __init__(self, text: Optional[str] = None, has_prayed: bool = False):
+    self._text = text
+    self._has_prayed = has_prayed
+    
+  def get_text(self):
+    return self._text
+  
+  def set_text(self, text: str):
+    self._text = text
+    
+  def has_prayed(self) -> bool:
+    return self._has_prayed
+    
+    
 
 class Person:  
   def __init__(self, id: str, name: str, relationship: str):
@@ -41,6 +55,9 @@ class Person:
   def get_relationship(self) -> str:
     return self.relationship
   
+  def get_prayer_requests(self) -> list[PrayerRequest]:
+    return self.prayer_requests
+    
   def add_prayer_request(self, prayer_request: PrayerRequest) -> None:
     self.prayer_requests.append(prayer_request)
     
@@ -50,6 +67,7 @@ class Person:
           self.prayer_requests.pop(i)
           return True
       return False
+  
       
     
   
