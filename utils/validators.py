@@ -3,8 +3,10 @@ from models import Relationship
 def is_valid_string(value) -> bool:
   return isinstance(value, str) and value.strip() != ""
 
+
 def is_valid_int(value) -> int:
   return isinstance(value, int) and value > 0
+
 
 def require_str(value, field_name):
   if not is_valid_string(value):

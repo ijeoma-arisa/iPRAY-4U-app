@@ -14,6 +14,7 @@ def home():
 def get_prayer_requests():
   return jsonify([person.to_dict() for person in persons]) 
 
+# TO DO: Change to match the URL of the submit form?
 @app.route("/prayer-requests", methods=["POST"])
 def create_prayer_request():
   data = request.get_json()
@@ -30,37 +31,24 @@ def create_prayer_request():
     is_valid_string(prayer)
     ):
       person = Person(person_id, name, relationship)
+      person.add_prayer_request(Prayer(prayer))
       persons.append(person)
       return jsonify(person.to_dict()), 201
   
   # TO DO: Specify missing or invalid fields
   return jsonify({"error": "Missing or invalid fields"}), 400
-    
-# @app.route("/prayer-requests", methods=["POST"])
-  
-  # person = None
-  # if person_id is not None:
-  #   for person in persons:
-  #     if person.get_id() == person_id:
-  #       person = person
-  #       break
-  # person = person if person else 
-    
-  # if person_id is not None:
-  #   prayer_request = {
-  #     "id": data.get("id"),
-  #     "person": data.get("person"),
-  #     "text": data.get("text"),
-  #     "prayed": data.get("prayed", False)
-  #   }
-  #   prayer_requests.append(prayer_request)
-  #   return jsonify(prayer_request), 201
-    
+      
 @app.route("/prayer-requests/<relationship>", methods=["GET"])
 def get_prayer_requests_relationship(relationship):
   result = []
+  
+  relationship = parse_relationship(relationship)
+  
+  if relationship is None:
+    return jsonify({"error": "Missing or invalid relationship value"}), 404 
+  
   for person in persons:
-    if person.get_relationship().value.lower() == relationship.lower():
+    if person.get_relationship() == relationship:
       result.append(person.to_dict())
   return jsonify(result)
 
