@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, render_template
 from models import Person, Prayer
-from utils.validators import is_valid_string, parse_relationship
+from utils.validators import is_valid_string, is_valid_int, parse_relationship
 
 app = Flask(__name__)
 
@@ -11,23 +11,8 @@ def home():
   return render_template("index.html")
 
 @app.route("/prayer-requests", methods=["GET"])
-def get_prayer_requests_all():
+def get_prayer_requests():
   return jsonify([person.to_dict() for person in persons]) 
-
-@app.route("/prayer-requests/<relationship>", methods=["GET"])
-def get_prayer_requests_relationship(relationship):
-  result = []
-  for person in persons:
-    if person.get_relationship().value.lower() == relationship.lower():
-      result.append(person.to_dict())
-  return jsonify(result)
-
-@app.route("/prayer-requests/<int:person_id>", methods=["GET"])
-def get_person(person_id):
-  for person in persons:
-    if person.get_id() == person_id:
-      return jsonify(person.to_dict())
-  return jsonify({"error": "Person not found"}), 404
 
 @app.route("/prayer-requests", methods=["POST"])
 def create_prayer_request():
@@ -36,15 +21,22 @@ def create_prayer_request():
   person_id = data.get("id", None)
   name = data.get("name", None)
   relationship = parse_relationship(data.get("relationship", None))
+  prayer = data.get("prayer", None)
   
-  if person_id and name and relationship:
-    person = Person(person_id, name, relationship)
-    persons.append(person)
-    return jsonify(person.to_dict()), 201
+    
+  if (is_valid_int(person_id) and 
+    is_valid_string(name) and 
+    relationship is not None and 
+    is_valid_string(prayer)
+    ):
+      person = Person(person_id, name, relationship)
+      persons.append(person)
+      return jsonify(person.to_dict()), 201
   
   # TO DO: Specify missing or invalid fields
   return jsonify({"error": "Missing or invalid fields"}), 400
     
+# @app.route("/prayer-requests", methods=["POST"])
   
   # person = None
   # if person_id is not None:
@@ -64,6 +56,21 @@ def create_prayer_request():
   #   prayer_requests.append(prayer_request)
   #   return jsonify(prayer_request), 201
     
+@app.route("/prayer-requests/<relationship>", methods=["GET"])
+def get_prayer_requests_relationship(relationship):
+  result = []
+  for person in persons:
+    if person.get_relationship().value.lower() == relationship.lower():
+      result.append(person.to_dict())
+  return jsonify(result)
+
+@app.route("/prayer-requests/<int:person_id>", methods=["GET"])
+def get_person(person_id):
+  for person in persons:
+    if person.get_id() == person_id:
+      return jsonify(person.to_dict())
+  return jsonify({"error": "Person not found"}), 404
+
 
 # @app.route("/prayer-requests/<int:prayer_request_id>", methods=["PUT"])
 # def update_prayer_request(prayer_request_id):
