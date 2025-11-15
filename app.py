@@ -32,6 +32,7 @@ def get_person(person_id):
 @app.route("/prayer-requests", methods=["POST"])
 def create_prayer_request():
   data = request.get_json()
+  
   person_id = data.get("id", None)
   name = data.get("name", None)
   relationship = parse_relationship(data.get("relationship", None))
@@ -40,6 +41,8 @@ def create_prayer_request():
     person = Person(person_id, name, relationship)
     persons.append(person)
     return jsonify(person.to_dict()), 201
+  
+  # TO DO: Specify missing or invalid fields
   return jsonify({"error": "Missing or invalid fields"}), 400
     
   
