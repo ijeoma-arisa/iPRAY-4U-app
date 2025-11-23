@@ -18,7 +18,6 @@ def get_prayer_requests():
 @app.route("/prayer-requests", methods=["POST"])
 def create_prayer_request():
   data = request.get_json()
-  print(data)
   
   person_id = data.get("id", None)
   name = data.get("name", None)
@@ -60,7 +59,36 @@ def get_person(person_id):
       return jsonify(person.to_dict())
   return jsonify({"error": "Person not found"}), 404
 
-
+@app.route("/prayer-requests/<int:person_id>", methods=["PATCH"])
+def update_person_or_add_prayer_request(person_id):
+  data = request.get_json()
+  
+  person_to_update = None
+  for person in persons:
+    if person.get_id() == person_id:
+      person_to_update = person
+      break
+  
+  if not person_to_update:
+    return jsonify({"error": "Person not found"}), 404 
+    
+  name = data.get("name", None)
+  relationship = parse_relationship(data.get("relationship", None))
+  prayer = data.get("prayer", None)
+  
+  if is_valid_string(name):
+    person.set_name(name)
+  
+  if relationship:
+    person.set_relationship(relationship)
+    
+  if is_valid_string(prayer):
+    person.add_prayer_request(Prayer(prayer))
+    
+  return jsonify(person.to_dict())
+  
+  
+      
 # @app.route("/prayer-requests/<int:prayer_request_id>", methods=["PUT"])
 # def update_prayer_request(prayer_request_id):
 #   data = request.get_json()
