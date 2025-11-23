@@ -74,16 +74,12 @@ def update_person(person_id):
     
   name = data.get("name", None)
   relationship = parse_relationship(data.get("relationship", None))
-  # prayer = data.get("prayer", None)
   
   if is_valid_string(name):
     person.set_name(name)
   
   if relationship:
     person.set_relationship(relationship)
-    
-  # if is_valid_string(prayer):
-  #   person.add_prayer_request(Prayer(prayer))
     
   return jsonify(person.to_dict())
   
@@ -102,7 +98,6 @@ def delete_person(person_id):
   persons.remove(person_to_delete)
 
   return jsonify({"message": "Person deleted"})
-
 
 # TO DO: ADD ID FOR PRAYERS IF NEEDED 
 @app.route("/persons/<int:person_id>/prayers", methods=["GET"])
