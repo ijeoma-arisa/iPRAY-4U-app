@@ -18,6 +18,7 @@ def get_prayer_requests():
 @app.route("/prayer-requests", methods=["POST"])
 def create_prayer_request():
   data = request.get_json()
+  print(data)
   
   person_id = data.get("id", None)
   name = data.get("name", None)

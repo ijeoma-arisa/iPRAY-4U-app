@@ -1,0 +1,37 @@
+{
+	"info": {
+		"_postman_id": "df9a7151-3343-44ed-b8d3-24093d806544",
+		"name": "Flask API Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49916609",
+		"_collection_link": "https://ijay-arisa-7445388.postman.co/workspace/Team-Eej's-Workspace~742392ff-713a-48eb-8241-b9d47e47b4a7/collection/49916609-df9a7151-3343-44ed-b8d3-24093d806544?action=share&source=collection_link&creator=49916609"
+	},
+	"item": [
+		{
+			"name": "New Prayer Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}\n"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/prayer-requests",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"prayer-requests"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
