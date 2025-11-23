@@ -10,13 +10,13 @@ persons: list[Person] = []
 def home():
   return render_template("index.html")
 
-@app.route("/prayer-requests", methods=["GET"])
-def get_prayer_requests():
+@app.route("/persons", methods=["GET"])
+def get_persons():
   return jsonify([person.to_dict() for person in persons]) 
 
 # TO DO: Change to match the URL of the submit form?
-@app.route("/prayer-requests", methods=["POST"])
-def create_prayer_request():
+@app.route("/persons", methods=["POST"])
+def add_person():
   data = request.get_json()
   
   person_id = data.get("id", None)
@@ -38,8 +38,8 @@ def create_prayer_request():
   # TO DO: Specify missing or invalid fields
   return jsonify({"error": "Missing or invalid fields"}), 400
       
-@app.route("/prayer-requests/<relationship>", methods=["GET"])
-def get_prayer_requests_relationship(relationship):
+@app.route("/persons/<relationship>", methods=["GET"])
+def get_persons_relationship(relationship):
   result = []
   
   relationship = parse_relationship(relationship)
@@ -52,15 +52,15 @@ def get_prayer_requests_relationship(relationship):
       result.append(person.to_dict())
   return jsonify(result)
 
-@app.route("/prayer-requests/<int:person_id>", methods=["GET"])
+@app.route("/persons/<int:person_id>", methods=["GET"])
 def get_person(person_id):
   for person in persons:
     if person.get_id() == person_id:
       return jsonify(person.to_dict())
   return jsonify({"error": "Person not found"}), 404
 
-@app.route("/prayer-requests/<int:person_id>", methods=["PATCH"])
-def update_person_or_add_prayer_request(person_id):
+@app.route("/persons/<int:person_id>", methods=["PATCH"])
+def update_person(person_id):
   data = request.get_json()
   
   person_to_update = None
@@ -74,7 +74,7 @@ def update_person_or_add_prayer_request(person_id):
     
   name = data.get("name", None)
   relationship = parse_relationship(data.get("relationship", None))
-  prayer = data.get("prayer", None)
+  # prayer = data.get("prayer", None)
   
   if is_valid_string(name):
     person.set_name(name)
@@ -82,31 +82,26 @@ def update_person_or_add_prayer_request(person_id):
   if relationship:
     person.set_relationship(relationship)
     
-  if is_valid_string(prayer):
-    person.add_prayer_request(Prayer(prayer))
+  # if is_valid_string(prayer):
+  #   person.add_prayer_request(Prayer(prayer))
     
   return jsonify(person.to_dict())
   
+@app.route("/persons/<int:person_id>", methods=["DELETE"])
+def delete_person(person_id):
+    
+  person_to_delete = None
+  for person in persons:
+    if person.get_id() == person_id:
+      person_to_delete = person
+      break
   
-      
-# @app.route("/prayer-requests/<int:prayer_request_id>", methods=["PUT"])
-# def update_prayer_request(prayer_request_id):
-#   data = request.get_json()
-#   for prayer_request in prayer_requests:
-#     if prayer_request["id"] == prayer_request_id:
-#       prayer_requests.update({
-#         "person": data.get("person", prayer_request["person"]),
-#         "text": data.get("text", prayer_request["text"]),
-#         "prayed": data.get("prayed", prayer_request["prayed"])
-#       })
-#       return jsonify(prayer_request)
-#   return jsonify({"error": "Prayer request not found"}), 404
+  if not person_to_delete:
+    return jsonify({"error": "Person not found"}), 404
+  
+  persons.remove(person_to_delete)
 
-# @app.route("/prayer-requests/<int:prayer_request_id>", methods=["DELETE"])
-# def delete_prayer_request(prayer_request_id):
-#   global prayer_requests
-#   prayer_requests = [prayer_request for prayer_request in prayer_requests if prayer_request["id"] != prayer_request_id]
-#   return jsonify({"message": "Prayer request deleted"})
+  return jsonify({"message": "Person deleted"})
 
 if __name__ == "__main__":
   app.run(debug=True)
