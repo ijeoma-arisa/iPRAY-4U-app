@@ -103,5 +103,23 @@ def delete_person(person_id):
 
   return jsonify({"message": "Person deleted"})
 
+
+# TO DO: ADD ID FOR PRAYERS IF NEEDED 
+@app.route("/persons/<int:person_id>/prayers", methods=["GET"])
+def get_prayers(person_id):
+  pass
+
+@app.route("/persons/<int:person_id>/prayers", methods=["POST"])
+def add_prayer(person_id):
+  pass
+
+@app.route("/persons/<int:person_id>/prayers", methods=["PATCH"])
+def update_prayer(person_id):
+  pass
+
+@app.route("/persons/<int:person_id>/prayers", methods=["DELETE"])
+def delete_prayer(person_id):
+  pass
+
 if __name__ == "__main__":
   app.run(debug=True)
