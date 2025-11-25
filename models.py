@@ -12,8 +12,15 @@ class Relationship(Enum):
 
 class Prayer:
   def __init__(self, text: Optional[str] = None, has_prayed: bool = False):
+    self._id = None
     self._text = text
     self._has_prayed = has_prayed
+    
+  def get_id(self): 
+    return self._id
+  
+  def set_id(self, id):
+    self._id = id
     
   def get_text(self):
     return self._text
