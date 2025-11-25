@@ -6,6 +6,8 @@ app = Flask(__name__)
 
 people: list[Person] = []
 
+# TO DO: Use binary search to find id in array -> O(logn) instead of O(n)
+
 @app.route("/")
 def home():
   return render_template("index.html")
@@ -135,24 +137,49 @@ def add_prayer(person_id):
     person_to_update.add_prayer_request(prayer)
     return jsonify(prayer.to_dict())
   
-  return jsonify("error": "Missing or invalid fields"), 400
+  return jsonify({"error": "Missing or invalid fields"}), 400
   
-  
-  
-  
-        
-  
-  
-  text = data.get("text", None)
-  has_prayed = data.get("has_prayed", False)
-  
-  
-  
-    
 
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
 def update_prayer(person_id, prayer_id):
-  pass
+  person_to_update = None
+  for person in people:
+    if person.get_id() == person_id:
+      person_to_update = person
+      break
+  
+  if not person_to_update:
+    return jsonify({"error": "Person not found"}), 404 
+  
+  data = request.get_json()
+  
+  text = data.get("text", None)
+  has_prayed = data.get("has_prayed", None)
+  
+  if not is_valid_string(text) and not is_valid_bool(has_prayed):
+    return jsonify({"error": "Missing or invalid fields"})
+    
+  for prayer in person_to_update.get_prayer_requests():
+    if prayer.get_id() == prayer_id:
+      
+      if is_valid_string(text):
+        prayer.set_text(text)
+        
+      if is_valid_bool(has_prayed):
+        prayer.set_has_prayed(has_prayed)
+        
+      return jsonify(prayer.to_dict())
+  
+  return jsonify({"error": "Prayer not found"})
+      
+      
+      
+      
+      
+      
+  
+  
+  
 
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
 def delete_prayer(person_id, prayer_id):

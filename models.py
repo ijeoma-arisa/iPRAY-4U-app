@@ -28,7 +28,7 @@ class Prayer:
   def set_text(self, text: str):
     self._text = text
   
-  def set_prayed(self, prayed: bool) -> None:
+  def set_has_prayed(self, prayed: bool) -> None:
     self._has_prayed = prayed
       
   def has_prayed(self) -> bool:
