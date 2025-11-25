@@ -6,7 +6,8 @@ app = Flask(__name__)
 
 people: list[Person] = []
 
-# TO DO: Use binary search to find id in array -> O(logn) instead of O(n)
+# Update: may use hashmap for O(1) lookup bc binary only helps
+# For VERY long lists (i.e. > 10K prayers / ppl)
 
 @app.route("/")
 def home():
@@ -21,6 +22,7 @@ def get_people():
 def add_person():
   data = request.get_json()
   
+  # TO DO: Implement id creation internally (similar to prayer request)
   person_id = data.get("id", None)
   name = data.get("name", None)
   relationship = parse_relationship(data.get("relationship", None))
@@ -41,37 +43,30 @@ def add_person():
   return jsonify({"error": "Missing or invalid fields"}), 400
       
 @app.route("/people/<relationship>", methods=["GET"])
-def get_people_relationship(relationship):
-  result = []
-  
+def get_people_relationship(relationship):  
   relationship = parse_relationship(relationship)
   
   if relationship is None:
-    return jsonify({"error": "Missing or invalid relationship value"}), 404 
+    return jsonify({"error": "Missing or invalid relationship value"}), 400 
   
-  for person in people:
-    if person.get_relationship() == relationship:
-      result.append(person.to_dict())
-  return jsonify(result)
+  return jsonify([p.to_dict() for p in people if p.get_relationship() == relationship])
 
 @app.route("/people/<int:person_id>", methods=["GET"])
 def get_person(person_id):
-  for person in people:
-    if person.get_id() == person_id:
-      return jsonify(person.to_dict())
-  return jsonify({"error": "Person not found"}), 404
+  person = next((p for p in people if p.get_id() == person_id), None)
+  
+  if person is None:
+    return jsonify({"error": "Person not found"}), 404
+  
+  return jsonify(person.to_dict())
 
 @app.route("/people/<int:person_id>", methods=["PATCH"])
 def update_person(person_id):
   data = request.get_json()
   
-  person_to_update = None
-  for person in people:
-    if person.get_id() == person_id:
-      person_to_update = person
-      break
-  
-  if not person_to_update:
+  person = next((p for p in people if p.get_id() == person_id), None)
+
+  if person is None:
     return jsonify({"error": "Person not found"}), 404 
     
   name = data.get("name", None)
@@ -80,51 +75,38 @@ def update_person(person_id):
   if is_valid_string(name):
     person.set_name(name)
   
-  if relationship:
+  if relationship is not None:
     person.set_relationship(relationship)
     
   return jsonify(person.to_dict())
   
 @app.route("/people/<int:person_id>", methods=["DELETE"])
 def delete_person(person_id):
-  person_to_delete = None
-  for person in people:
-    if person.get_id() == person_id:
-      person_to_delete = person
-      break
+  person = next((p for p in people if p.get_id() == person_id), None)
   
-  if not person_to_delete:
+  if person is None:
     return jsonify({"error": "Person not found"}), 404
   
-  people.remove(person_to_delete)
-
-  return jsonify({"message": "Person deleted"})
+  people.remove(person)
+  
+  return '', 204
 
 
 @app.route("/people/<int:person_id>/prayers", methods=["GET"])
 def get_prayers(person_id):
-  person_to_view = None
-  for person in people:
-    if person.get_id() == person_id:
-      person_to_view = person
-      break
-  
-  if person_to_view is None:
+  person = next((p for p in people if p.get_id() == person_id), None)
+
+  if person is None:
     return jsonify({"error": "Person not found"}), 404
   
-  return jsonify([prayer.to_dict() for prayer in person_to_view.get_prayer_requests()])
+  return jsonify([prayer.to_dict() for prayer in person.get_prayer_requests()])
 
-  
 
 @app.route("/people/<int:person_id>/prayers", methods=["POST"])
 def add_prayer(person_id):
-  person_to_update = None
-  for person in people:
-    if person.get_id() == person_id:
-        person_to_update = person
-        break
-      
-  if person_to_update is None:
+  person = next((p for p in people if p.get_id() == person_id), None)
+
+  if person is None:
     return jsonify({"error": "Person not found"}), 404
   
   data = request.get_json()
@@ -134,21 +116,17 @@ def add_prayer(person_id):
   
   if is_valid_string(text) and is_valid_bool(has_prayed):
     prayer = Prayer(text, has_prayed)
-    person_to_update.add_prayer_request(prayer)
-    return jsonify(prayer.to_dict())
+    person.add_prayer_request(prayer)
+    return jsonify(prayer.to_dict()), 201
   
   return jsonify({"error": "Missing or invalid fields"}), 400
   
 
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
 def update_prayer(person_id, prayer_id):
-  person_to_update = None
-  for person in people:
-    if person.get_id() == person_id:
-      person_to_update = person
-      break
+  person = next((p for p in people if p.get_id() == person_id), None)
   
-  if not person_to_update:
+  if person is None:
     return jsonify({"error": "Person not found"}), 404 
   
   data = request.get_json()
@@ -157,9 +135,9 @@ def update_prayer(person_id, prayer_id):
   has_prayed = data.get("has_prayed", None)
   
   if not is_valid_string(text) and not is_valid_bool(has_prayed):
-    return jsonify({"error": "Missing or invalid fields"})
+    return jsonify({"error": "Missing or invalid fields"}), 400
     
-  for prayer in person_to_update.get_prayer_requests():
+  for prayer in person.get_prayer_requests():
     if prayer.get_id() == prayer_id:
       
       if is_valid_string(text):
@@ -170,20 +148,19 @@ def update_prayer(person_id, prayer_id):
         
       return jsonify(prayer.to_dict())
   
-  return jsonify({"error": "Prayer not found"})
-      
-      
-      
-      
-      
-      
-  
-  
-  
+  return jsonify({"error": "Prayer not found"}), 404
 
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
 def delete_prayer(person_id, prayer_id):
-  pass
+  person = next((p for p in people if p.get_id() == person_id), None)
+
+  if not person:
+    return jsonify({"error": "Person not found"}), 404
+  
+  if not person.delete_prayer_request(prayer_id):
+    return jsonify({"error": "Prayer not found"}), 404 
+      
+  return '', 204
 
 if __name__ == "__main__":
   app.run(debug=True)
