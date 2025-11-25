@@ -85,7 +85,6 @@ def update_person(person_id):
   
 @app.route("/persons/<int:person_id>", methods=["DELETE"])
 def delete_person(person_id):
-    
   person_to_delete = None
   for person in persons:
     if person.get_id() == person_id:
@@ -104,15 +103,15 @@ def delete_person(person_id):
 def get_prayers(person_id):
   pass
 
-@app.route("/persons/<int:person_id>/prayers", methods=["POST"])
-def add_prayer(person_id):
+@app.route("/persons/<int:person_id>/prayers/<int:prayer_id>", methods=["POST"])
+def add_prayer(person_id, prayer_id):
   pass
 
-@app.route("/persons/<int:person_id>/prayers", methods=["PATCH"])
+@app.route("/persons/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
 def update_prayer(person_id):
   pass
 
-@app.route("/persons/<int:person_id>/prayers", methods=["DELETE"])
+@app.route("/persons/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
 def delete_prayer(person_id):
   pass
 
