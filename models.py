@@ -35,7 +35,7 @@ class Prayer:
     return self._has_prayed
   
   def to_dict(self) -> dict:
-    return {"text": self._text, "has_prayed": self._has_prayed}
+    return {"id": self._id, "text": self._text, "has_prayed": self._has_prayed}
 
 
 class Person:  
@@ -81,11 +81,13 @@ class Person:
     return self._prayer_requests
     
   def add_prayer_request(self, prayer_request: Prayer) -> None:
+    prayer_id = self._prayer_requests[-1].get_id() + 1 if self._prayer_requests else 1
+    prayer_request.set_id(prayer_id)
     self._prayer_requests.append(prayer_request)
     
   def delete_prayer_request(self, prayer_request_id: str) -> bool:
       for i, prayer_request in self._prayer_requests:
-        if prayer_request.id == prayer_request_id:
+        if prayer_request.get_id() == prayer_request_id:
           self._prayer_requests.pop(i)
           return True
       return False

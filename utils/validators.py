@@ -4,8 +4,11 @@ def is_valid_string(value) -> bool:
   return isinstance(value, str) and value.strip() != ""
 
 
-def is_valid_int(value) -> int:
+def is_valid_int(value) -> bool:
   return isinstance(value, int) and value > 0
+
+def is_valid_bool(value) -> bool:
+  return isinstance(value, bool)
 
 
 def require_str(value, field_name):
