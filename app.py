@@ -22,18 +22,15 @@ def get_people():
 def add_person():
   data = request.get_json()
   
-  # TO DO: Implement id creation internally (similar to prayer request)
-  person_id = data.get("id", None)
   name = data.get("name", None)
   relationship = parse_relationship(data.get("relationship", None))
   prayer = data.get("prayer", None)
   
-    
-  if (is_valid_int(person_id) and 
-    is_valid_string(name) and 
-    relationship is not None and 
-    is_valid_string(prayer)
-    ):
+  if (is_valid_string(name) and 
+      relationship is not None 
+      and is_valid_string(prayer)
+      ):
+      person_id = people[-1].get_id() + 1 if people else 1
       person = Person(person_id, name, relationship)
       person.add_prayer_request(Prayer(prayer))
       people.append(person)
