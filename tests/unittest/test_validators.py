@@ -14,99 +14,84 @@ class TestIsValidString(unittest.TestCase):
     """Test cases for is_valid_string function."""
     
     def test_valid_string(self):
-        """Test that a valid non-empty string returns True."""
-        # TODO: Implement test
-        pass
+        self.assertTrue(is_valid_string("Hello"))
     
     def test_empty_string(self):
-        """Test that an empty string returns False."""
-        # TODO: Implement test
-        pass
+        self.assertFalse(is_valid_string(""))
     
     def test_whitespace_only_string(self):
-        """Test that a string with only whitespace returns False."""
-        # TODO: Implement test
-        pass
+        self.assertFalse(is_valid_string("   "))
     
     def test_non_string_input(self):
-        """Test that non-string inputs return False."""
-        # TODO: Implement test - try int, list, None, etc.
-        pass
-
+        self.assertFalse(is_valid_string(123))
+        self.assertFalse(is_valid_string(["hello"]))
+        self.assertFalse(is_valid_string(None))
 
 class TestIsValidInt(unittest.TestCase):
     """Test cases for is_valid_int function."""
     
     def test_positive_integer(self):
-        """Test that a positive integer returns True."""
-        # TODO: Implement test
-        pass
+        self.assertTrue(is_valid_int(5))
     
     def test_zero(self):
-        """Test that zero returns False."""
-        # TODO: Implement test
-        pass
+        self.assertFalse(is_valid_int(0))
     
     def test_negative_integer(self):
-        """Test that a negative integer returns False."""
-        # TODO: Implement test
-        pass
+        self.assertFalse(is_valid_int(-3))
     
     def test_non_integer_input(self):
-        """Test that non-integer inputs return False."""
-        # TODO: Implement test - try string, float, None, etc.
-        pass
-
+        self.assertFalse(is_valid_int("10"))
+        self.assertFalse(is_valid_int(4.5))
+        self.assertFalse(is_valid_int(None))
 
 class TestIsValidBool(unittest.TestCase):
     """Test cases for is_valid_bool function."""
     
     def test_true_value(self):
-        """Test that True returns True."""
-        # TODO: Implement test
-        pass
+      self.assertTrue(is_valid_bool(True))        
     
     def test_false_value(self):
-        """Test that False returns True."""
-        # TODO: Implement test
-        pass
-    
-    def test_non_bool_input(self):
-        """Test that non-boolean inputs return False."""
-        # TODO: Implement test - try 1, 0, "True", None, etc.
-        pass
+        self.assertTrue(is_valid_bool(False))        
 
+    def test_non_bool_input(self):
+        self.assertFalse(is_valid_bool(0))
+        self.assertFalse(is_valid_bool(1))
+        self.assertFalse(is_valid_bool("True"))
+        self.assertFalse(is_valid_bool("False"))
+        self.assertFalse(is_valid_bool(None))
 
 class TestRequireStr(unittest.TestCase):
     """Test cases for require_str function."""
     
     def test_valid_string_passes(self):
-        """Test that a valid string does not raise an exception."""
-        # TODO: Implement test
-        pass
+        self.assertIsNone(require_str("Valid String", "test_field"))
     
     def test_empty_string_raises(self):
-        """Test that an empty string raises ValueError."""
-        # TODO: Implement test - use assertRaises
-        pass
+        with self.assertRaises(ValueError):
+            require_str("", "test_field")
     
     def test_non_string_raises(self):
-        """Test that non-string input raises ValueError."""
-        # TODO: Implement test
-        pass
+        with self.assertRaises(ValueError):
+          require_str(123, "test_field")
+        
+        with self.assertRaises(ValueError):
+          require_str(None, "test_field")
     
     def test_error_message_contains_field_name(self):
-        """Test that the error message includes the field name."""
-        # TODO: Implement test
-        pass
-
+        with self.assertRaisesRegex(ValueError, "name"):
+            require_str("", "name")
+    
 
 class TestRequireFields(unittest.TestCase):
     """Test cases for require_fields function."""
+    data = {
+        "text": "Alice",
+        "has_prayed": False
+    }
     
     def test_all_fields_present(self):
         """Test that no exception is raised when all fields are present."""
-        # TODO: Implement test
+        
         pass
     
     def test_missing_one_field(self):
