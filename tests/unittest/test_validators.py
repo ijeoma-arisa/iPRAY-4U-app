@@ -91,7 +91,7 @@ class TestRequireFields(unittest.TestCase):
     
     def test_all_fields_present(self):
         """Test that no exception is raised when all fields are present."""
-        
+        # TODO: Implement test
         pass
     
     def test_missing_one_field(self):
@@ -114,39 +114,37 @@ class TestParseRelationship(unittest.TestCase):
     """Test cases for parse_relationship function."""
     
     def test_valid_relationship_lowercase(self):
-        """Test parsing a valid relationship in lowercase."""
-        # TODO: Implement test
-        pass
+        self.assertEqual(parse_relationship("friends"), Relationship.FRIENDS)
+        self.assertEqual(parse_relationship("family"), Relationship.FAMILY)
+        self.assertEqual(parse_relationship("ministry"), Relationship.MINISTRY)
+        self.assertEqual(parse_relationship("custom"), Relationship.CUSTOM)
     
     def test_valid_relationship_uppercase(self):
-        """Test parsing a valid relationship in uppercase."""
-        # TODO: Implement test
-        pass
+        self.assertEqual(parse_relationship("FRIENDS"), Relationship.FRIENDS)
+        self.assertEqual(parse_relationship("FAMILY"), Relationship.FAMILY)
+        self.assertEqual(parse_relationship("MINISTRY"), Relationship.MINISTRY)
+        self.assertEqual(parse_relationship("CUSTOM"), Relationship.CUSTOM)
     
     def test_valid_relationship_mixed_case(self):
-        """Test parsing a valid relationship in mixed case."""
-        # TODO: Implement test
-        pass
+        self.assertEqual(parse_relationship("Friends"), Relationship.FRIENDS)
+        self.assertEqual(parse_relationship("fAmILy"), Relationship.FAMILY)
+        self.assertEqual(parse_relationship("MiniStry"), Relationship.MINISTRY)
+        self.assertEqual(parse_relationship("CuStOm"), Relationship.CUSTOM)
     
     def test_invalid_relationship_string(self):
-        """Test that an invalid relationship string returns None."""
-        # TODO: Implement test
-        pass
+        self.assertIsNone(parse_relationship("Customer"))
+        self.assertIsNone(parse_relationship("Friend"))
+        self.assertIsNone(parse_relationship("Fam"))        
     
-    def test_empty_string_returns_none(self):
-        """Test that an empty string returns None."""
-        # TODO: Implement test
-        pass
-    
-    def test_whitespace_only_returns_none(self):
-        """Test that whitespace-only input returns None."""
-        # TODO: Implement test
-        pass
+    def test_empty_string_or_whitespace(self):
+        self.assertIsNone(parse_relationship(""))
+        self.assertIsNone(parse_relationship("   "))
+        self.assertIsNone(parse_relationship("\n"))
     
     def test_non_string_input_returns_none(self):
-        """Test that non-string input returns None."""
-        # TODO: Implement test
-        pass
+        self.assertIsNone(parse_relationship(123))
+        self.assertIsNone(parse_relationship(None))
+        self.assertIsNone(parse_relationship([]))
 
 
 if __name__ == '__main__':
