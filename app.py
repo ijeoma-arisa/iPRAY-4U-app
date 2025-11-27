@@ -15,7 +15,12 @@ def home():
 
 @app.route("/people", methods=["GET"])
 def get_people():
-  return jsonify([person.to_dict() for person in people]) 
+  relationship = parse_relationship(request.args.get("rel", None))
+  
+  if relationship:
+    return jsonify([p.to_dict() for p in people if p.get_relationship() == relationship])
+  
+  return jsonify([p.to_dict() for p in people]) 
 
 # TO DO: Change to match the URL of the submit form?
 @app.route("/people", methods=["POST"])
@@ -38,15 +43,7 @@ def add_person():
   
   # TO DO: Specify missing or invalid fields
   return jsonify({"error": "Missing or invalid fields"}), 400
-      
-@app.route("/people/<relationship>", methods=["GET"])
-def get_people_relationship(relationship):  
-  relationship = parse_relationship(relationship)
-  
-  if relationship is None:
-    return jsonify({"error": "Missing or invalid relationship value"}), 400 
-  
-  return jsonify([p.to_dict() for p in people if p.get_relationship() == relationship])
+
 
 @app.route("/people/<int:person_id>", methods=["GET"])
 def get_person(person_id):

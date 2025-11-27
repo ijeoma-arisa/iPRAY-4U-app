@@ -146,6 +146,5 @@ class TestParseRelationship(unittest.TestCase):
         self.assertIsNone(parse_relationship(None))
         self.assertIsNone(parse_relationship([]))
 
-
 if __name__ == '__main__':
     unittest.main()
