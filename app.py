@@ -4,7 +4,10 @@ from utils.validators import *
 
 app = Flask(__name__)
 
+# TO DO: Convert to DB storage
 people: list[Person] = []
+
+# TO DO: Run API tests in Postman
 
 # Update: may use hashmap for O(1) lookup bc binary only helps
 # For VERY long lists (i.e. > 10K prayers / ppl)
@@ -126,7 +129,7 @@ def update_prayer(person_id, prayer_id):
   data = request.get_json()
   
   text = data.get("text", None)
-  has_prayed = data.get("has_prayed", None)
+  has_prayed = data.get("has_prayed", False)
   
   if not is_valid_string(text) and not is_valid_bool(has_prayed):
     return jsonify({"error": "Missing or invalid fields"}), 400
