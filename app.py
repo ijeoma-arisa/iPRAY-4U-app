@@ -1,16 +1,19 @@
 from flask import Flask, jsonify, request, render_template
 from models import Person, Prayer
 from utils.validators import *
+import sqlite3
 
 app = Flask(__name__)
 
-# TO DO: Convert to DB storage
+DB_PATH = "./instance/prayer_requests.db"
+
+# TO DO: Initialize DB connection and create tables if not exist
+def init_db():
+  with sqlite3.connect(DB_PATH) as conn:
+    cursor = conn.cursor()
+    
+    
 people: list[Person] = []
-
-# TO DO: Run API tests in Postman
-
-# Update: may use hashmap for O(1) lookup bc binary only helps
-# For VERY long lists (i.e. > 10K prayers / ppl)
 
 @app.route("/")
 def home():
