@@ -1,3 +1,6 @@
+# TO DO: Migrate to SQLAlchemy ORM later
+
+# Tables
 CREATE_RELATIONSHIPS_TABLE = """
 CREATE TABLE IF NOT EXISTS relationships (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,9 +24,18 @@ CREATE TABLE IF NOT EXISTS prayers (
   CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE
   );"""
 
+# Indexes
 CREATE_INDEX_ON_PEOPLE_RELATIONSHIP = """
 CREATE INDEX IF NOT EXISTS idx_people_relationship ON people(relationship_id);"""
 
 CREATE_INDEX_ON_PRAYERS_PERSON = """
 CREATE INDEX IF NOT EXISTS idx_prayers_person ON prayers(person_id);"""
 
+# Select Queries
+SELECT_ALL_PEOPLE_QUERY = "SELECT * FROM people"
+
+SELECT_PERSON_QUERY = "SELECT * FROM people WHERE id = ?"
+
+SELECT_PRAYERS_BY_PERSON_QUERY = "SELECT * FROM prayers WHERE person_id = ?"
+
+# SELECT_RELATIONSHIP_QUERY = "SELECT * FROM people WHERE "

@@ -1,18 +1,34 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, g, jsonify, request, render_template
 from models import Person, Prayer
 from utils.validators import *
+from schema import *
 import sqlite3
 
 app = Flask(__name__)
 
 DB_PATH = "./instance/prayer_requests.db"
 
-# TO DO: Initialize DB connection and create tables if not exist
 def init_db():
   with sqlite3.connect(DB_PATH) as conn:
     cursor = conn.cursor()
-    
-    
+    cursor.execute(CREATE_RELATIONSHIPS_TABLE)
+    cursor.execute(CREATE_PEOPLE_TABLE)
+    cursor.execute(CREATE_PRAYERS_TABLE)
+    cursor.execute(CREATE_INDEX_ON_PEOPLE_RELATIONSHIP)
+    cursor.execute(CREATE_INDEX_ON_PRAYERS_PERSON)
+
+def get_db_connection():
+  if "db" not in g:
+    g.db = sqlite3.connect(DB_PATH)
+    g.db.row_factory = sqlite3.Row
+  return g.db
+
+@app.teardown_appcontext
+def close_db_connection(exception):
+  db = g.pop("db", None)
+  if db is not None:
+    db.close()
+
 people: list[Person] = []
 
 @app.route("/")
@@ -21,12 +37,15 @@ def home():
 
 @app.route("/people", methods=["GET"])
 def get_people():
-  relationship = parse_relationship(request.args.get("rel", None))
+  db = get_db_connection()
+  people = db.execute(SELECT_ALL_PEOPLE_QUERY).fetchall()
   
-  if relationship:
-    return jsonify([p.to_dict() for p in people if p.get_relationship() == relationship])
+  # relationship = parse_relationship(request.args.get("rel", None))
   
-  return jsonify([p.to_dict() for p in people]) 
+  # if relationship:
+  #   return jsonify([p.to_dict() for p in people if p.get_relationship() == relationship])
+  
+  return jsonify([dict(p) for p in people]) 
 
 # TO DO: Change to match the URL of the submit form?
 @app.route("/people", methods=["POST"])
@@ -53,12 +72,13 @@ def add_person():
 
 @app.route("/people/<int:person_id>", methods=["GET"])
 def get_person(person_id):
-  person = next((p for p in people if p.get_id() == person_id), None)
+  db = get_db_connection()
   
+  person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   if person is None:
     return jsonify({"error": "Person not found"}), 404
   
-  return jsonify(person.to_dict())
+  return jsonify(dict(person))
 
 @app.route("/people/<int:person_id>", methods=["PATCH"])
 def update_person(person_id):
@@ -94,12 +114,13 @@ def delete_person(person_id):
 
 @app.route("/people/<int:person_id>/prayers", methods=["GET"])
 def get_prayers(person_id):
-  person = next((p for p in people if p.get_id() == person_id), None)
-
-  if person is None:
+  db = get_db_connection()
+  prayers = db.execute(SELECT_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchone()
+  
+  if prayers is None:
     return jsonify({"error": "Person not found"}), 404
   
-  return jsonify([prayer.to_dict() for prayer in person.get_prayer_requests()])
+  return jsonify([dict(p) for p in prayers])
 
 
 @app.route("/people/<int:person_id>/prayers", methods=["POST"])
@@ -163,4 +184,5 @@ def delete_prayer(person_id, prayer_id):
   return '', 204
 
 if __name__ == "__main__":
+  init_db()
   app.run(debug=True)
