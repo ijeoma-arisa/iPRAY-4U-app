@@ -105,8 +105,9 @@ def get_person(person_id):
 def update_person(person_id):
   data = request.get_json()
   
-  person = next((p for p in people if p.get_id() == person_id), None)
-
+  db = get_db_connection()
+  person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
+  
   if person is None:
     return jsonify({"error": "Person not found"}), 404 
     
@@ -114,12 +115,17 @@ def update_person(person_id):
   relationship = parse_relationship(data.get("relationship", None))
   
   if is_valid_string(name):
-    person.set_name(name)
+    db.execute(UPDATE_PERSON_NAME_QUERY, (name, person_id))
   
   if relationship is not None:
-    person.set_relationship(relationship)
+    relationship_id = db.execute(SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"]
+    db.execute(UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id))
     
-  return jsonify(person.to_dict())
+  db.commit()
+    
+  updated_person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    
+  return jsonify(dict(updated_person))
   
 @app.route("/people/<int:person_id>", methods=["DELETE"])
 def delete_person(person_id):
@@ -171,32 +177,36 @@ def add_prayer(person_id):
 
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
 def update_prayer(person_id, prayer_id):
-  person = next((p for p in people if p.get_id() == person_id), None)
+  db = get_db_connection()
+  person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   
   if person is None:
     return jsonify({"error": "Person not found"}), 404 
   
+  prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
+  
+  if prayer is None:
+      return jsonify({"error": "Prayer not found"}), 404
+    
   data = request.get_json()
   
   text = data.get("text", None)
-  has_prayed = data.get("has_prayed", False)
+  has_prayed = data.get("has_prayed", None)
   
   if not is_valid_string(text) and not is_valid_bool(has_prayed):
     return jsonify({"error": "Missing or invalid fields"}), 400
-    
-  for prayer in person.get_prayer_requests():
-    if prayer.get_id() == prayer_id:
-      
-      if is_valid_string(text):
-        prayer.set_text(text)
-        
-      if is_valid_bool(has_prayed):
-        prayer.set_has_prayed(has_prayed)
-        
-      return jsonify(prayer.to_dict())
   
-  return jsonify({"error": "Prayer not found"}), 404
-
+  if is_valid_string(text):
+    db.execute(UPDATE_PRAYER_TEXT_QUERY, (text, prayer_id))
+    
+  if is_valid_bool(has_prayed):
+    db.execute(UPDATE_PRAYER_HAS_PRAYED_QUERY, (has_prayed, prayer_id))
+    
+  db.commit()
+  
+  updated_prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
+  return jsonify(dict(updated_prayer))
+  
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
 def delete_prayer(person_id, prayer_id):
   person = next((p for p in people if p.get_id() == person_id), None)
