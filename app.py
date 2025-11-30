@@ -42,8 +42,6 @@ def close_db_connection(exception):
 def rows_to_dict(rows):
   return [dict(row) for row in rows]
 
-people: list[Person] = []
-
 @app.route("/")
 def home():
   return render_template("index.html")
@@ -129,12 +127,14 @@ def update_person(person_id):
   
 @app.route("/people/<int:person_id>", methods=["DELETE"])
 def delete_person(person_id):
-  person = next((p for p in people if p.get_id() == person_id), None)
+  db = get_db_connection()
+  person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   
   if person is None:
     return jsonify({"error": "Person not found"}), 404
   
-  people.remove(person)
+  db.execute(DELETE_PERSON_QUERY, (person_id,))
+  db.commit()
   
   return '', 204
 
@@ -209,13 +209,19 @@ def update_prayer(person_id, prayer_id):
   
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
 def delete_prayer(person_id, prayer_id):
-  person = next((p for p in people if p.get_id() == person_id), None)
-
+  db = get_db_connection()
+  person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
+  
   if not person:
     return jsonify({"error": "Person not found"}), 404
   
-  if not person.delete_prayer_request(prayer_id):
-    return jsonify({"error": "Prayer not found"}), 404 
+  prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
+  
+  if not prayer:
+    return jsonify({"error": "Prayer not found"}), 404
+  
+  db.execute(DELETE_PRAYER_QUERY, (prayer_id,))
+  db.commit() 
       
   return '', 204
 

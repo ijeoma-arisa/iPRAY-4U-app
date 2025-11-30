@@ -70,3 +70,8 @@ UPDATE_PERSON_RELATIONSHIP_QUERY = "UPDATE people SET relationship_id = ? where 
 UPDATE_PRAYER_TEXT_QUERY = "UPDATE prayers SET text = ? WHERE id = ?"
 
 UPDATE_PRAYER_HAS_PRAYED_QUERY = "UPDATED prayers SET has_prayed = ? WHERE id = ?"
+
+# DELETE Queries
+DELETE_PERSON_QUERY = "DELETE FROM people WHERE id = ?"
+
+DELETE_PRAYER_QUERY = "DELETE FROM prayers WHERE id = ?"
