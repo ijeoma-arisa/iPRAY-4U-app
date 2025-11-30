@@ -1,6 +1,6 @@
 # TO DO: Migrate to SQLAlchemy ORM later
 
-# Tables
+# TABLES
 CREATE_RELATIONSHIPS_TABLE = """
 CREATE TABLE IF NOT EXISTS relationships (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,18 +24,40 @@ CREATE TABLE IF NOT EXISTS prayers (
   CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE
   );"""
 
-# Indexes
+# INDEXES
 CREATE_INDEX_ON_PEOPLE_RELATIONSHIP = """
 CREATE INDEX IF NOT EXISTS idx_people_relationship ON people(relationship_id);"""
 
 CREATE_INDEX_ON_PRAYERS_PERSON = """
 CREATE INDEX IF NOT EXISTS idx_prayers_person ON prayers(person_id);"""
 
-# Select Queries
+# SELECT QUERIES
+SELECT_LAST_INSERTED_ID_QUERY = "SELECT last_insert_rowid() AS id"
+
+# People
 SELECT_ALL_PEOPLE_QUERY = "SELECT * FROM people"
+
+SELECT_RELATIONSHIP_PEOPLE_QUERY = """
+SELECT p.* 
+FROM people AS p
+JOIN relationships AS r ON p.relationship_id = r.id
+WHERE r.relationship = ?"""
 
 SELECT_PERSON_QUERY = "SELECT * FROM people WHERE id = ?"
 
+# Prayers
 SELECT_PRAYERS_BY_PERSON_QUERY = "SELECT * FROM prayers WHERE person_id = ?"
 
-# SELECT_RELATIONSHIP_QUERY = "SELECT * FROM people WHERE "
+SELECT_PRAYER_QUERY = "SElECT * FROM prayers WHERE id = ?"
+
+# Relationship
+SELECT_RELATIONSHIP_QUERY = "SELECT id FROM RELATIOSHIPS where relationship = ?"
+
+# INSERT QUERIES
+INSERT_RELATIONSHIP_ROWS = "INSERT OR IGNORE INTO relationships (relationship) VALUES (?)"
+
+INSERT_PERSON_QUERY = "INSERT INTO people (name, relationship_id) VALUES (?, ?)"
+
+INSERT_DEFAULT_PRAYER_QUERY = "INSERT INTO prayers (person_id, text) VALUES (?, ?)"
+
+INSERT_PRAYER_QUERY = "INSERT INTO prayers (person_id, text, has_prayed) VALUES (?, ?, ?)"

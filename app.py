@@ -9,13 +9,23 @@ app = Flask(__name__)
 DB_PATH = "./instance/prayer_requests.db"
 
 def init_db():
+  
   with sqlite3.connect(DB_PATH) as conn:
     cursor = conn.cursor()
+    
+    # Create tables
     cursor.execute(CREATE_RELATIONSHIPS_TABLE)
     cursor.execute(CREATE_PEOPLE_TABLE)
     cursor.execute(CREATE_PRAYERS_TABLE)
+    
+    # Create indexes
     cursor.execute(CREATE_INDEX_ON_PEOPLE_RELATIONSHIP)
     cursor.execute(CREATE_INDEX_ON_PRAYERS_PERSON)
+    
+    # Insert relationship values
+    relationship_values = [(r.value,) for r in Relationship]
+    cursor.executemany(INSERT_RELATIONSHIP_ROWS, relationship_values)
+
 
 def get_db_connection():
   if "db" not in g:
@@ -29,6 +39,9 @@ def close_db_connection(exception):
   if db is not None:
     db.close()
 
+def rows_to_dict(rows):
+  return [dict(row) for row in rows]
+
 people: list[Person] = []
 
 @app.route("/")
@@ -38,14 +51,15 @@ def home():
 @app.route("/people", methods=["GET"])
 def get_people():
   db = get_db_connection()
-  people = db.execute(SELECT_ALL_PEOPLE_QUERY).fetchall()
   
-  # relationship = parse_relationship(request.args.get("rel", None))
+  # TO DO: Add Invalid relationship error handling mayhaps
+  relationship = parse_relationship(request.args.get("rel", None))
   
-  # if relationship:
-  #   return jsonify([p.to_dict() for p in people if p.get_relationship() == relationship])
+  people = (db.execute(SELECT_RELATIONSHIP_PEOPLE_QUERY, (relationship.value,)).fetchall()
+            if relationship 
+            else db.execute(SELECT_ALL_PEOPLE_QUERY).fetchall())
   
-  return jsonify([dict(p) for p in people]) 
+  return jsonify(rows_to_dict(people)) 
 
 # TO DO: Change to match the URL of the submit form?
 @app.route("/people", methods=["POST"])
@@ -60,11 +74,18 @@ def add_person():
       relationship is not None 
       and is_valid_string(prayer)
       ):
-      person_id = people[-1].get_id() + 1 if people else 1
-      person = Person(person_id, name, relationship)
-      person.add_prayer_request(Prayer(prayer))
-      people.append(person)
-      return jsonify(person.to_dict()), 201
+    
+      db = get_db_connection()
+            
+      relationship_row = db.execute(SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()
+      db.execute(INSERT_PERSON_QUERY, (name, relationship_row["id"]))
+      
+      person_id = db.execute(SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]      
+      db.execute(INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer)) 
+      db.commit()
+      
+      person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
+      return jsonify(dict(person)), 201
   
   # TO DO: Specify missing or invalid fields
   return jsonify({"error": "Missing or invalid fields"}), 400
@@ -120,13 +141,14 @@ def get_prayers(person_id):
   if prayers is None:
     return jsonify({"error": "Person not found"}), 404
   
-  return jsonify([dict(p) for p in prayers])
+  return jsonify(rows_to_dict(prayers))
 
 
 @app.route("/people/<int:person_id>/prayers", methods=["POST"])
 def add_prayer(person_id):
-  person = next((p for p in people if p.get_id() == person_id), None)
-
+  db = get_db_connection()
+  person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
+  
   if person is None:
     return jsonify({"error": "Person not found"}), 404
   
@@ -136,9 +158,13 @@ def add_prayer(person_id):
   has_prayed = data.get("has_prayed", False)
   
   if is_valid_string(text) and is_valid_bool(has_prayed):
-    prayer = Prayer(text, has_prayed)
-    person.add_prayer_request(prayer)
-    return jsonify(prayer.to_dict()), 201
+    db.execute(INSERT_PRAYER_QUERY, (person_id, text))
+    db.commit()
+    
+    prayer_id = db.execute(SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]
+    prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id)).fetchone()
+    
+    return jsonify(dict(prayer)), 201
   
   return jsonify({"error": "Missing or invalid fields"}), 400
   
