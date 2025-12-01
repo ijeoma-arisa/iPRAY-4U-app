@@ -142,7 +142,7 @@ def delete_person(person_id):
 @app.route("/people/<int:person_id>/prayers", methods=["GET"])
 def get_prayers(person_id):
   db = get_db_connection()
-  prayers = db.execute(SELECT_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchone()
+  prayers = db.execute(SELECT_ALL_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchall()
   
   if prayers is None:
     return jsonify({"error": "Person not found"}), 404
@@ -164,11 +164,11 @@ def add_prayer(person_id):
   has_prayed = data.get("has_prayed", False)
   
   if is_valid_string(text) and is_valid_bool(has_prayed):
-    db.execute(INSERT_PRAYER_QUERY, (person_id, text))
+    db.execute(INSERT_PRAYER_QUERY, (person_id, text, has_prayed))
     db.commit()
     
     prayer_id = db.execute(SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]
-    prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id)).fetchone()
+    prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
     
     return jsonify(dict(prayer)), 201
   
@@ -183,7 +183,7 @@ def update_prayer(person_id, prayer_id):
   if person is None:
     return jsonify({"error": "Person not found"}), 404 
   
-  prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
+  prayer = db.execute(SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
   
   if prayer is None:
       return jsonify({"error": "Prayer not found"}), 404
@@ -204,7 +204,7 @@ def update_prayer(person_id, prayer_id):
     
   db.commit()
   
-  updated_prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
+  updated_prayer = db.execute(SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
   return jsonify(dict(updated_prayer))
   
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
@@ -215,7 +215,7 @@ def delete_prayer(person_id, prayer_id):
   if not person:
     return jsonify({"error": "Person not found"}), 404
   
-  prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
+  prayer = db.execute(SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
   
   if not prayer:
     return jsonify({"error": "Prayer not found"}), 404

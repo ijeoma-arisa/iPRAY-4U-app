@@ -46,9 +46,12 @@ WHERE r.relationship = ?"""
 SELECT_PERSON_QUERY = "SELECT * FROM people WHERE id = ?"
 
 # Prayers
-SELECT_PRAYERS_BY_PERSON_QUERY = "SELECT * FROM prayers WHERE person_id = ?"
+SELECT_ALL_PRAYERS_BY_PERSON_QUERY = "SELECT * FROM prayers WHERE person_id = ?"
 
 SELECT_PRAYER_QUERY = "SELECT * FROM prayers WHERE id = ?"
+
+SELECT_PRAYER_BY_PERSON_QUERY = "SELECT * FROM prayers WHERE id = ? AND person_id = ?"
+
 
 # Relationship
 SELECT_RELATIONSHIP_QUERY = "SELECT id FROM relationships WHERE relationship = ?"
