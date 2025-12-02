@@ -1,11 +1,75 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>PRAY 4U</title>
-  </head>
-  <body>
-    <h1>iPRAY 4U</h1>
-    <ul id="prayer-request-list"></ul>
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPray 4U | Home</title>
+  
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <div class="homepage">
+    <div class="homepage-banner">
+      <div class="homepage-title-banner">
+        <h1>iPray 4U</h1>
+        <h3>A simple way of organizing prayer requests</h3>
+      </div>
+      
+      <div class="homepage-image-banner">
+        <div class="homepage-image">
+          <img src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}" class="homepage-image">
+        </div>
+        <div class="homepage-image-caption">
+          <a href="http://www.freepik.com">Designed by studiogstock / Freepik</a>
+        </div>
+      </div>
+  
+      <div class="homepage-buttons-banner">
+        <button class="btn add-button add-button-js">Add New Prayer Request</button>
+        <a class="btn view-button" href="{{ url_for('prayer_requests_page') }}">View Prayer Requests</a>
+        
+        <dialog class="modal add-prayer-request-modal-js">
+          <button class="close-button close-prayer-request-modal-js" aria-label="Close">&times;</button>
+          <form action="/prayer-requests.html" class="new-prayer-request-form" method="POST">
+            <h2 class="form-title">New Prayer Request</h2>
+            <div class="form-data">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Name" required/>
+            </div>
+            <div class="form-data">
+              <label for="relationship">Relationship</label> 
+              <select id="relationship" name="relationship" required>
+                <!-- TO DO: Retrieve this from saved categories -->
+                <option value="Select...">Select...</option>
+                <option value="Favorites">Favorites</option>
+                <option value="Family">Family</option>
+                <option value="Friends">Friends</option>
+                <option value="Ministry">Ministry</option>
+                <!-- TO DO: Add option to create new category   -->
+                <option value="Custom">Custom</option>
+              </select>
+            </div>
+            <div class="form-data">
+              <label for="prayer-request-text">Prayer Request</label>
+              <textarea id="prayer-request-text" name="prayer-request-text" placeholder="Start typing here" rows="5" cols="20" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn save-button save-button-js">Save</button>
+          </form>
+        </dialog>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
 </html>
+
+

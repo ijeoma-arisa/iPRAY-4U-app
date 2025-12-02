@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prayer Requests</title>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+
+<body>
+  <div class="prayer-request-page">
+    <nav class="nav-bar">
+      <a href="{{ url_for('homepage') }}">
+      <div class="nav-logo">
+          <img src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}">
+          <h3>iPray 4U</h3>
+        </div>
+      </a>
+  
+      <div class="nav-search">
+        <input type="text" placeholder="Search Prayer Requests"/>
+        <button><i class="fa fa-search"></i></button>
+      </div>
+  
+      <ul class="nav-links">
+        <!-- To DO: Maybe add profile section -->
+         <li class="current-date-js"></li>
+      </ul>
+    </nav>
+    <div class="prayer-requests-banner">
+      
+      <div class="prayer-requests-title">
+        <h1>Prayer Requests</h1>
+      </div>
+      <!-- <div class="prayer-navigation-bar prayer-navigation-bar-js"> -->
+    
+      <div class="relationships-row relationships-row-js"> 
+        <!-- To DO: Populate based on relationships data -->
+        <button class="btn relationship-button">Favorites</button>
+        <button class="btn relationship-button">Family</button>
+        <button class="btn relationship-button">Friends</button>
+        <button class="btn relationship-button">Ministry</button>
+        <button class="btn relationship-button">Custom</button>
+      </div>
+    </div>
+  
+    <div class="prayer-requests-grid prayer-requests-grid-js"> 
+      <ul id="prayer-request-list"></ul>
+      <!-- 
+      <div class="prayer-requests-header">
+        <div class="header">#</div>
+        <div class="header">Name</div>
+        <div class="header">Relationship</div>
+        <div class="header">Request</div>
+      </div>
+      <div class="prayer-requests-body">
+        <div class="row">
+          <div class="cell">1</div>
+          <div class="cell">Samantha</div>
+          <div class="cell">Friends</div>
+          <div class="cell">Health</div>
+        </div>
+        <div class="row">
+          <div class="cell">2</div>
+          <div class="cell">Sarah</div>
+          <div class="cell">Family</div>
+          <div class="cell">Increase in faith</div>
+        </div>
+      </div>
+    </div>-->
+  </div>
+  <script src="{{ url_for('static', filename='js/prayer-requests.js') }}"></script>
+</body>
+</html>

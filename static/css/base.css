@@ -1,0 +1,24 @@
+:root {
+  --main-purple: #966fd6;
+  --darker-purple: #452b6f;
+  --main-blue: rgb(57, 186, 189);
+  --darker-blue: rgb(8, 90, 91);
+  --light-gray: #ccc;
+}
+
+/* REVIEW */
+html, body {
+  height: 100%;
+  margin:0;
+}
+
+body {
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  background: #966fd6;
+  color: white;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

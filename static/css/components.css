@@ -1,0 +1,220 @@
+.btn {
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.7rem; 
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  color: white;
+  text-align: center;
+}
+
+.add-button, .save-button {
+  background-color: var(--main-blue);
+}
+
+.relationship-button {
+  background-color: var(--main-blue);
+  margin-right: 10px;
+}
+
+.add-button:hover, .save-button:hover, .relationship-button:hover {
+  background: var(--darker-blue);
+}
+
+.view-button {
+  background: var(--main-purple);
+  width: 50%;
+}
+
+.view-button:hover {
+  background: var(--darker-purple);
+}
+
+.close-button {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #555;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color:red;
+}
+
+.form-title {
+  text-align: center;
+}
+
+.new-prayer-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 300px;
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.form-data {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.6rem;
+  border: 1px solid var(--light-gray);
+}
+
+textarea {
+  overflow: auto;
+  resize: none;
+}
+
+.modal:open {
+  height: 500px;
+  overflow: hidden;
+  padding: 50px;
+  border: none;
+  border-radius: 6px;
+}
+
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: black;
+  /* background-color: var(--main-blue); */
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  position: sticky;
+  padding: 0.5rem 1rem;
+}
+
+.nav-logo {
+  display: flex;
+  background-color: white;
+  color: black;
+  padding: 0 1rem;
+  border-radius: 6px;
+  gap: 0.5rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.nav-logo img {
+  width: 50px;
+  /* height: auto; */
+}
+
+.nav-search {
+  display: flex;
+  flex: 1;
+  max-width: 700px;
+  margin: 0 1rem;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 40px;
+}
+
+.nav-search input {
+  flex: 1;
+  border: none;
+  padding: 0 10px;
+  /* border-radius: 4px; */
+  overflow: hidden;
+  outline: none;
+}
+
+.nav-search button {
+  background-color: var(--main-purple);
+  color: white;
+  border: none;
+  width: 45px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.nav-search button:hover{
+  background-color: var(--darker-purple);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  margin: 2rem;
+  padding: 0;
+  gap: 3rem;
+}
+
+.relationships-row {
+  display: flex;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+
+.prayer-requests-grid {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background-color: white;
+  color: black;
+  border-radius: 6px;
+}
+
+.prayer-requests-header {
+  display: grid;
+  grid-template-columns: 0.25fr 1fr 1fr 1fr;
+  background-color: var(--light-gray);
+  font-weight: bold;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom: 1px solid black;
+  border-top: 4px solid var(--light-gray);
+}
+
+.header {
+  padding: 4px;
+  border-right: 1px solid black;
+}
+
+.header:last-child {
+  border-right: none;
+}
+
+.prayer-requests-body {
+  display: grid;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 0.25fr 1fr 1fr 1fr;
+}
+
+.cell {
+  padding: 10px;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
+.cell:last-child {
+  border-right: none;
+}
+

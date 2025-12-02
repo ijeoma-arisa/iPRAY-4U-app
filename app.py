@@ -8,6 +8,8 @@ app = Flask(__name__)
 
 DB_PATH = "./instance/prayer_requests.db"
 
+# TO DO: Change endpoints to /api/...
+
 def init_db():
   
   with sqlite3.connect(DB_PATH) as conn:
@@ -43,9 +45,14 @@ def rows_to_dict(rows):
   return [dict(row) for row in rows]
 
 @app.route("/")
-def home():
+def homepage():
   return render_template("index.html")
 
+@app.route("/prayer-requests")
+def prayer_requests_page():
+  return render_template("prayer-requests.html")
+
+# TO DO: Create JOIN queries to include relationship names in people responses
 @app.route("/people", methods=["GET"])
 def get_people():
   db = get_db_connection()

@@ -1,23 +1,27 @@
-fetch("/prayer-requests")
-  .then(res => res.json())
-  .then(persons => {
+
+async function loadPrayerRequests() {
+    const response = await fetch("/people");
+    const persons = await response.json();
+
     const list = document.getElementById('prayer-request-list');
     
     persons.forEach(person => {
       
       const personListItem = document.createElement("li");
-      personListItem.textContent = `${person.name}\t|\t${person.relationship}`;
+      personListItem.textContent = `${person.name}\t|\t${person.relationship_id}`;
 
-      const prayerUnorderedList = document.createElement("ul");
+      // const prayerUnorderedList = document.createElement("ul");
 
-      person.prayer_requests.forEach(prayer => {
-        const prayerListItem =  document.createElement("li");
-        prayerListItem.textContent = `${prayer.text}: [${prayer.has_prayed ? "X" : ""}]`;
-        prayerUnorderedList.appendChild(prayerListItem);
-      });
+      // person.prayer_requests.forEach(prayer => {
+      //   const prayerListItem =  document.createElement("li");
+      //   prayerListItem.textContent = `${prayer.text}: [${prayer.has_prayed ? "X" : ""}]`;
+      //   prayerUnorderedList.appendChild(prayerListItem);
+      // });
 
-      personListItem.appendChild(prayerUnorderedList);
+      // personListItem.appendChild(prayerUnorderedList);
 
       list.appendChild(personListItem);
     });
-  });
+  }
+
+  loadPrayerRequests();
