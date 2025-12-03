@@ -35,7 +35,10 @@ CREATE INDEX IF NOT EXISTS idx_prayers_person ON prayers(person_id);"""
 SELECT_LAST_INSERTED_ID_QUERY = "SELECT last_insert_rowid() AS id"
 
 # People
-SELECT_ALL_PEOPLE_QUERY = "SELECT * FROM people"
+SELECT_ALL_PEOPLE_QUERY = """
+SELECT p.id, p.name, r.relationship
+FROM people AS p
+JOIN relationships AS r ON p.relationship_id = r.id"""
 
 SELECT_RELATIONSHIP_PEOPLE_QUERY = """
 SELECT p.* 

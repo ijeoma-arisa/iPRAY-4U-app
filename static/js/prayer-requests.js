@@ -5,35 +5,64 @@ function displayTime(){
   document.querySelector('.current-date-js').innerHTML = today.toLocaleDateString('en-US', options);
 }
 
+async function renderRelationshipButtons() {
+  const response = await fetch("/relationships");
+  const relationships = await response.json();
+
+  let relationshipsHTML = '<button class="btn relationship-button relationship-button-fav">Favorites</button>';
+
+  relationships.forEach(relationship => {
+    relationshipsHTML += ` <button class="btn relationship-button relationship-button-${relationship.id}">${relationship.relationship}</button>`;
+  });
+
+  document.querySelector('.relationships-row-js')
+    .innerHTML = relationshipsHTML;
+}
+
+async function loadPrayers(person_id) {
+  const response = await fetch(`people/${person_id}/prayers`);
+  const prayers = await response.json();
+
+  let prayersHTML = '<div>';
+
+  prayers.forEach(prayer => {
+    prayersHTML += `
+        <div class="prayer-cell-${person_id}-${prayer.id}">
+          ${prayer.text} ${prayer.has_prayed ? 'X':''}
+        </div>`;
+  });
+  prayersHTML += `</div>`
+
+  return prayersHTML;
+}
+
 // TO DO: Add time that updates every minute
-async function loadPrayerRequests() {
+async function renderPrayerRequests() {
   const response = await fetch("/people");
   const persons = await response.json();
+  
+  let personHTML = '';
 
-  const list = document.getElementById('prayer-request-list');
+  for (const person of persons){
+    personHTML += `
+        <div class="row">
+          <div class="id-cell-${person.id}">${person.id}</div>
+          <div class="name-cell-${person.id}">${person.name}</div>
+          <div class="rel-cell-${person.id}">${person.relationship}</div>
+        </div>`;
 
-  persons.forEach(person => {
-    
-    const personListItem = document.createElement("li");
-    personListItem.textContent = `${person.name}\t|\t${person.relationship_id}`;
+        const prayersHTML = await loadPrayers(person.id);
+        personHTML += `${prayersHTML}</div>`
+  }
 
-    // const prayerUnorderedList = document.createElement("ul");
-
-    // person.prayer_requests.forEach(prayer => {
-    //   const prayerListItem =  document.createElement("li");
-    //   prayerListItem.textContent = `${prayer.text}: [${prayer.has_prayed ? "X" : ""}]`;
-    //   prayerUnorderedList.appendChild(prayerListItem);
-    // });
-
-    // personListItem.appendChild(prayerUnorderedList);
-
-    list.appendChild(personListItem);
-  });
+  document.querySelector('.prayer-requests-body')
+    .innerHTML = personHTML;
 }
 
 function initPage(){
   displayTime();
-  loadPrayerRequests();
+  renderRelationshipButtons();
+  renderPrayerRequests();
 }
 
 initPage();
