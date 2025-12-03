@@ -54,6 +54,8 @@ SELECT_PRAYER_BY_PERSON_QUERY = "SELECT * FROM prayers WHERE id = ? AND person_i
 
 
 # Relationship
+SELECT_ALL_RELATIONSHIPS_QUERY = "SELECT * FROM relationships"
+
 SELECT_RELATIONSHIP_QUERY = "SELECT id FROM relationships WHERE relationship = ?"
 
 # INSERT QUERIES

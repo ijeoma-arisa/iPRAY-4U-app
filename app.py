@@ -232,6 +232,14 @@ def delete_prayer(person_id, prayer_id):
       
   return '', 204
 
+@app.route("/relationships", methods=["GET"])
+def get_relationships():
+    db = get_db_connection()
+    relationships = db.execute(SELECT_ALL_RELATIONSHIPS_QUERY).fetchall()
+    
+    return jsonify(rows_to_dict(relationships))
+    
+
 if __name__ == "__main__":
   init_db()
   app.run(debug=True)

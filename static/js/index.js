@@ -1,27 +1,39 @@
+function initPrayerRequestModal(){
+  const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+  
+  document.querySelector('.add-button-js')
+  .addEventListener('click', () => {
+    addPrayerRequestModal.showModal();
+  });
+  
+  document.querySelector('.close-prayer-request-modal-js')
+    .addEventListener('click', () => {
+      addPrayerRequestModal.close();
+  });
+  
+  document.querySelector('.add-button-js')
+  .addEventListener('click', () =>{
+    console.log('Adding prayer request')
+  });
+}
 
-async function loadPrayerRequests() {
-    const response = await fetch("/people");
-    const persons = await response.json();
+// TO DO: Make "Custom" editable here and in HTML
+async function renderRelationshipDropdown() {
+  const response = await fetch("/relationships");
+  const relationships = await response.json();
 
-    const list = document.getElementById('prayer-request-list');
-    
-    persons.forEach(person => {
-      
-      const personListItem = document.createElement("li");
-      personListItem.textContent = `${person.name}\t|\t${person.relationship_id}`;
+  let relationshipsHTML = '<option value="Select...">Select...</option>';
 
-      // const prayerUnorderedList = document.createElement("ul");
+  relationships.forEach(relationship => {
+    relationshipsHTML += `<option value="${relationship.relationship}">${relationship.relationship}</option>`;
+  });
 
-      // person.prayer_requests.forEach(prayer => {
-      //   const prayerListItem =  document.createElement("li");
-      //   prayerListItem.textContent = `${prayer.text}: [${prayer.has_prayed ? "X" : ""}]`;
-      //   prayerUnorderedList.appendChild(prayerListItem);
-      // });
+  document.querySelector('.relationship-dropdown-js').innerHTML = relationshipsHTML;
+}
 
-      // personListItem.appendChild(prayerUnorderedList);
+async function initPage(){
+  initPrayerRequestModal();
+  await renderRelationshipDropdown();
+}
 
-      list.appendChild(personListItem);
-    });
-  }
-
-  loadPrayerRequests();
+initPage();
