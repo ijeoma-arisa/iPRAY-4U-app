@@ -105,6 +105,7 @@ textarea {
   font-size: 1rem;
   position: sticky;
   padding: 0.5rem 1rem;
+  width: 100%;
 }
 
 .nav-logo {
@@ -169,52 +170,57 @@ textarea {
   justify-content: center;
 }
 
-.prayer-requests-grid {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  background-color: white;
+.prayer-request-cards {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   color: black;
-  border-radius: 6px;
 }
 
-.prayer-requests-header {
-  display: grid;
-  grid-template-columns: 0.25fr 1fr 1fr 1fr;
-  background-color: var(--light-gray);
-  font-weight: bold;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  border-bottom: 1px solid black;
-  border-top: 4px solid var(--light-gray);
+.prayer-request-card {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  width: 1000px;
+  margin: 20px;
+  padding: 10px 20px;
+  border-radius: 16px;
+  border: 1px solid black;
 }
 
-.header {
-  padding: 4px;
-  border-right: 1px solid black;
-}
-
-.header:last-child {
-  border-right: none;
-}
-
-.prayer-requests-body {
-  display: grid;
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 0.25fr 1fr 1fr 1fr;
-}
-
-.cell {
+.person-info-section {
+  /* border: 2px solid black; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 10px;
-  border-right: 1px solid black;
-  border-bottom: 1px solid black;
+  flex: 0.25;
 }
 
-.cell:last-child {
-  border-right: none;
+.prayer-cards-section {
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
+.prayer-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid gray;
+  margin: 4px;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.prayer-text {
+  padding: 20px;
+  flex: 1;
+}
+
+.update-prayer-buttons {
+  /* border: 2px green solid; */
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+}

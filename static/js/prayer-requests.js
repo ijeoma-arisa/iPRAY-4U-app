@@ -23,16 +23,22 @@ async function loadPrayers(person_id) {
   const response = await fetch(`people/${person_id}/prayers`);
   const prayers = await response.json();
 
-  let prayersHTML = '<div>';
+  let prayersHTML = '';
 
   prayers.forEach(prayer => {
     prayersHTML += `
-        <div class="prayer-cell-${person_id}-${prayer.id}">
-          ${prayer.text} ${prayer.has_prayed ? 'X':''}
-        </div>`;
+          <div class="prayer-card">
+            <div class="prayer-text">
+              ${prayer.text}
+            </div>
+            <div class="update-prayer-buttons">
+              <button class="prayed-prayer-button">Prayed</button>
+              <button class="edit-prayer-button">Edit</button>
+              <button class="archive-prayer-button">Archive</button>
+              <button class="delete-prayer-button">Delete</button>
+            </div>
+          </div>`;
   });
-  prayersHTML += `</div>`
-
   return prayersHTML;
 }
 
@@ -41,21 +47,25 @@ async function renderPrayerRequests() {
   const response = await fetch("/people");
   const persons = await response.json();
   
+  
   let personHTML = '';
 
   for (const person of persons){
+    const prayersHTML = await loadPrayers(person.id);
+    
     personHTML += `
-        <div class="row">
-          <div class="id-cell-${person.id}">${person.id}</div>
-          <div class="name-cell-${person.id}">${person.name}</div>
-          <div class="rel-cell-${person.id}">${person.relationship}</div>
+        <div class="prayer-request-card">
+          <div class="person-info-section">
+            <h3>${person.name}</h3>
+            <p>${person.relationship}</p>
+          </div>
+          <div class="prayer-cards-section">
+            ${prayersHTML}
+          </div>
         </div>`;
-
-        const prayersHTML = await loadPrayers(person.id);
-        personHTML += `${prayersHTML}</div>`
   }
 
-  document.querySelector('.prayer-requests-body')
+  document.querySelector('.prayer-request-cards')
     .innerHTML = personHTML;
 }
 
