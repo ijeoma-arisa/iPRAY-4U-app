@@ -1,7 +1,7 @@
 function renderPrayerRequestModal() {
   document.querySelector('.add-prayer-request-modal-js').innerHTML =
   `<button class="close-button close-prayer-request-modal-js" aria-label="Close">&times;</button>
-    <form action="/prayer-requests.html" class="new-prayer-request-form" method="POST">
+    <form class="prayer-request-form" method="POST">
       <h2 class="form-title">New Prayer Request</h2>
       <div class="form-data">
         <label for="name">Name</label>
@@ -49,10 +49,43 @@ async function renderRelationshipDropdown() {
   document.querySelector('.relationship-dropdown-js').innerHTML = relationshipsHTML;
 }
 
+async function handlePrayerRequestInput(){
+  const prayerRequestForm = document.querySelector('.prayer-request-form');
+
+  prayerRequestForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const formData = {
+      name: prayerRequestForm.name.value,
+      relationship: prayerRequestForm.relationship.value,
+      prayer: prayerRequestForm['prayer-request-text'].value
+    }
+
+    const options = {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(formData)
+    };
+  
+    const response = await fetch('/people', options);
+    const data = await response.json();
+
+    console.log(`Server reponses\n${data.status}: ${data.message}`); 
+
+    if (data.status === 'success') {
+      window.location.href = '/prayer-requests';
+    }
+  
+  });
+  
+
+}
+
 export function initPrayerRequestModal(){
   renderPrayerRequestModal();
   initPrayerRequestModalListeners();
   renderRelationshipDropdown();
+  handlePrayerRequestInput();
 }
 
 initPrayerRequestModal();

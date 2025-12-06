@@ -10,6 +10,7 @@ DB_PATH = "./instance/prayer_requests.db"
 
 # TO DO: Change endpoints to /api/...
 # TO DO: Use with statement in routes
+# TO DO: Add generate_json_response to all routes
 def init_db():
   
   with sqlite3.connect(DB_PATH) as conn:
@@ -44,6 +45,17 @@ def close_db_connection(exception):
 def rows_to_dict(rows):
   return [dict(row) for row in rows]
 
+def generate_json_response(status, message, data=None):
+  if status == "error":
+    return jsonify({"status": "error", "message": message})
+  
+  return jsonify({
+    "status": status,
+    "message": message,
+    "data": data
+  })
+
+
 @app.route("/")
 def homepage():
   return render_template("index.html")
@@ -66,7 +78,6 @@ def get_people():
   
   return jsonify(rows_to_dict(people)) 
 
-# TO DO: Change to match the URL of the submit form?
 @app.route("/people", methods=["POST"])
 def add_person():
   data = request.get_json()
@@ -90,11 +101,10 @@ def add_person():
       db.commit()
       
       person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
-      return jsonify(dict(person)), 201
+      return generate_json_response("success", "Prayer added successfully", dict(person)), 201
   
   # TO DO: Specify missing or invalid fields
-  return jsonify({"error": "Missing or invalid fields"}), 400
-
+  return generate_json_response("error", "Missing or invalid fields"), 400
 
 @app.route("/people/<int:person_id>", methods=["GET"])
 def get_person(person_id):
