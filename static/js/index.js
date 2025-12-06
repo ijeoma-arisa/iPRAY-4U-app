@@ -1,20 +1,38 @@
-function initPrayerRequestModal(){
-  const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
-  
-  document.querySelector('.add-button-js')
-  .addEventListener('click', () => {
-    addPrayerRequestModal.showModal();
-  });
-  
-  document.querySelector('.close-prayer-request-modal-js')
-    .addEventListener('click', () => {
-      addPrayerRequestModal.close();
-  });
-  
-  document.querySelector('.add-button-js')
-  .addEventListener('click', () =>{
-    console.log('Adding prayer request')
-  });
+function renderPrayerRequestModal() {
+  document.querySelector('.add-prayer-request-modal-js').innerHTML =
+  `<button class="close-button close-prayer-request-modal-js" aria-label="Close">&times;</button>
+    <form action="/prayer-requests.html" class="new-prayer-request-form" method="POST">
+      <h2 class="form-title">New Prayer Request</h2>
+      <div class="form-data">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Name" required/>
+      </div>
+      <div class="form-data">
+        <label for="relationship">Relationship</label> 
+        <select id="relationship" name="relationship" class="relationship-dropdown-js" required>
+        </select>
+      </div>
+      <div class="form-data">
+        <label for="prayer-request-text">Prayer Request</label>
+        <textarea id="prayer-request-text" name="prayer-request-text" placeholder="Start typing here" rows="5" cols="20" required></textarea>
+      </div>
+      
+      <button type="submit" class="btn save-button save-button-js">Save</button>
+    </form>`;
+}
+
+function initPrayerRequestModalListeners(){
+  document.addEventListener('click', (event) => {
+    const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+
+    if (event.target.classList.contains('add-prayer-button-js')) {
+        addPrayerRequestModal.showModal();
+      }
+      
+      if (event.target.classList.contains('close-prayer-request-modal-js')) {
+        addPrayerRequestModal.close();
+      }
+    });
 }
 
 // TO DO: Make "Custom" editable here and in HTML
@@ -31,9 +49,10 @@ async function renderRelationshipDropdown() {
   document.querySelector('.relationship-dropdown-js').innerHTML = relationshipsHTML;
 }
 
-async function initPage(){
-  initPrayerRequestModal();
-  await renderRelationshipDropdown();
+export function initPrayerRequestModal(){
+  renderPrayerRequestModal();
+  initPrayerRequestModalListeners();
+  renderRelationshipDropdown();
 }
 
-initPage();
+initPrayerRequestModal();

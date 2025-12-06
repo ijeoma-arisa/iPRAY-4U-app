@@ -40,14 +40,12 @@
         <div class="prayer-requests-title">
           <h1>Prayer Requests</h1>
         </div>
-        <div class="relationships-row relationships-row-js">
-        </div>
+        <div class="relationships-row relationships-row-js"></div>
       </div>
 
-      <div class="prayer-request-cards">
-      </div>
-      
-      <script src="{{ url_for('static', filename='js/prayer-requests.js') }}"></script>
+      <div class="prayer-request-cards"></div>
+      <dialog class="modal add-prayer-request-modal-js"></dialog>
     </div>
+    <script type="module" src="{{ url_for('static', filename='js/prayer-requests.js') }}"></script>
   </body>
 </html>

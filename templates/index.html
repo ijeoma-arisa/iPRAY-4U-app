@@ -33,34 +33,14 @@
       </div>
   
       <div class="homepage-buttons-banner">
-        <button class="btn add-button add-button-js">Add New Prayer Request</button>
+        <button class="btn add-prayer-button add-prayer-button-js">Add New Prayer Request</button>
         <a class="btn view-button" href="{{ url_for('prayer_requests_page') }}">View Prayer Requests</a>
         
-        <dialog class="modal add-prayer-request-modal-js">
-          <button class="close-button close-prayer-request-modal-js" aria-label="Close">&times;</button>
-          <form action="/prayer-requests.html" class="new-prayer-request-form" method="POST">
-            <h2 class="form-title">New Prayer Request</h2>
-            <div class="form-data">
-              <label for="name">Name</label>
-              <input type="text" id="name" name="name" placeholder="Name" required/>
-            </div>
-            <div class="form-data">
-              <label for="relationship">Relationship</label> 
-              <select id="relationship" name="relationship" class="relationship-dropdown-js" required>
-              </select>
-            </div>
-            <div class="form-data">
-              <label for="prayer-request-text">Prayer Request</label>
-              <textarea id="prayer-request-text" name="prayer-request-text" placeholder="Start typing here" rows="5" cols="20" required></textarea>
-            </div>
-            
-            <button type="submit" class="btn save-button save-button-js">Save</button>
-          </form>
-        </dialog>
+        <dialog class="modal add-prayer-request-modal-js"></dialog>
       </div>
     </div>
   </div>
-  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>
 </html>
 

@@ -11,7 +11,7 @@
   text-align: center;
 }
 
-.add-button, .save-button {
+.add-prayer-button, .save-button {
   background-color: var(--main-blue);
 }
 
@@ -20,7 +20,7 @@
   margin-right: 10px;
 }
 
-.add-button:hover, .save-button:hover, .relationship-button:hover {
+.add-prayer-button:hover, .save-button:hover, .relationship-button:hover {
   background: var(--darker-blue);
 }
 
@@ -223,4 +223,9 @@ textarea {
   display: flex;
   gap: 5px;
   padding: 5px;
+}
+
+.add-prayer-card {
+  display: flex;
+  justify-content: center;
 }

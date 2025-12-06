@@ -1,3 +1,5 @@
+import {initPrayerRequestModal} from './index.js';
+
 function displayTime(){
   const today = new Date();
   const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
@@ -40,6 +42,13 @@ async function loadPrayers(person_id) {
             </div>
           </div>`;
   });
+
+  prayersHTML += `
+    <div class="prayer-card" data-id="add">
+      <button class="btn add-prayer-button add-prayer-button-js">
+        Add New Prayer Request
+      </button>
+    </div>`
   return prayersHTML;
 }
 
@@ -47,7 +56,6 @@ async function loadPrayers(person_id) {
 async function renderPrayerRequests() {
   const response = await fetch("/people");
   const persons = await response.json();
-  
   
   let personHTML = '';
 
@@ -70,13 +78,14 @@ async function renderPrayerRequests() {
     .innerHTML = personHTML;
 }
 
-
 function initPrayerEventListeners() {
   document.addEventListener('click', async (event) => {
   const prayerRequestCard = event.target.closest('.prayer-request-card');
-  const personId = prayerRequestCard.dataset.personId;
-
   const prayerCard = event.target.closest('.prayer-card');
+
+  if (!prayerRequestCard && !prayerCard) return;
+  
+  const personId = prayerRequestCard.dataset.personId;
   const prayerId = prayerCard.dataset.id;
 
   const prayerRoute = `/people/${personId}/prayers/${prayerId}`
@@ -111,11 +120,16 @@ function initPrayerEventListeners() {
 }
 
 
-function initPage(){
+async function initPage(){
   displayTime();
+
+  initPrayerRequestModal();
   initPrayerEventListeners();
+
   renderRelationshipButtons();
+  
   renderPrayerRequests();
+  
 }
 
 initPage();
