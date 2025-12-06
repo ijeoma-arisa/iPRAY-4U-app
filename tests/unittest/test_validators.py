@@ -2,7 +2,7 @@ import unittest
 from utils.validators import (
     is_valid_string,
     is_valid_int,
-    is_valid_bool,
+    is_valid_int_as_bool,
     require_str,
     require_fields,
     parse_relationship
@@ -44,21 +44,19 @@ class TestIsValidInt(unittest.TestCase):
         self.assertFalse(is_valid_int(4.5))
         self.assertFalse(is_valid_int(None))
 
-class TestIsValidBool(unittest.TestCase):
-    """Test cases for is_valid_bool function."""
+class TestIsValidIntAsBool(unittest.TestCase):
+    """Test cases for is_valid_int_as_bool function."""
     
     def test_true_value(self):
-      self.assertTrue(is_valid_bool(True))        
+      self.assertTrue(is_valid_int_as_bool(1))        
     
     def test_false_value(self):
-        self.assertTrue(is_valid_bool(False))        
+        self.assertTrue(is_valid_int_as_bool(0))        
 
-    def test_non_bool_input(self):
-        self.assertFalse(is_valid_bool(0))
-        self.assertFalse(is_valid_bool(1))
-        self.assertFalse(is_valid_bool("True"))
-        self.assertFalse(is_valid_bool("False"))
-        self.assertFalse(is_valid_bool(None))
+    def test_non_int_input(self):
+        self.assertFalse(is_valid_int_as_bool("0"))
+        self.assertFalse(is_valid_int_as_bool("1"))
+        self.assertFalse(is_valid_int_as_bool(None))
 
 class TestRequireStr(unittest.TestCase):
     """Test cases for require_str function."""

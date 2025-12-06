@@ -9,7 +9,7 @@ app = Flask(__name__)
 DB_PATH = "./instance/prayer_requests.db"
 
 # TO DO: Change endpoints to /api/...
-
+# TO DO: Use with statement in routes
 def init_db():
   
   with sqlite3.connect(DB_PATH) as conn:
@@ -170,7 +170,7 @@ def add_prayer(person_id):
   text = data.get("text", None)
   has_prayed = data.get("has_prayed", False)
   
-  if is_valid_string(text) and is_valid_bool(has_prayed):
+  if is_valid_string(text) and is_valid_int_as_bool(has_prayed):
     db.execute(INSERT_PRAYER_QUERY, (person_id, text, has_prayed))
     db.commit()
     
@@ -200,13 +200,13 @@ def update_prayer(person_id, prayer_id):
   text = data.get("text", None)
   has_prayed = data.get("has_prayed", None)
   
-  if not is_valid_string(text) and not is_valid_bool(has_prayed):
+  if not is_valid_string(text) and not is_valid_int_as_bool(has_prayed):
     return jsonify({"error": "Missing or invalid fields"}), 400
   
   if is_valid_string(text):
     db.execute(UPDATE_PRAYER_TEXT_QUERY, (text, prayer_id))
     
-  if is_valid_bool(has_prayed):
+  if is_valid_int_as_bool(has_prayed):
     db.execute(UPDATE_PRAYER_HAS_PRAYED_QUERY, (has_prayed, prayer_id))
     
   db.commit()
