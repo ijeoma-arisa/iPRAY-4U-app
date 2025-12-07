@@ -17,35 +17,47 @@ function renderPrayerRequestModal() {
         <textarea id="prayer-request-text" name="prayer-request-text" placeholder="Start typing here" rows="5" cols="20" required></textarea>
       </div>
       
-      <button type="submit" class="btn save-button save-button-js">Save</button>
+      <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
     </form>`;
 }
 
 function initPrayerRequestModalListeners(){
-  // const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
-
-  // const addPrayerButton = document.querySelector('.add-prayer-button-js');
-  // const closeModalButton = document.querySelector('.close-prayer-request-modal-js');
-
-  // addPrayerButton?.addEventListener('click', () => addPrayerRequestModal.showModal());
-
-  // closeModalButton?.addEventListener('click', () => addPrayerRequestModal.close());
-
   const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+  const addPrayerButton = document.querySelector('.add-prayer-button-js');
+  const closePrayerButton = document.querySelector('.close-prayer-request-modal-js');
+
   
   document.addEventListener('click', (event) => {
 
     if (event.target.classList.contains('add-prayer-button-js')) {
-        addPrayerRequestModal.showModal();
-      }
       
-      if (event.target.classList.contains('close-prayer-request-modal-js')) {
-        addPrayerRequestModal.close();
+      const addPrayerButton = event.target.closest('.add-prayer-button-js');
+      
+      const personId = addPrayerButton.dataset.personId;
+      const personName = addPrayerButton.dataset.personName;
+      const personRelationship = addPrayerButton.dataset.personRelationship;
+      
+      if (personId && personName && personRelationship) {
+        const prayerRequestForm = document.querySelector('.prayer-request-form');
+        prayerRequestForm.dataset.personId = personId; 
+
+        prayerRequestForm.elements.name.value = personName;
+        prayerRequestForm.elements.name.readOnly = true;
+        
+        prayerRequestForm.elements.relationship.value = personRelationship;
+        prayerRequestForm.elements.relationship.disabled = true;
       }
+
+      addPrayerRequestModal.showModal();
+    }
+    
+      
+    if (event.target.classList.contains('close-prayer-request-modal-js')) {
+      addPrayerRequestModal.close();
+    }
     });
 }
 
-// TO DO: Make "Custom" editable here and in HTML
 async function renderRelationshipDropdown() {
   const response = await fetch("/relationships");
   const relationships = await response.json();
@@ -64,11 +76,12 @@ async function handlePrayerRequestInput(){
 
   prayerRequestForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-
+    
     const formData = {
       name: prayerRequestForm.name.value,
       relationship: prayerRequestForm.relationship.value,
-      prayer: prayerRequestForm['prayer-request-text'].value
+      prayer: prayerRequestForm['prayer-request-text'].value,
+      text: prayerRequestForm['prayer-request-text'].value
     }
 
     const options = {
@@ -76,18 +89,25 @@ async function handlePrayerRequestInput(){
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(formData)
     };
-  
-    const response = await fetch('/people', options);
+    
+    const personExists = prayerRequestForm.dataset.personId !== undefined && prayerRequestForm.elements.name.readOnly && prayerRequestForm.elements.relationship.disabled;
+    
+    const prayerRoute = personExists ? 
+        `/people/${prayerRequestForm.dataset.personId}/prayers`:
+        '/people'
+        
+    const response = await fetch(prayerRoute, options);
     const data = await response.json();
 
     console.log(`Server reponses\n${data.status}: ${data.message}`); 
 
     if (data.status === 'success') {
+      const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+      addPrayerRequestModal.close();
       window.location.href = '/prayer-requests';
     }
 
   });
-  
 
 }
 

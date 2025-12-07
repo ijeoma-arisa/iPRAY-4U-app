@@ -99,7 +99,6 @@ textarea {
   justify-content: space-between;
   align-items: center;
   background-color: black;
-  /* background-color: var(--main-blue); */
   color: white;
   font-weight: bold;
   font-size: 1rem;
@@ -121,7 +120,6 @@ textarea {
 
 .nav-logo img {
   width: 50px;
-  /* height: auto; */
 }
 
 .nav-search {
@@ -138,7 +136,6 @@ textarea {
   flex: 1;
   border: none;
   padding: 0 10px;
-  /* border-radius: 4px; */
   overflow: hidden;
   outline: none;
 }
@@ -189,7 +186,6 @@ textarea {
 }
 
 .person-info-section {
-  /* border: 2px solid black; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -198,10 +194,11 @@ textarea {
 }
 
 .prayer-cards-section {
-  /* border: 1px solid red; */
   display: flex;
   flex-direction: column;
   flex: 1;
+  overflow-y: auto;
+  max-height: 220px;
 }
 
 .prayer-card {
@@ -219,7 +216,6 @@ textarea {
 }
 
 .update-prayer-buttons {
-  /* border: 2px green solid; */
   display: flex;
   gap: 5px;
   padding: 5px;
@@ -228,4 +224,12 @@ textarea {
 .add-prayer-card {
   display: flex;
   justify-content: center;
+}
+
+.delete-prayer-button {
+  background-color: var(--main-red);
+}
+
+.delete-prayer-button:hover {
+  background-color: var(--darker-red);
 }
