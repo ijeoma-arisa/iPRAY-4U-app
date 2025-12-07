@@ -21,7 +21,6 @@ async function renderRelationshipButtons() {
     .innerHTML = relationshipsHTML;
 }
 
-// async function 
 
 async function loadPrayers(person_id) {
   const response = await fetch(`people/${person_id}/prayers`);
@@ -44,7 +43,7 @@ async function loadPrayers(person_id) {
   });
 
   prayersHTML += `
-    <div class="prayer-card" data-id="add">
+    <div class="prayer-card" data-id="add" style="display: flex; justify-content: center; border:none;">
       <button class="btn add-prayer-button add-prayer-button-js">
         Add New Prayer Request
       </button>
@@ -67,6 +66,7 @@ async function renderPrayerRequests() {
           <div class="person-info-section">
             <h3>${person.name}</h3>
             <p>${person.relationship}</p>
+            <button class="delete-person-button delete-person-button-js">Delete Person</button>
           </div>
           <div class="prayer-cards-section">
             ${prayersHTML}
@@ -76,6 +76,34 @@ async function renderPrayerRequests() {
 
   document.querySelector('.prayer-request-cards')
     .innerHTML = personHTML;
+}
+
+function renderDeletePersonModal() {
+  document.querySelector('.delete-person-modal-js').innerHTML =
+  `
+  <button class="close-button close-delete-person-modal-js" aria-label="Close">&times;</button>
+    <h2>Are you sure you want to delete?</h3>
+    <div class="confirm-decline-buttons">
+      <button class="confirm-delete-button confirm-delete-button-js">Yes</button>
+      <button class="decline-delete-button decline-delete-button-js">No</button>
+    </div>
+  `;
+}
+
+function initDeletePersonModalListeners() {
+   document.addEventListener('click', (event) => {
+    const deletePersonModal = document.querySelector('.delete-person-modal-js');
+
+    if (event.target.classList.contains('delete-person-button-js')) {
+        deletePersonModal.showModal();
+    }
+
+    if (event.target.classList.contains('close-delete-person-modal-js') ||
+        event.target.classList.contains('decline-delete-button-js')) 
+      {
+          deletePersonModal.close();
+      }
+    });
 }
 
 function initPrayerEventListeners() {
@@ -88,7 +116,8 @@ function initPrayerEventListeners() {
   const personId = prayerRequestCard.dataset.personId;
   const prayerId = prayerCard.dataset.id;
 
-  const prayerRoute = `/people/${personId}/prayers/${prayerId}`
+  const personRoute = `/people/${personId}`;
+  const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
   if (event.target.classList.contains('prayed-prayer-button')){
     let hasPrayed = Number(event.target.dataset.hasPrayed);
@@ -116,6 +145,19 @@ function initPrayerEventListeners() {
     prayerCard.remove();
   }
 
+  if (event.target.classList.contains('confirm-delete-button-js')){
+    const request = await fetch(personRoute, {method: "DELETE"});
+    const response = request.json()
+
+    if (response.status === 'success'){
+      console.log(response.message);
+      prayerRequestCard.remove();
+      document.querySelector('.delete-person-modal-js').close();
+    }
+    else {
+      console.log(response.message);
+    }
+  }
   });
 }
 
@@ -123,11 +165,13 @@ function initPrayerEventListeners() {
 async function initPage(){
   displayTime();
 
+  renderDeletePersonModal();
+  initDeletePersonModalListeners();
+  
   initPrayerRequestModal();
   initPrayerEventListeners();
 
   renderRelationshipButtons();
-  
   renderPrayerRequests();
   
 }

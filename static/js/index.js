@@ -22,8 +22,18 @@ function renderPrayerRequestModal() {
 }
 
 function initPrayerRequestModalListeners(){
+  // const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+
+  // const addPrayerButton = document.querySelector('.add-prayer-button-js');
+  // const closeModalButton = document.querySelector('.close-prayer-request-modal-js');
+
+  // addPrayerButton?.addEventListener('click', () => addPrayerRequestModal.showModal());
+
+  // closeModalButton?.addEventListener('click', () => addPrayerRequestModal.close());
+
+  const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+  
   document.addEventListener('click', (event) => {
-    const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
 
     if (event.target.classList.contains('add-prayer-button-js')) {
         addPrayerRequestModal.showModal();
@@ -75,7 +85,7 @@ async function handlePrayerRequestInput(){
     if (data.status === 'success') {
       window.location.href = '/prayer-requests';
     }
-  
+
   });
   
 

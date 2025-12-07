@@ -64,7 +64,6 @@ def homepage():
 def prayer_requests_page():
   return render_template("prayer-requests.html")
 
-# TO DO: Create JOIN queries to include relationship names in people responses
 @app.route("/people", methods=["GET"])
 def get_people():
   db = get_db_connection()
@@ -148,12 +147,12 @@ def delete_person(person_id):
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   
   if person is None:
-    return jsonify({"error": "Person not found"}), 404
+    return generate_json_response("error", "Person not found"), 404
   
   db.execute(DELETE_PERSON_QUERY, (person_id,))
   db.commit()
   
-  return '', 204
+  return generate_json_response("success", "Person deleted"), 204
 
 
 @app.route("/people/<int:person_id>/prayers", methods=["GET"])
