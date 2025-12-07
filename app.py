@@ -1,5 +1,4 @@
 from flask import Flask, g, jsonify, request, render_template
-from models import Person, Prayer
 from utils.validators import *
 from schema import *
 import sqlite3
@@ -8,9 +7,6 @@ app = Flask(__name__)
 
 DB_PATH = "./instance/prayer_requests.db"
 
-# TO DO: Change endpoints to /api/...
-# TO DO: Use with statement in routes
-# TO DO: Add generate_json_response to all routes
 def init_db():
   
   with sqlite3.connect(DB_PATH) as conn:
@@ -102,7 +98,6 @@ def add_person():
       person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
       return generate_json_response("success", "Prayer added successfully", dict(person)), 201
   
-  # TO DO: Specify missing or invalid fields
   return generate_json_response("error", "Missing or invalid fields"), 400
 
 @app.route("/people/<int:person_id>", methods=["GET"])
@@ -186,9 +181,9 @@ def add_prayer(person_id):
     prayer_id = db.execute(SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]
     prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
     
-    return jsonify(dict(prayer)), 201
+    return generate_json_response("success", "Prayer added successfully", dict(prayer)), 201
   
-  return jsonify({"error": "Missing or invalid fields"}), 400
+  return generate_json_response("error","Missing or invalid fields"), 400
   
 
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])

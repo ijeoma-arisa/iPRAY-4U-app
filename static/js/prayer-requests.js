@@ -42,7 +42,6 @@ async function loadPrayers(person_id) {
   return prayersHTML;
 }
 
-// TO DO: Add time that updates every minute
 async function renderPrayerRequests() {
   const response = await fetch("/people");
   const persons = await response.json();
