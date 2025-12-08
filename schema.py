@@ -1,5 +1,3 @@
-# TO DO: Migrate to SQLAlchemy ORM later
-
 # TABLES
 CREATE_RELATIONSHIPS_TABLE = """
 CREATE TABLE IF NOT EXISTS relationships (

@@ -2,11 +2,9 @@ from typing import Optional
 from enum import Enum
 
 class Relationship(Enum):
-  # TO DO: Add a way to designate it as favorite
   FAMILY = "Family"
   FRIENDS = "Friends"
   MINISTRY = "Ministry"
-  # TO DO: Implement custom feature
   CUSTOM = "Custom"
 
 
@@ -40,14 +38,12 @@ class Prayer:
 
 class Person:  
   def __init__(self, id: str, name: str, relationship: Relationship):
-    # TO DO: Generate id
     self._id = id
     self._name = name
     self._relationship = relationship
     self._prayer_requests = []
     
   def __repr__(self):
-    # TO DO: Fix the prayer_requests output
     return f"Person(id={self._id}, name={self._name}, relationship={self._relationship}, prayer_requests={self._prayer_requests})"
   
   def __str__(self):

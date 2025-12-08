@@ -64,7 +64,6 @@ def prayer_requests_page():
 def get_people():
   db = get_db_connection()
   
-  # TO DO: Add Invalid relationship error handling mayhaps
   relationship = parse_relationship(request.args.get("rel", None))
   
   people = (db.execute(SELECT_RELATIONSHIP_PEOPLE_QUERY, (relationship.value,)).fetchall()
