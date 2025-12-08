@@ -50,10 +50,11 @@ pip install -r requirements.txt
 
 ## Run the app
 
-**NOTE: This app currently runs with Flask's development server using `debug=True`. 
-Do not use it in a production deployment.**
+**NOTE: This app currently runs with Flask's development server using** `debug=True`. 
+**Do not use it in a production deployment.**
 ```
 python app.py
 ```
+
 
 
