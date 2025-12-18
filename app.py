@@ -25,7 +25,6 @@ def init_db():
     relationship_values = [(r.value,) for r in Relationship]
     cursor.executemany(INSERT_RELATIONSHIP_ROWS, relationship_values)
 
-
 def get_db_connection():
   if "db" not in g:
     g.db = sqlite3.connect(DB_PATH)
@@ -41,16 +40,13 @@ def close_db_connection(exception):
 def rows_to_dict(rows):
   return [dict(row) for row in rows]
 
-def generate_json_response(status, message, data=None):
-  if status == "error":
-    return jsonify({"status": "error", "message": message})
-  
-  return jsonify({
-    "status": status,
-    "message": message,
-    "data": data
-  })
+def success_json(message, data={}):
+  data = dict(data) if not isinstance(data, list) else rows_to_dict(data) 
+  print(data)
+  return jsonify({"status": "success", "message": message, "data": data})
 
+def error_json(message):
+  return jsonify({"status": "error", "message": message})
 
 @app.route("/")
 def homepage():
@@ -70,7 +66,7 @@ def get_people():
             if relationship 
             else db.execute(SELECT_ALL_PEOPLE_QUERY).fetchall())
   
-  return jsonify(rows_to_dict(people)) 
+  return success_json("People retrieved", people)
 
 @app.route("/people", methods=["POST"])
 def add_person():
@@ -95,9 +91,9 @@ def add_person():
       db.commit()
       
       person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
-      return generate_json_response("success", "Prayer added successfully", dict(person)), 201
+      return success_json("Prayer added", person), 201
   
-  return generate_json_response("error", "Missing or invalid fields"), 400
+  return error_json("Missing or invalid fields"), 400
 
 @app.route("/people/<int:person_id>", methods=["GET"])
 def get_person(person_id):
@@ -105,9 +101,9 @@ def get_person(person_id):
   
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   if person is None:
-    return jsonify({"error": "Person not found"}), 404
+    return error_json("Person not found"), 404
   
-  return jsonify(dict(person))
+  return success_json("Person retrieved", person)
 
 @app.route("/people/<int:person_id>", methods=["PATCH"])
 def update_person(person_id):
@@ -117,7 +113,7 @@ def update_person(person_id):
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   
   if person is None:
-    return jsonify({"error": "Person not found"}), 404 
+    return error_json("Person not found"), 404 
     
   name = data.get("name", None)
   relationship = parse_relationship(data.get("relationship", None))
@@ -133,7 +129,7 @@ def update_person(person_id):
     
   updated_person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
-  return jsonify(dict(updated_person))
+  return success_json("Person updated", updated_person)
   
 @app.route("/people/<int:person_id>", methods=["DELETE"])
 def delete_person(person_id):
@@ -141,12 +137,12 @@ def delete_person(person_id):
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   
   if person is None:
-    return generate_json_response("error", "Person not found"), 404
+    return error_json("Person not found"), 404
   
   db.execute(DELETE_PERSON_QUERY, (person_id,))
   db.commit()
   
-  return generate_json_response("success", "Person deleted"), 204
+  return success_json("Person deleted"), 204
 
 
 @app.route("/people/<int:person_id>/prayers", methods=["GET"])
@@ -155,9 +151,9 @@ def get_prayers(person_id):
   prayers = db.execute(SELECT_ALL_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchall()
   
   if prayers is None:
-    return jsonify({"error": "Person not found"}), 404
+    return error_json("Person not found"), 404
   
-  return jsonify(rows_to_dict(prayers))
+  return success_json("Prayers retrieved", prayers)
 
 
 @app.route("/people/<int:person_id>/prayers", methods=["POST"])
@@ -166,7 +162,7 @@ def add_prayer(person_id):
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   
   if person is None:
-    return jsonify({"error": "Person not found"}), 404
+    return error_json("Person not found"), 404
   
   data = request.get_json()
   
@@ -180,9 +176,9 @@ def add_prayer(person_id):
     prayer_id = db.execute(SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]
     prayer = db.execute(SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
     
-    return generate_json_response("success", "Prayer added successfully", dict(prayer)), 201
+    return success_json("Prayer added", prayer), 201
   
-  return generate_json_response("error","Missing or invalid fields"), 400
+  return error_json("Missing or invalid fields"), 400
   
 
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
@@ -191,12 +187,12 @@ def update_prayer(person_id, prayer_id):
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   
   if person is None:
-    return jsonify({"error": "Person not found"}), 404 
+    return error_json("Person not found"), 404 
   
   prayer = db.execute(SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
   
   if prayer is None:
-      return jsonify({"error": "Prayer not found"}), 404
+      return error_json("Prayer not found"), 404
     
   data = request.get_json()
   
@@ -204,7 +200,7 @@ def update_prayer(person_id, prayer_id):
   has_prayed = data.get("has_prayed", None)
   
   if not is_valid_string(text) and not is_valid_int_as_bool(has_prayed):
-    return jsonify({"error": "Missing or invalid fields"}), 400
+    return error_json("Missing or invalid fields"), 400
   
   if is_valid_string(text):
     db.execute(UPDATE_PRAYER_TEXT_QUERY, (text, prayer_id))
@@ -215,7 +211,7 @@ def update_prayer(person_id, prayer_id):
   db.commit()
   
   updated_prayer = db.execute(SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
-  return jsonify(dict(updated_prayer))
+  return success_json("Prayer updated", updated_prayer)
   
 @app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
 def delete_prayer(person_id, prayer_id):
@@ -223,12 +219,12 @@ def delete_prayer(person_id, prayer_id):
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
   
   if not person:
-    return jsonify({"error": "Person not found"}), 404
+    return error_json("Person not found"), 404 
   
   prayer = db.execute(SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
   
   if not prayer:
-    return jsonify({"error": "Prayer not found"}), 404
+    return error_json("Prayer not found"), 404 
   
   db.execute(DELETE_PRAYER_QUERY, (prayer_id,))
   db.commit() 
@@ -239,8 +235,8 @@ def delete_prayer(person_id, prayer_id):
 def get_relationships():
     db = get_db_connection()
     relationships = db.execute(SELECT_ALL_RELATIONSHIPS_QUERY).fetchall()
-    
-    return jsonify(rows_to_dict(relationships))
+        
+    return success_json("Relationships retrieved", relationships)
     
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@ CREATE_PRAYERS_TABLE = """
 CREATE TABLE IF NOT EXISTS prayers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   person_id INTEGER NOT NULL,
-  text TEXT NOT NULL,
+  prayer TEXT NOT NULL,
   has_prayed INTEGER NOT NULL DEFAULT 0 CHECK (has_prayed IN (0,1)),
   CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE
   );"""
@@ -64,9 +64,9 @@ INSERT_RELATIONSHIP_ROWS = "INSERT OR IGNORE INTO relationships (relationship) V
 
 INSERT_PERSON_QUERY = "INSERT INTO people (name, relationship_id) VALUES (?, ?)"
 
-INSERT_DEFAULT_PRAYER_QUERY = "INSERT INTO prayers (person_id, text) VALUES (?, ?)"
+INSERT_DEFAULT_PRAYER_QUERY = "INSERT INTO prayers (person_id, prayer) VALUES (?, ?)"
 
-INSERT_PRAYER_QUERY = "INSERT INTO prayers (person_id, text, has_prayed) VALUES (?, ?, ?)"
+INSERT_PRAYER_QUERY = "INSERT INTO prayers (person_id, prayer, has_prayed) VALUES (?, ?, ?)"
 
 # UPDATE Queries
 UPDATE_PERSON_NAME_QUERY = "UPDATE people SET name = ? WHERE id = ?"

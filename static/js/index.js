@@ -1,3 +1,5 @@
+import { renderPersonCards } from './prayer-requests.js';
+
 function renderPrayerRequestModal() {
   document.querySelector('.add-prayer-request-modal-js').innerHTML =
   `<button class="close-button close-prayer-request-modal-js" aria-label="Close">&times;</button>
@@ -13,8 +15,8 @@ function renderPrayerRequestModal() {
         </select>
       </div>
       <div class="form-data">
-        <label for="prayer-request-text">Prayer Request</label>
-        <textarea id="prayer-request-text" name="prayer-request-text" placeholder="Start typing here" rows="5" cols="20" required></textarea>
+        <label for="prayer">Prayer Request</label>
+        <textarea id="prayer" name="prayer" placeholder="Enter prayer here" rows="5" cols="20" required></textarea>
       </div>
       
       <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
@@ -56,8 +58,8 @@ function initPrayerRequestModalListeners(){
 
 async function renderRelationshipDropdown() {
   const response = await fetch("/relationships");
-  const relationships = await response.json();
-
+  const {status, data: relationships} = await response.json();
+  
   let relationshipsHTML = '<option value="Select...">Select...</option>';
 
   relationships.forEach(relationship => {
@@ -74,10 +76,9 @@ async function handlePrayerRequestInput(){
     event.preventDefault();
     
     const formData = {
-      name: prayerRequestForm.name.value,
-      relationship: prayerRequestForm.relationship.value,
-      prayer: prayerRequestForm['prayer-request-text'].value,
-      text: prayerRequestForm['prayer-request-text'].value
+      name: prayerRequestForm.elements.name.value,
+      relationship: prayerRequestForm.elements.relationship.value,
+      prayer: prayerRequestForm.elements.prayer.value
     }
 
     const options = {
@@ -93,12 +94,16 @@ async function handlePrayerRequestInput(){
         '/people'
         
     const response = await fetch(prayerRoute, options);
-    const data = await response.json();
+    const {status, message} = await response.json();
 
-    console.log(`Server reponses\n${data.status}: ${data.message}`); 
+    console.log(`${status}:${message}`);
 
-    if (data.status === 'success') {
-      window.location.href = '/prayer-requests';
+    if (status === 'success') {
+      const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+      renderPersonCards();
+      
+      prayerRequestForm.elements.prayer.value = "";
+      addPrayerRequestModal.close();
     }
 
   });

@@ -9,7 +9,7 @@ function displayTime(){
 
 async function renderRelationshipButtons() {
   const response = await fetch("/relationships");
-  const relationships = await response.json();
+  const {status, data: relationships} = await response.json();
 
   let relationshipsHTML = '<button class="btn relationship-button relationship-button-fav">Favorites</button>';
 
@@ -24,7 +24,7 @@ async function renderRelationshipButtons() {
 
 async function loadPrayers(person_id) {
   const response = await fetch(`people/${person_id}/prayers`);
-  const prayers = await response.json();
+  const {status, data: prayers} = await response.json();
 
   let prayersHTML = '';
 
@@ -32,7 +32,7 @@ async function loadPrayers(person_id) {
     prayersHTML += `
           <div class="prayer-card" data-id="${prayer.id}">
             <div class="prayer-text">
-              ${prayer.text}
+              ${prayer.prayer}
             </div>
             <div class="update-prayer-buttons">
               <button class="btn delete-prayer-button"><i class="fa fa-trash-o"></i></button>
@@ -42,9 +42,9 @@ async function loadPrayers(person_id) {
   return prayersHTML;
 }
 
-async function renderPersonCards() {
+export async function renderPersonCards() {
   const response = await fetch("/people");
-  const persons = await response.json();
+  const {status, data: persons} = await response.json();
   
   let personHTML = '';
 
@@ -87,17 +87,17 @@ function initPrayerEventListeners() {
     const personId = personCard.dataset.personId;
     const personRoute = `/people/${personId}`;
     
+    if (event.target.classList.contains('delete-person-button')){
+      await fetch(personRoute, {method: "DELETE"});
+      personCard.remove();
+    }
+    
     if (event.target.classList.contains('delete-prayer-button')){
       const prayerId = prayerCard.dataset.id;
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
       
       await fetch(prayerRoute, {method: "DELETE"});
       prayerCard.remove();
-    }
-    if (event.target.classList.contains('delete-person-button')){
-      await fetch(personRoute, {method: "DELETE"});
-      personCard.remove();
-
     }
   });
 }
