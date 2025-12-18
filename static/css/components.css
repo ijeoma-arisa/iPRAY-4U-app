@@ -167,14 +167,14 @@ textarea {
   justify-content: center;
 }
 
-.prayer-request-cards {
+.person-cards {
   display: flex;
   flex-direction: column;
   justify-content: center;
   color: black;
 }
 
-.prayer-request-card {
+.person-card {
   display: flex;
   align-items: center;
   background-color: white;
@@ -226,10 +226,12 @@ textarea {
   justify-content: center;
 }
 
+.delete-person-button, 
 .delete-prayer-button {
   background-color: var(--main-red);
 }
 
+.delete-person-button:hover, 
 .delete-prayer-button:hover {
   background-color: var(--darker-red);
 }
