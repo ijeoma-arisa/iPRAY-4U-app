@@ -46,7 +46,15 @@
 
       <div class="person-cards"></div>
       <dialog class="modal add-prayer-request-modal-js"></dialog>
-      <dialog class="modal delete-person-modal-js"></dialog>
+      <dialog class="modal delete-item-modal-js">
+        <button class="close-button close-delete-item-modal-js" aria-label="Close">&times;</button>
+        <h2 class="form-title">Delete</h2>
+        <h2 class="item-to-delete"></h2>
+        <div>
+          <button class="btn confirm-delete-button confirm-delete-button-js">Yes</button>
+          <button class="btn deny-delete-button deny-delete-button-js">No</button>
+        </div>
+      </dialog>
     </div>
     <script type="module" src="{{ url_for('static', filename='js/prayer-requests.js') }}"></script>
   </body>

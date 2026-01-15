@@ -21,7 +21,6 @@ async function renderRelationshipButtons() {
     .innerHTML = relationshipsHTML;
 }
 
-
 async function loadPrayers(person_id) {
   const response = await fetch(`people/${person_id}/prayers`);
   const {status, data: prayers} = await response.json();
@@ -66,8 +65,8 @@ export async function renderPersonCards() {
           data-person-id=${person.id} 
           data-person-name="${person.name}" 
           data-person-relationship="${person.relationship}">
-        Add Prayer 
-        </button>
+            Add Prayer 
+          </button>
         </div>`;
   }
 

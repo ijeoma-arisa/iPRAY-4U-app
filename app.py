@@ -166,11 +166,11 @@ def add_prayer(person_id):
   
   data = request.get_json()
   
-  text = data.get("text", None)
+  prayer = data.get("prayer", None)
   has_prayed = data.get("has_prayed", False)
   
-  if is_valid_string(text) and is_valid_int_as_bool(has_prayed):
-    db.execute(INSERT_PRAYER_QUERY, (person_id, text, has_prayed))
+  if is_valid_string(prayer) and is_valid_int_as_bool(has_prayed):
+    db.execute(INSERT_PRAYER_QUERY, (person_id, prayer, has_prayed))
     db.commit()
     
     prayer_id = db.execute(SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]
@@ -196,14 +196,14 @@ def update_prayer(person_id, prayer_id):
     
   data = request.get_json()
   
-  text = data.get("text", None)
+  prayer = data.get("prayer", None)
   has_prayed = data.get("has_prayed", None)
   
-  if not is_valid_string(text) and not is_valid_int_as_bool(has_prayed):
+  if not is_valid_string(prayer) and not is_valid_int_as_bool(has_prayed):
     return error_json("Missing or invalid fields"), 400
   
-  if is_valid_string(text):
-    db.execute(UPDATE_PRAYER_TEXT_QUERY, (text, prayer_id))
+  if is_valid_string(prayer):
+    db.execute(UPDATE_PRAYER_TEXT_QUERY, (prayer, prayer_id))
     
   if is_valid_int_as_bool(has_prayed):
     db.execute(UPDATE_PRAYER_HAS_PRAYED_QUERY, (has_prayed, prayer_id))

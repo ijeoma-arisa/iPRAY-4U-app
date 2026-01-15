@@ -78,7 +78,7 @@ async function handlePrayerRequestInput(){
     const formData = {
       name: prayerRequestForm.elements.name.value,
       relationship: prayerRequestForm.elements.relationship.value,
-      prayer: prayerRequestForm.elements.prayer.value
+      prayer: prayerRequestForm.elements.prayer.value,
     }
 
     const options = {
