@@ -1,7 +1,9 @@
 :root {
   --main-purple: #966fd6;
+  --light-purple: #c9b0f1;
   --darker-purple: #452b6f;
   --main-blue: rgb(57, 186, 189);
+  --light-blue: rgb(148, 246, 248);
   --darker-blue: rgb(8, 90, 91);
   --light-gray: #ccc;
   --main-red: rgb(255, 82, 82);
@@ -15,8 +17,9 @@ html, body {
 
 body {
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
-  background: #966fd6;
+  background: var(--light-purple);
   color: white;
+  zoom: 0.75;
 }
 
 a {

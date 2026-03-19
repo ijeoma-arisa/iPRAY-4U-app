@@ -10,11 +10,13 @@
 .homepage-banner {
   display: flex;
   background-color: white;
-  border-radius: 20px;
+  border-radius: 1rem;
   padding: 1.5rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .homepage-title-banner {
@@ -33,14 +35,17 @@
   width: 100%;
   background-color: rgb(57, 186, 189);
   margin-bottom: 1rem;
+  border-radius: 0.8rem;
+  gap: 1rem;
 }
 
 .homepage-image {
   width: 200px;
 }
 
-.homepage-image-caption{
+.homepage-image-caption {
   color: white;
+  padding: 0.8rem;
 }
 
 .homepage-buttons-banner {
@@ -54,6 +59,7 @@
 }
 
 .prayer-requests-page {
+  background-color: var(--light-purple);
   margin: 0;
   padding: 0;
   display: flex;
@@ -68,7 +74,6 @@
 }
 
 .prayer-requests-title {
-  background-color: white;
   color: black;
   border-radius: 6px;
 }

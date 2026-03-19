@@ -42,7 +42,7 @@ def rows_to_dict(rows):
 
 def success_json(message, data={}):
   data = dict(data) if not isinstance(data, list) else rows_to_dict(data) 
-  print(data)
+  # print(data)
   return jsonify({"status": "success", "message": message, "data": data})
 
 def error_json(message):
@@ -56,7 +56,8 @@ def homepage():
 def prayer_requests_page():
   return render_template("prayer-requests.html")
 
-@app.route("/people", methods=["GET"])
+# TODO: Add custom 404 Not Found page (or redirect)
+@app.route("/api/people", methods=["GET"])
 def get_people():
   db = get_db_connection()
   
@@ -68,7 +69,9 @@ def get_people():
   
   return success_json("People retrieved", people)
 
-@app.route("/people", methods=["POST"])
+@app.route("/api/people", methods=["POST"])
+# TODO: Resolve duplicate people and relationships
+# TODO: Add specific error messages
 def add_person():
   data = request.get_json()
   
@@ -95,17 +98,18 @@ def add_person():
   
   return error_json("Missing or invalid fields"), 400
 
-@app.route("/people/<int:person_id>", methods=["GET"])
+@app.route("/api/people/<int:person_id>", methods=["GET"])
 def get_person(person_id):
   db = get_db_connection()
   
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
+  
   if person is None:
     return error_json("Person not found"), 404
   
   return success_json("Person retrieved", person)
 
-@app.route("/people/<int:person_id>", methods=["PATCH"])
+@app.route("/api/people/<int:person_id>", methods=["PATCH"])
 def update_person(person_id):
   data = request.get_json()
   
@@ -118,9 +122,11 @@ def update_person(person_id):
   name = data.get("name", None)
   relationship = parse_relationship(data.get("relationship", None))
   
+  # TODO: Add error message for invalid name
   if is_valid_string(name):
     db.execute(UPDATE_PERSON_NAME_QUERY, (name, person_id))
   
+  # TODO: Add error message for invalid relationship
   if relationship is not None:
     relationship_id = db.execute(SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"]
     db.execute(UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id))
@@ -131,7 +137,7 @@ def update_person(person_id):
     
   return success_json("Person updated", updated_person)
   
-@app.route("/people/<int:person_id>", methods=["DELETE"])
+@app.route("/api/people/<int:person_id>", methods=["DELETE"])
 def delete_person(person_id):
   db = get_db_connection()
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
@@ -144,9 +150,15 @@ def delete_person(person_id):
   
   return success_json("Person deleted"), 204
 
+@app.route("/api/prayers", methods=["GET"])
+def get_prayers():
+  db = get_db_connection()
+  prayers = db.execute(SELECT_ALL_PRAYERS_QUERY).fetchall()
+  
+  return success_json("Prayers retrieved", prayers)
 
-@app.route("/people/<int:person_id>/prayers", methods=["GET"])
-def get_prayers(person_id):
+@app.route("/api/people/<int:person_id>/prayers", methods=["GET"])
+def get_prayers_by_person(person_id):
   db = get_db_connection()
   prayers = db.execute(SELECT_ALL_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchall()
   
@@ -155,8 +167,8 @@ def get_prayers(person_id):
   
   return success_json("Prayers retrieved", prayers)
 
-
-@app.route("/people/<int:person_id>/prayers", methods=["POST"])
+#TODO: Add more specific error message for invalid/missing fields
+@app.route("/api/people/<int:person_id>/prayers", methods=["POST"])
 def add_prayer(person_id):
   db = get_db_connection()
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
@@ -181,7 +193,7 @@ def add_prayer(person_id):
   return error_json("Missing or invalid fields"), 400
   
 
-@app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
+@app.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
 def update_prayer(person_id, prayer_id):
   db = get_db_connection()
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
@@ -213,7 +225,8 @@ def update_prayer(person_id, prayer_id):
   updated_prayer = db.execute(SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
   return success_json("Prayer updated", updated_prayer)
   
-@app.route("/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
+#TODO: Maybe distinguish "prayer id does not exist" from that "prayer id does not belong to that person"
+@app.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
 def delete_prayer(person_id, prayer_id):
   db = get_db_connection()
   person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
@@ -231,7 +244,7 @@ def delete_prayer(person_id, prayer_id):
       
   return '', 204
 
-@app.route("/relationships", methods=["GET"])
+@app.route("/api/relationships", methods=["GET"])
 def get_relationships():
     db = get_db_connection()
     relationships = db.execute(SELECT_ALL_RELATIONSHIPS_QUERY).fetchall()

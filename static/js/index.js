@@ -96,7 +96,7 @@ async function handlePrayerRequestInput(){
     const response = await fetch(prayerRoute, options);
     const {status, message} = await response.json();
 
-    console.log(`${status}:${message}`);
+    // console.log(`${status}:${message}`);
 
     if (status === 'success') {
       const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
