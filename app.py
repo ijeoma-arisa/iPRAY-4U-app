@@ -75,36 +75,37 @@ def add_person():
   data = request.get_json()
   
   # Check to see if any fields are missing
-  required_fields = ["name", "relationship", "prayer"]
+  # required_fields = ["name", "relationship", "prayer"]
   
-  missing_fields = require_fields(data, required_fields)
-  if missing_fields:
-    return error_json(f"Missing fields: {", ".join(missing_fields)}"), 400
+  # missing_fields = require_fields(data, required_fields)
+  # if missing_fields:
+  #   return error_json(f"Missing fields: {", ".join(missing_fields)}"), 400
   
-  name = data.get("name")
-  relationship = parse_relationship(data.get("relationship"))
-  prayer = data.get("prayer")
+  name = parse_str("name", data.get("name"))
+  relationship = parse_relationship("relationship", data.get("relationship"))
+  prayer = parse_str("prayer", data.get("prayer"))
   
   
   # TODO: Add name, relationship, prayer to output with invalid message
-  invalid_fields = []
-  if validate_str("name", name) is not None:
-    invalid_fields.append(validate_str("name", name))
+  fields = [name, relationship, prayer]
   
-  if validate_str("prayer", prayer) is not None:
-    invalid_fields.append(validate_str("prayer", prayer))
+  errors = [f[1] for f in fields in type(f) != str]
+  
+  # invalid_fields = []
+  # if validate_str("name", name) is not None:
+  #   invalid_fields.append(validate_str("name", name))
+  
+  # if validate_str("prayer", prayer) is not None:
+  #   invalid_fields.append(validate_str("prayer", prayer))
     
-  if type(relationship) != Relationship:
-    invalid_fields.append(relationship)
+  # if type(relationship) != Relationship:
+  #   invalid_fields.append(relationship)
     
   #TODO: Fix formatting instead of joining with commas
-  if invalid_fields:
-    return error_json(f"Invalid fields: {", ".join(invalid_fields)}"), 400
+  if errors:
+    return error_json(f"Error: {", ".join(errors)}"), 400
 
     
-  
-
-
   
   if (is_valid_string(name) and 
       relationship is not None 
