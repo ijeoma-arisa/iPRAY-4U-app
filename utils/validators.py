@@ -18,17 +18,13 @@ def require_fields(data, fields):
   missing = [f for f in fields if data.get(f) is None]
   
   return missing
-  #if missing:
-    # raise ValueError(f"Missing required fields: {','.join(missing)}")
     
 
 def parse_str(field, value):
-  if value is None:
-    return ["error", f"Missing field '{field}'"]
   if not isinstance(value, str):
-    return ["error", f"'{field}' must be a string. Received type {type(value)}."]
+    return [f"Invalid type: '{field}' must be a string. Received type {type(value)}."]
   if value.strip() == "":
-    return ["error", f"'{field}' must be a non-empty string."]
+    return [f"Invalid string: '{field}' must be a non-empty string."]
   
   return value
   
@@ -43,4 +39,4 @@ def parse_relationship(field, value) -> Relationship:
     if relationship_type.value == relationship:
       return relationship_type
     
-  return ["error", f"Relationship '{relationship_str}' does not exist."]
+  return [f"Invalid relationship: Relationship '{relationship_str}' does not exist."]

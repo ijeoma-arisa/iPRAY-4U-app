@@ -61,7 +61,7 @@ def prayer_requests_page():
 def get_people():
   db = get_db_connection()
   
-  relationship = parse_relationship(request.args.get("rel", None))
+  relationship = parse_relationship("rel", request.args.get("rel", None))
   
   people = (db.execute(SELECT_RELATIONSHIP_PEOPLE_QUERY, (relationship.value,)).fetchall()
             if type(relationship) is Relationship 
@@ -74,58 +74,34 @@ def get_people():
 def add_person():
   data = request.get_json()
   
-  # Check to see if any fields are missing
-  # required_fields = ["name", "relationship", "prayer"]
+  # Check to see if any fields are missing  
+  missing_fields = require_fields(data, ["name", "relationship", "prayer"])
+  if missing_fields:
+    return error_json(f"Missing fields: {", ".join(missing_fields)}"), 400
   
-  # missing_fields = require_fields(data, required_fields)
-  # if missing_fields:
-  #   return error_json(f"Missing fields: {", ".join(missing_fields)}"), 400
-  
+  # Validate fields
   name = parse_str("name", data.get("name"))
   relationship = parse_relationship("relationship", data.get("relationship"))
   prayer = parse_str("prayer", data.get("prayer"))
   
-  
-  # TODO: Add name, relationship, prayer to output with invalid message
-  fields = [name, relationship, prayer]
-  
-  errors = [f[1] for f in fields in type(f) != str]
-  
-  # invalid_fields = []
-  # if validate_str("name", name) is not None:
-  #   invalid_fields.append(validate_str("name", name))
-  
-  # if validate_str("prayer", prayer) is not None:
-  #   invalid_fields.append(validate_str("prayer", prayer))
-    
-  # if type(relationship) != Relationship:
-  #   invalid_fields.append(relationship)
+  errors = [f[0] for f in [name, relationship, prayer] if type(f) == list]
     
   #TODO: Fix formatting instead of joining with commas
   if errors:
     return error_json(f"Error: {", ".join(errors)}"), 400
 
-    
+  db = get_db_connection()
+        
+  relationship_row = db.execute(SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()
+  db.execute(INSERT_PERSON_QUERY, (name, relationship_row["id"]))
   
-  if (is_valid_string(name) and 
-      relationship is not None 
-      and is_valid_string(prayer)
-      ):
-    
-      db = get_db_connection()
-            
-      relationship_row = db.execute(SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()
-      db.execute(INSERT_PERSON_QUERY, (name, relationship_row["id"]))
-      
-      person_id = db.execute(SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]      
-      db.execute(INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer)) 
-      db.commit()
-      
-      person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
-      return success_json("Prayer added", person), 201
-    
+  person_id = db.execute(SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]      
+  db.execute(INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer)) 
+  db.commit()
   
-  return error_json("Missing or invalid fields"), 400
+  person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
+  return success_json("Prayer added", person), 201
+    
 
 @app.route("/api/people/<int:person_id>", methods=["GET"])
 def get_person(person_id):
