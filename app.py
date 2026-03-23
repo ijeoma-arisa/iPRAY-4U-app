@@ -79,15 +79,29 @@ def add_person():
   
   missing_fields = require_fields(data, required_fields)
   if missing_fields:
-    return error_json(f"Missing fields: {",".join(missing_fields)}"), 400
+    return error_json(f"Missing fields: {", ".join(missing_fields)}"), 400
   
   name = data.get("name")
   relationship = parse_relationship(data.get("relationship"))
   prayer = data.get("prayer")
   
-  # TODO: Add name, relationship, prayer to output with invalid message
-
+  # values = [name, relationship, prayer]
   
+  # TODO: Add name, relationship, prayer to output with invalid message
+  invalid_fields = []
+  if validate_str(name) is not None:
+    invalid_fields.append(validate_str(name))
+  
+  if validate_str(prayer) is not None:
+    invalid_fields.append(validate_str(prayer))
+    
+  if invalid_fields:
+    return error_json(f"Invalid fields: {", ".join(invalid_fields)}"), 400
+
+    
+  
+
+
   
   if (is_valid_string(name) and 
       relationship is not None 

@@ -17,9 +17,15 @@ def require_str(value, field_name):
 def require_fields(data, fields):
   missing = [f for f in fields if data.get(f) is None]
   
-  return missing or None
+  return missing
   #if missing:
     # raise ValueError(f"Missing required fields: {','.join(missing)}")
+    
+def validate_str(field, value):
+  if not isinstance(value, str):
+    return f"{field} must be a string. Received type {type(value)}"
+  if value.strip() == "":
+    return f"{field} must be a non-empty string"
   
   
 def parse_relationship(relationship_str: str) -> Relationship:

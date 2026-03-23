@@ -56,8 +56,18 @@ Content-Type: application/json
 
 {
   "name": "Sarah",
-  "relationship": "Friends",
+  "relationship": "Friends"
 }
+
+
+### Add missing fields (multiple)
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+
+}
+
 
 ### Add invalid name
 POST {{baseUrl}}/api/people
