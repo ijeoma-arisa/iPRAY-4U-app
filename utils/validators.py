@@ -17,17 +17,18 @@ def require_str(value, field_name):
 def require_fields(data, fields):
   missing = [f for f in fields if data.get(f) is None]
   
-  if missing:
-    raise ValueError(f"Missing required fields: {','.join(missing)}")
+  return missing or None
+  #if missing:
+    # raise ValueError(f"Missing required fields: {','.join(missing)}")
   
   
-def parse_relationship(relationship_str: str) -> Relationship | None:
+def parse_relationship(relationship_str: str) -> Relationship:
   if not is_valid_string(relationship_str):
-    return None
+    return "Not a valid string"
   
   relationship_str = relationship_str.strip().title()
   
   for relationship_type in Relationship:
     if relationship_type.value == relationship_str:
       return relationship_type
-  return None
+  return "Selected relationship does not exist"

@@ -22,7 +22,6 @@ GET {{baseUrl}}/api/people/74
 
 ### POST REQUESTS
 
-
 ### Add valid person
 POST {{baseUrl}}/api/people
 Content-Type: application/json
@@ -31,6 +30,33 @@ Content-Type: application/json
   "name": "Billy",
   "relationship": "Friends",
   "prayer": "To pass my exam"
+}
+
+### Add missing name
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "relationship": "Friends",
+  "prayer": "To pass my exam"
+}
+
+### Add missing relationship
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Sarah",
+  "prayer": "To pass my exam"
+}
+
+### Add missing prayer
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Sarah",
+  "relationship": "Friends",
 }
 
 ### Add invalid name

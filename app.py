@@ -64,20 +64,30 @@ def get_people():
   relationship = parse_relationship(request.args.get("rel", None))
   
   people = (db.execute(SELECT_RELATIONSHIP_PEOPLE_QUERY, (relationship.value,)).fetchall()
-            if relationship 
+            if type(relationship) is Relationship 
             else db.execute(SELECT_ALL_PEOPLE_QUERY).fetchall())
   
   return success_json("People retrieved", people)
 
 @app.route("/api/people", methods=["POST"])
 # TODO: Resolve duplicate people and relationships
-# TODO: Add specific error messages
 def add_person():
   data = request.get_json()
   
-  name = data.get("name", None)
-  relationship = parse_relationship(data.get("relationship", None))
-  prayer = data.get("prayer", None)
+  # Check to see if any fields are missing
+  required_fields = ["name", "relationship", "prayer"]
+  
+  missing_fields = require_fields(data, required_fields)
+  if missing_fields:
+    return error_json(f"Missing fields: {",".join(missing_fields)}"), 400
+  
+  name = data.get("name")
+  relationship = parse_relationship(data.get("relationship"))
+  prayer = data.get("prayer")
+  
+  # TODO: Add name, relationship, prayer to output with invalid message
+
+  
   
   if (is_valid_string(name) and 
       relationship is not None 
@@ -95,6 +105,7 @@ def add_person():
       
       person = db.execute(SELECT_PERSON_QUERY, (person_id,)).fetchone()
       return success_json("Prayer added", person), 201
+    
   
   return error_json("Missing or invalid fields"), 400
 
