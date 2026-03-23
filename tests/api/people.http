@@ -99,6 +99,16 @@ Content-Type: application/json
   "prayer": "   "
 }
 
+### Add multiple invalid fields
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Nathan",
+  "relationship": "Father",
+  "prayer": "   "
+}
+
 
 ### PATCH Requests
 

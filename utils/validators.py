@@ -21,20 +21,21 @@ def require_fields(data, fields):
   #if missing:
     # raise ValueError(f"Missing required fields: {','.join(missing)}")
     
+
 def validate_str(field, value):
   if not isinstance(value, str):
-    return f"{field} must be a string. Received type {type(value)}"
+    return f"'{field}' must be a string. Received type {type(value)}."
   if value.strip() == "":
-    return f"{field} must be a non-empty string"
+    return f"'{field}' must be a non-empty string."
   
   
 def parse_relationship(relationship_str: str) -> Relationship:
   if not is_valid_string(relationship_str):
     return "Not a valid string"
   
-  relationship_str = relationship_str.strip().title()
+  relationship_title = relationship_str.strip().title()
   
   for relationship_type in Relationship:
-    if relationship_type.value == relationship_str:
+    if relationship_type.value == relationship_title:
       return relationship_type
-  return "Selected relationship does not exist"
+  return f"Relationship '{relationship_str}' does not exist."

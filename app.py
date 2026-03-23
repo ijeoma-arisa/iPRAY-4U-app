@@ -85,16 +85,19 @@ def add_person():
   relationship = parse_relationship(data.get("relationship"))
   prayer = data.get("prayer")
   
-  # values = [name, relationship, prayer]
   
   # TODO: Add name, relationship, prayer to output with invalid message
   invalid_fields = []
-  if validate_str(name) is not None:
-    invalid_fields.append(validate_str(name))
+  if validate_str("name", name) is not None:
+    invalid_fields.append(validate_str("name", name))
   
-  if validate_str(prayer) is not None:
-    invalid_fields.append(validate_str(prayer))
+  if validate_str("prayer", prayer) is not None:
+    invalid_fields.append(validate_str("prayer", prayer))
     
+  if type(relationship) != Relationship:
+    invalid_fields.append(relationship)
+    
+  #TODO: Fix formatting instead of joining with commas
   if invalid_fields:
     return error_json(f"Invalid fields: {", ".join(invalid_fields)}"), 400
 
