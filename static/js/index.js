@@ -87,7 +87,7 @@ async function handlePrayerRequestInput(){
       body: JSON.stringify(formData)
     };
     
-    const personExists = prayerRequestForm.dataset.personId !== undefined && prayerRequestForm.elements.name.readOnly && prayerRequestForm.elements.relationship.disabled;
+    const personExists = prayerRequestForm.dataset.personId !== undefined && prayerRequestForm.elements.name.disabled && prayerRequestForm.elements.relationship.disabled;
     
     const prayerRoute = personExists ? 
         `/api/people/${prayerRequestForm.dataset.personId}/prayers`:
@@ -96,7 +96,7 @@ async function handlePrayerRequestInput(){
     const response = await fetch(prayerRoute, options);
     const {status, message} = await response.json();
 
-    // console.log(`${status}:${message}`);
+    console.log(`${status}:${message}`);
 
     if (status === 'success') {
       const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');

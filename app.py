@@ -183,12 +183,12 @@ def add_prayer(person_id):
   
   data = request.get_json()
   
-  missing_fields = require_fields(data, ["prayer", "has_prayed"])
+  missing_fields = require_fields(data, ["prayer"])
   if missing_fields:
     return error_json(missing_fields), 400
   
   prayer = data.get("prayer")
-  has_prayed = data.get("has_prayed")
+  has_prayed = data.get("has_prayed", False)
   
   # TODO: Validate 'prayer' and 'has_prayed' data types
   # Edge case: either field is present but assigned None value

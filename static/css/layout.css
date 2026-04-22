@@ -65,15 +65,33 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.prayer-requests-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+  border-radius: 1rem; 
+  width: 95%;
 }
 
 .prayer-requests-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   border-radius: 6px;
   width: 100%;
-  text-align: center;
+  gap: 1rem;
 }
 
 .prayer-requests-title {
+  display: flex;
+  justify-content: center;
   color: black;
   border-radius: 6px;
+  background-color: white;
+  width: 80%;
 }
