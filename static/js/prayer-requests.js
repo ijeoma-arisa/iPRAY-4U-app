@@ -8,7 +8,7 @@ function displayTime(){
 }
 
 async function renderRelationshipButtons() {
-  const response = await fetch("/relationships");
+  const response = await fetch("/api/relationships");
   const {status, data: relationships} = await response.json();
 
   let relationshipsHTML = '<button class="btn relationship-button relationship-button-fav">Favorites</button>';
@@ -22,7 +22,7 @@ async function renderRelationshipButtons() {
 }
 
 async function loadPrayers(person_id) {
-  const response = await fetch(`people/${person_id}/prayers`);
+  const response = await fetch(`/api/people/${person_id}/prayers`);
   const {status, data: prayers} = await response.json();
 
   let prayersHTML = '';
@@ -42,7 +42,7 @@ async function loadPrayers(person_id) {
 }
 
 export async function renderPersonCards() {
-  const response = await fetch("/people");
+  const response = await fetch("/api/people");
   const {status, data: persons} = await response.json();
   
   let personHTML = '';
@@ -84,7 +84,7 @@ function initPrayerEventListeners() {
     if (!personCard && !prayerCard) return;
     
     const personId = personCard.dataset.personId;
-    const personRoute = `/people/${personId}`;
+    const personRoute = `/api/people/${personId}`;
     
     if (event.target.classList.contains('delete-person-button')){
       await fetch(personRoute, {method: "DELETE"});

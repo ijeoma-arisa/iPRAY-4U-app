@@ -57,7 +57,7 @@ function initPrayerRequestModalListeners(){
 }
 
 async function renderRelationshipDropdown() {
-  const response = await fetch("/relationships");
+  const response = await fetch("/api/relationships");
   const {status, data: relationships} = await response.json();
   
   let relationshipsHTML = '<option value="Select...">Select...</option>';
@@ -90,8 +90,8 @@ async function handlePrayerRequestInput(){
     const personExists = prayerRequestForm.dataset.personId !== undefined && prayerRequestForm.elements.name.readOnly && prayerRequestForm.elements.relationship.disabled;
     
     const prayerRoute = personExists ? 
-        `/people/${prayerRequestForm.dataset.personId}/prayers`:
-        '/people'
+        `/api/people/${prayerRequestForm.dataset.personId}/prayers`:
+        '/api/people'
         
     const response = await fetch(prayerRoute, options);
     const {status, message} = await response.json();

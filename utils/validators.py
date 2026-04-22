@@ -13,13 +13,12 @@ def require_str(value, field_name):
   if not is_valid_string(value):
     raise ValueError(f"{field_name} must be a non-empty string.")
   
-  
 def require_fields(data, fields):
-  missing = [f for f in fields if data.get(f) is None]
+  missing = [f"'{f}'" for f in fields if data.get(f) is None]
   
-  return missing
+  if missing:
+    return f"Missing fields: {", ".join(missing)}"
     
-
 def parse_str(field, value):
   if not isinstance(value, str):
     return [f"Invalid type: '{field}' must be a string. Received type {type(value)}."]

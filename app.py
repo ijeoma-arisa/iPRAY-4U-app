@@ -183,8 +183,16 @@ def add_prayer(person_id):
   
   data = request.get_json()
   
-  prayer = data.get("prayer", None)
-  has_prayed = data.get("has_prayed", False)
+  missing_fields = require_fields(data, ["prayer", "has_prayed"])
+  if missing_fields:
+    return error_json(missing_fields), 400
+  
+  prayer = data.get("prayer")
+  has_prayed = data.get("has_prayed")
+  
+  # TODO: Validate 'prayer' and 'has_prayed' data types
+  # Edge case: either field is present but assigned None value
+  # May update validator functions used, then delete later
   
   if is_valid_string(prayer) and is_valid_int_as_bool(has_prayed):
     db.execute(INSERT_PRAYER_QUERY, (person_id, prayer, has_prayed))

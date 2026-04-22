@@ -19,7 +19,6 @@ body {
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
   background: var(--light-purple);
   color: white;
-  zoom: 0.75;
 }
 
 a {

@@ -232,7 +232,8 @@ textarea {
 }
 
 .prayer-card:hover {
-  background-color: rgba(128, 128, 128, 0.6);
+  background-color: rgb(208, 208, 208);
+  cursor: pointer;
 }
 
 .prayer-text {

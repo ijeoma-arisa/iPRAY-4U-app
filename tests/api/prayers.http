@@ -40,6 +40,30 @@ Content-Type: application/json
   "has_prayed": true
 }
 
+### Add invalid prayer - missing prayer
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+  "has_prayed": true
+}
+
+### Add invalid prayer - missing has_prayed
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+  "prayer": "Perseverance"
+}
+
+### Add invalid prayer - missing both
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+
+}
+
 ### Add invalid prayer - person does not exist
 POST {{baseUrl}}/api/people/0/prayers
 Content-Type: application/json
