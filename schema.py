@@ -75,7 +75,7 @@ UPDATE_PERSON_NAME_QUERY = "UPDATE people SET name = ? WHERE id = ?"
 
 UPDATE_PERSON_RELATIONSHIP_QUERY = "UPDATE people SET relationship_id = ? WHERE id = ?"
 
-UPDATE_PRAYER_TEXT_QUERY = "UPDATE prayers SET text = ? WHERE id = ?"
+UPDATE_PRAYER_TEXT_QUERY = "UPDATE prayers SET prayer = ? WHERE id = ?"
 
 UPDATE_PRAYER_HAS_PRAYED_QUERY = "UPDATE prayers SET has_prayed = ? WHERE id = ?"
 

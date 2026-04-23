@@ -49,11 +49,11 @@ function initPrayerRequestModalListeners(){
 
       addPrayerRequestModal.showModal();
     }
-    
+
     if (event.target.classList.contains('close-prayer-request-modal-js')) {
       addPrayerRequestModal.close();
     }
-    });
+  });
 }
 
 async function renderRelationshipDropdown() {
@@ -87,7 +87,7 @@ async function handlePrayerRequestInput(){
       body: JSON.stringify(formData)
     };
     
-    const personExists = prayerRequestForm.dataset.personId !== undefined && prayerRequestForm.elements.name.disabled && prayerRequestForm.elements.relationship.disabled;
+    const personExists = prayerRequestForm.dataset.personId !== undefined && prayerRequestForm.elements.name.readOnly && prayerRequestForm.elements.relationship.disabled;
     
     const prayerRoute = personExists ? 
         `/api/people/${prayerRequestForm.dataset.personId}/prayers`:

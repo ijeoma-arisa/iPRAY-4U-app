@@ -202,10 +202,6 @@ textarea {
   transition: all 0.3s ease-out;
 }
 
-.person-card:hover {
-  transform: scale(1.05);
-}
-
 .person-info-section {
   display: flex;
   flex-direction: column;
@@ -234,11 +230,6 @@ textarea {
   transition: all 0.3s ease-out;
 }
 
-.prayer-card:hover {
-  background-color: rgb(208, 208, 208);
-  cursor: pointer;
-}
-
 .prayer-text {
   padding: 20px;
   flex: 1;
@@ -263,5 +254,12 @@ textarea {
 .delete-person-button:hover, 
 .delete-prayer-button:hover {
   background-color: var(--darker-red);
-  transform: scale(1.05);
+}
+
+.edit-prayer-button {
+  background-color: var(--main-green);
+}
+
+.edit-prayer-button:hover {
+  background-color: var(--darker-green);
 }

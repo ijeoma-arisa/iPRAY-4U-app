@@ -8,6 +8,8 @@
   --light-gray: #ccc;
   --main-red: rgb(255, 82, 82);
   --darker-red: rgb(137, 39, 39);
+  --main-green: rgb(66, 189, 57);
+  --darker-green: rgb(41, 115, 36);
 }
 
 html, body {
