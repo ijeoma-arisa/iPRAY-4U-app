@@ -60,7 +60,7 @@
   text-align: center;
 }
 
-.prayer-request-form {
+form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -82,7 +82,7 @@ label {
   margin-bottom: 0.5rem;
 }
 
-.prayer-request-form input, textarea, select {
+form input, textarea, select {
   font-family: inherit;
   font-size: 1rem;
   padding: 0.5rem 1rem;
@@ -202,6 +202,13 @@ textarea {
   transition: all 0.3s ease-out;
 }
 
+.person-buttons {
+  display:flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+
 .person-info-section {
   display: flex;
   flex-direction: column;
@@ -256,10 +263,12 @@ textarea {
   background-color: var(--darker-red);
 }
 
+.edit-person-button,
 .edit-prayer-button {
   background-color: var(--main-green);
 }
 
+.edit-person-button:hover,
 .edit-prayer-button:hover {
   background-color: var(--darker-green);
 }

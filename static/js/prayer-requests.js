@@ -1,4 +1,4 @@
-import { initPrayerRequestModal } from './index.js';
+import { initPrayerRequestModal, renderRelationshipDropdown } from './index.js';
 
 function displayTime(){
   const today = new Date();
@@ -60,11 +60,22 @@ export async function renderPersonCards() {
     const prayersHTML = await loadPrayers(person.id);
     
     personHTML += `
-        <div class="person-card" data-person-id=${person.id}>
+        <div class="person-card person-card-js" data-person-id=${person.id}>
           <div class="person-info-section">
             <h3>${person.name}</h3>
             <p>${person.relationship}</p>
-            <button class="btn delete-person-button">Delete</button>
+            <div class="person-buttons">
+              <button 
+                class="btn edit-person-button edit-person-button-js"
+                data-person-id="${person.id}"
+                data-person-name="${person.name}"
+                data-person-relationship="${person.relationship}"
+              >
+                <i class="fa fa-pencil" aria-hidden="true"></i> 
+                Edit
+              </button>
+              <button class="btn delete-person-button delete-person-button-js"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+            </div>
           </div>
           <div class="prayer-cards-section">
             ${prayersHTML}
@@ -79,28 +90,28 @@ export async function renderPersonCards() {
         </div>`;
   }
 
-  document.querySelector('.person-cards')
+  document.querySelector('.person-cards-js')
     .innerHTML = personHTML;
 }
 
 function initPrayerEventListeners() {
-  const personCards = document.querySelector('.person-cards');
+  const personCards = document.querySelector('.person-cards-js');
 
   personCards.addEventListener('click', async (event) => {
-    const personCard = event.target.closest('.person-card');
-    const prayerCard = event.target.closest('.prayer-card');
+    const personCard = event.target.closest('.person-card-js');
+    const prayerCard = event.target.closest('.prayer-card-js');
 
     if (!personCard && !prayerCard) return;
     
     const personId = personCard.dataset.personId;
     const personRoute = `/api/people/${personId}`;
     
-    if (event.target.classList.contains('delete-person-button')){
+    if (event.target.classList.contains('delete-person-button-js')){
       await fetch(personRoute, {method: "DELETE"});
       personCard.remove();
     }
     
-    if (event.target.classList.contains('delete-prayer-button')){
+    if (event.target.classList.contains('delete-prayer-button-js')){
       const prayerId = prayerCard.dataset.id;
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
       
@@ -137,7 +148,8 @@ function initEditPrayerModalListeners(){
       if (personId && prayerId && prayerText){
           const editPrayerForm = document.querySelector('.edit-prayer-form');
           editPrayerForm.dataset.personId = personId; 
-          editPrayerForm.dataset.prayerId = prayerId; 
+          editPrayerForm.dataset.prayerId = prayerId;
+
           editPrayerForm.elements.prayer.value = prayerText;
       }
 
@@ -168,12 +180,8 @@ async function handleEditPrayerInput(){
 
     const prayerRoute = `/api/people/${editPrayerForm.dataset.personId}/prayers/${editPrayerForm.dataset.prayerId}`;
 
-    console.log(prayerRoute);
-
     const response = await fetch(prayerRoute, options);
     const { status, message } = await response.json();
-
-    console.log(`${status}:${message}`);
 
     if (status === 'success') {
       const editPrayerModal = document.querySelector('.edit-prayer-modal-js');
@@ -185,10 +193,96 @@ async function handleEditPrayerInput(){
   });
 }
 
+function renderEditPersonModal(){
+  document.querySelector('.edit-person-modal-js').innerHTML =
+  `<button class="close-button close-edit-person-modal-js" aria-label="Close">&times;</button>
+    <form class="edit-person-form" method="POST">
+      <h2 class="form-title">Edit Person</h2>
+      <div class="form-data">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Name" required/>
+      </div>
+      <div class="form-data">
+        <label for="relationship">Relationship</label> 
+        <select id="relationship" name="relationship" class="relationship-dropdown-js" required>
+        </select>
+      </div>
+      <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
+    </form>`;
+}
+
+function initEditPersonModalListeners(){
+  const editPersonModal = document.querySelector('.edit-person-modal-js');
+
+  document.addEventListener('click', (event) => {
+    if (event.target.classList.contains('edit-person-button-js')) {
+      const editPersonButton = event.target.closest('.edit-person-button-js');
+
+      const personId = editPersonButton.dataset.personId;
+      const personName = editPersonButton.dataset.personName;
+      const personRelationship = editPersonButton.dataset.personRelationship;
+
+      if (personId && personName && personRelationship){
+        const editPersonForm = document.querySelector('.edit-person-form');
+        editPersonForm.dataset.personId = personId;
+        editPersonForm.dataset.personName = personName;
+        editPersonForm.dataset.personRelationship = personRelationship;
+
+        editPersonForm.elements.name.value = personName;
+        editPersonForm.elements.relationship.value = personRelationship;
+      }
+
+      editPersonModal.showModal();
+    }
+
+    if (event.target.classList.contains('close-edit-person-modal-js')){
+      editPersonModal.close();
+    }
+  });
+}
+
+async function handleEditPersonInput(){
+  const editPersonForm = document.querySelector('.edit-person-form');
+
+  editPersonForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const formData = {
+      name: editPersonForm.elements.name.value,
+      relationship: editPersonForm.elements.relationship.value
+    }
+
+    const options = {
+      method: "PATCH",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(formData)
+    };
+
+    const personRoute = `/api/people/${editPersonForm.dataset.personId}`;
+
+    const response = await fetch(personRoute, options);
+    const { status, message } = await response.json();
+
+    if (status === 'success') {
+      const editPersonModal = document.querySelector('.edit-person-modal-js');
+      renderPersonCards();
+
+      editPersonModal.close();
+    }
+  });
+}
+
+
 function initEditPrayerModal(){
   renderEditPrayerModal();
   initEditPrayerModalListeners();
   handleEditPrayerInput();
+}
+
+function initEditPersonModal(){
+  renderEditPersonModal();
+  initEditPersonModalListeners();
+  handleEditPersonInput();
 }
 
 async function initPage(){
@@ -198,10 +292,12 @@ async function initPage(){
   initPrayerEventListeners();
 
   initEditPrayerModal();
+  initEditPersonModal();
 
   renderRelationshipButtons();
   renderPersonCards();
   
+  renderRelationshipDropdown();
 }
 
 initPage();

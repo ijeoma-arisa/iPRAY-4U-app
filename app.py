@@ -125,7 +125,7 @@ def update_person(person_id):
     return error_json("Person not found"), 404 
     
   name = data.get("name", None)
-  relationship = parse_relationship(data.get("relationship", None))
+  relationship = parse_relationship("relationship", data.get("relationship"))
   
   # TODO: Add error message for invalid name
   if is_valid_string(name):

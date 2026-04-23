@@ -56,7 +56,7 @@ function initPrayerRequestModalListeners(){
   });
 }
 
-async function renderRelationshipDropdown() {
+export async function renderRelationshipDropdown() {
   const response = await fetch("/api/relationships");
   const {status, data: relationships} = await response.json();
   
@@ -66,7 +66,7 @@ async function renderRelationshipDropdown() {
     relationshipsHTML += `<option value="${relationship.relationship}">${relationship.relationship}</option>`;
   });
 
-  document.querySelector('.relationship-dropdown-js').innerHTML = relationshipsHTML;
+  document.querySelectorAll('.relationship-dropdown-js').forEach((dropdown) => dropdown.innerHTML = relationshipsHTML);
 }
 
 async function handlePrayerRequestInput(){
@@ -113,8 +113,9 @@ async function handlePrayerRequestInput(){
 export function initPrayerRequestModal(){
   renderPrayerRequestModal();
   initPrayerRequestModalListeners();
-  renderRelationshipDropdown();
+  // renderRelationshipDropdown();
   handlePrayerRequestInput();
 }
 
 initPrayerRequestModal();
+renderRelationshipDropdown();
