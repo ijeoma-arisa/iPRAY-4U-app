@@ -6,10 +6,14 @@
   --light-blue: rgb(148, 246, 248);
   --darker-blue: rgb(8, 90, 91);
   --light-gray: #ccc;
+  --gray: #6d6d6d;
+  --darker-gray: #3c3c3c;
   --main-red: rgb(255, 82, 82);
   --darker-red: rgb(137, 39, 39);
   --main-green: rgb(66, 189, 57);
   --darker-green: rgb(41, 115, 36);
+  --main-yellow: rgb(255, 216, 76);
+  --darker-yellow: rgb(202, 172, 65);
 }
 
 html, body {

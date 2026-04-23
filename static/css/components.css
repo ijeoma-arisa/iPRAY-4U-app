@@ -253,6 +253,24 @@ textarea {
   justify-content: center;
 }
 
+.mark-prayed-button {
+  background-color: var(--main-green);
+}
+
+.mark-prayed-button:hover  {
+  background-color: var(--darker-green);
+}
+
+.edit-person-button,
+.edit-prayer-button {
+  background-color: var(--gray);
+}
+
+.edit-person-button:hover,
+.edit-prayer-button:hover{
+  background-color: var(--darker-gray);
+}
+
 .delete-person-button, 
 .delete-prayer-button {
   background-color: var(--main-red);
@@ -261,14 +279,4 @@ textarea {
 .delete-person-button:hover, 
 .delete-prayer-button:hover {
   background-color: var(--darker-red);
-}
-
-.edit-person-button,
-.edit-prayer-button {
-  background-color: var(--main-green);
-}
-
-.edit-person-button:hover,
-.edit-prayer-button:hover {
-  background-color: var(--darker-green);
 }

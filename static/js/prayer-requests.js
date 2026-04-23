@@ -29,11 +29,20 @@ async function loadPrayers(person_id) {
 
   prayers.forEach(prayer => {
     prayersHTML += `
-          <div class="prayer-card" data-id="${prayer.id}">
+          <div class="prayer-card" 
+            data-prayer-id="${prayer.id}"
+            data-prayer-text="${prayer.prayer}"
+            data-prayer-has-prayed="${prayer.hasPrayed}"  
+          >
             <div class="prayer-text">
               ${prayer.prayer}
             </div>
             <div class="update-prayer-buttons">
+              <button 
+                class="btn mark-prayed-button mark-prayed-button-js"
+              >
+                <i class="fa-solid fa-hands-praying"></i>
+              </button>
               <button 
                 class="btn edit-prayer-button edit-prayer-button-js"
                 data-person-id="${person_id}"
@@ -41,9 +50,9 @@ async function loadPrayers(person_id) {
                 data-prayer-text="${prayer.prayer}"
                 data-prayer-has-prayed="${prayer.hasPrayed}"  
               >
-                <i class="fa fa-pencil" aria-hidden="true"></i>
+                <i class="fa-solid fa-pencil" aria-hidden="true"></i>
               </button>
-              <button class="btn delete-prayer-button"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+              <button class="btn delete-prayer-button"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
             </div>
           </div>`;
   });
@@ -71,10 +80,10 @@ export async function renderPersonCards() {
                 data-person-name="${person.name}"
                 data-person-relationship="${person.relationship}"
               >
-                <i class="fa fa-pencil" aria-hidden="true"></i> 
+                <i class="fa-solid fa-pencil" aria-hidden="true"></i> 
                 Edit
               </button>
-              <button class="btn delete-person-button delete-person-button-js"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+              <button class="btn delete-person-button delete-person-button-js"><i class="fa-solid fa-trash" aria-hidden="true"></i> Delete</button>
             </div>
           </div>
           <div class="prayer-cards-section">
