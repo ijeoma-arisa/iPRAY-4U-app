@@ -24,36 +24,68 @@ function renderPrayerRequestModal() {
 }
 
 function initPrayerRequestModalListeners(){
-    const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+  const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
 
-    document.addEventListener('click', (event) => {
-
-    if (event.target.classList.contains('add-prayer-button-js')) {
-      
-      const addPrayerButton = event.target.closest('.add-prayer-button-js');
-      
+  const addPrayerButtons = document.querySelectorAll('.add-prayer-button-js').forEach((addPrayerButton) => {
+    addPrayerButton.addEventListener('click', () => {
       const personId = addPrayerButton.dataset.personId;
       const personName = addPrayerButton.dataset.personName;
       const personRelationship = addPrayerButton.dataset.personRelationship;
-      
+
+      console.log(personId);
+      console.log(personName);
+      console.log(personRelationship);
+  
       if (personId && personName && personRelationship) {
         const prayerRequestForm = document.querySelector('.prayer-request-form');
         prayerRequestForm.dataset.personId = personId; 
-
+  
         prayerRequestForm.elements.name.value = personName;
         prayerRequestForm.elements.name.readOnly = true;
         
         prayerRequestForm.elements.relationship.value = personRelationship;
         prayerRequestForm.elements.relationship.disabled = true;
       }
-
-      addPrayerRequestModal.showModal();
-    }
-
-    if (event.target.classList.contains('close-prayer-request-modal-js')) {
-      addPrayerRequestModal.close();
-    }
+        addPrayerRequestModal.showModal();
+    });
+  })
+    
+  const closeModalButton = document.querySelector('.close-prayer-request-modal-js');
+  
+  closeModalButton.addEventListener('click', ()  => {
+     addPrayerRequestModal.close();
   });
+
+    // const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+
+  //   document.addEventListener('click', (event) => {
+
+  //   if (event.target.classList.contains('add-prayer-button-js')) {
+      
+  //     const addPrayerButton = event.target.closest('.add-prayer-button-js');
+      
+  //     const personId = addPrayerButton.dataset.personId;
+  //     const personName = addPrayerButton.dataset.personName;
+  //     const personRelationship = addPrayerButton.dataset.personRelationship;
+      
+    //   if (personId && personName && personRelationship) {
+    //     const prayerRequestForm = document.querySelector('.prayer-request-form');
+    //     prayerRequestForm.dataset.personId = personId; 
+
+    //     prayerRequestForm.elements.name.value = personName;
+    //     prayerRequestForm.elements.name.readOnly = true;
+        
+    //     prayerRequestForm.elements.relationship.value = personRelationship;
+    //     prayerRequestForm.elements.relationship.disabled = true;
+    //   }
+
+    //   addPrayerRequestModal.showModal();
+    // }
+
+  //   if (event.target.classList.contains('close-prayer-request-modal-js')) {
+  //     addPrayerRequestModal.close();
+  //   }
+  // });
 }
 
 export async function renderRelationshipDropdown() {
@@ -101,6 +133,7 @@ async function handlePrayerRequestInput(){
     if (status === 'success') {
       const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
       renderPersonCards();
+
       
       prayerRequestForm.elements.prayer.value = "";
       addPrayerRequestModal.close();
