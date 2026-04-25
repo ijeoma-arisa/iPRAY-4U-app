@@ -62,8 +62,37 @@
           </div>
         </dialog>
 
-        <dialog class="modal modal-js edit-prayer-modal edit-prayer-modal-js"></dialog>
-        <dialog class="modal modal-js edit-person-modal edit-person-modal-js"></dialog>
+        <dialog class="modal modal-js edit-prayer-modal edit-prayer-modal-js">
+          <button class="close-button modal-form-js close-modal-js" aria-label="Close">&times;</button>
+          <form class="edit-prayer-form modal-form-js edit-prayer-form-js" method="POST">
+            <h2 class="form-title">Edit Prayer</h2>
+            <div class="form-data">
+              <label for="prayer">Prayer Request</label>
+              <textarea id="prayer" name="prayer" placeholder="Enter prayer here" rows="5" cols="20" required></textarea>
+
+              <label for="has-prayed">Prayed</label>
+              <input id="has-prayed" name="has-prayed" type="checkbox" value="Prayed" />
+            </div>
+            <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
+          </form>
+        </dialog>
+
+        <dialog class="modal modal-js edit-person-modal edit-person-modal-js">
+          <button class="close-button close-modal-js" aria-label="Close">&times;</button>
+          <form class="edit-person-form modal-form-js edit-person-form-js" method="POST">
+            <h2 class="form-title">Edit Person</h2>
+            <div class="form-data">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Name" required/>
+            </div>
+            <div class="form-data">
+              <label for="relationship">Relationship</label> 
+              <select id="relationship" name="relationship" class="relationship-dropdown-js" required>
+              </select>
+            </div>
+            <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
+          </form>
+        </dialog>
 
       </div>
     </div>

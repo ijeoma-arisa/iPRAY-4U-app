@@ -30,10 +30,11 @@ async function loadPrayers(person_id) {
     prayersHTML += `
           <div
             id="prayer-${prayer.id}" 
-            class="prayer-card prayer-card-js" 
-            data-prayer-id="${prayer.id}"
-            data-prayer-text="${prayer.prayer}"
-            data-has-prayed="${prayer['has_prayed']}"  
+            class="prayer-card prayer-card-js"
+              data-person-id="${person_id}" 
+              data-prayer-id="${prayer.id}"
+              data-prayer-text="${prayer.prayer}"
+              data-has-prayed="${prayer['has_prayed'] === 1}"  
           >
             <div class="prayer-text">
               ${prayer.prayer}
@@ -46,13 +47,7 @@ async function loadPrayers(person_id) {
                 <i class="fa-solid fa-hands-praying" aria-hidden="true"></i>
               </button>
 
-              <button 
-                class="btn edit-prayer-button edit-prayer-button-js"
-                data-person-id="${person_id}"
-                data-prayer-id="${prayer.id}"
-                data-prayer-text="${prayer.prayer}"
-                data-has-prayed="${prayer['has_prayed']}"  
-              >
+              <button class="btn edit-prayer-button edit-prayer-button-js">
                 <i class="fa-solid fa-pencil" aria-hidden="true"></i>
               </button>
 
@@ -198,53 +193,42 @@ function initDeleteModalListeners(){
   });
 }
 
-
-function renderEditPrayerModal() {
-  document.querySelector('.edit-prayer-modal-js').innerHTML =
-  `<button class="close-button close-modal-js" aria-label="Close">&times;</button>
-    <form class="edit-prayer-form" method="POST">
-      <h2 class="form-title">Edit Prayer</h2>
-      <div class="form-data">
-        <label for="prayer">Prayer Request</label>
-        <textarea id="prayer" name="prayer" placeholder="Enter prayer here" rows="5" cols="20" required></textarea>
-      </div>
-      <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
-    </form>`;
-}
-
 function initEditPrayerModalListeners(){
   const editPrayerModal = document.querySelector('.edit-prayer-modal-js');
 
   document.addEventListener('click', (event) => {
-    if (event.target.classList.contains('edit-prayer-button-js')) {
-      const editPrayerButton = event.target.closest('.edit-prayer-button-js');
+    const editPrayerButton = event.target.closest('.edit-prayer-button-js');
 
-      const personId = editPrayerButton.dataset.personId;
-      const prayerId = editPrayerButton.dataset.prayerId;
-      const prayerText = editPrayerButton.dataset.prayerText;
+    if (!editPrayerButton) return;
+    
+    const prayerCard = event.target.closest('.prayer-card-js');
+    if (!prayerCard) return;
 
+    const { personId, prayerId, prayerText, hasPrayed } = prayerCard.dataset;
 
-      if (personId && prayerId && prayerText){
-          const editPrayerForm = document.querySelector('.edit-prayer-form');
-          editPrayerForm.dataset.personId = personId; 
-          editPrayerForm.dataset.prayerId = prayerId;
+    if (personId && prayerId && prayerText && hasPrayed){
+      const editPrayerForm = document.querySelector('.edit-prayer-form-js');
 
-          editPrayerForm.elements.prayer.value = prayerText;
-      }
+      editPrayerForm.dataset.personId = personId;
+      editPrayerForm.dataset.prayerId = prayerId;
 
-      editPrayerModal.showModal();
+      editPrayerForm.elements.prayer.value = prayerText;
+      editPrayerForm.elements['has-prayed'].checked = hasPrayed === 'true';
     }
+
+    editPrayerModal.showModal();
   });
 }
 
 async function handleEditPrayerInput(){
-  const editPrayerForm = document.querySelector('.edit-prayer-form');
+  const editPrayerForm = document.querySelector('.edit-prayer-form-js');
 
   editPrayerForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const formData = {
-      prayer: editPrayerForm.elements.prayer.value
+      prayer: editPrayerForm.elements.prayer.value,
+      ['has_prayed']: editPrayerForm.elements['has-prayed'].checked ? 1 : 0,
     }
 
     const options = {
@@ -262,28 +246,9 @@ async function handleEditPrayerInput(){
       const editPrayerModal = document.querySelector('.edit-prayer-modal-js');
       renderPersonCards();
 
-      editPrayerForm.elements.prayer.value = "";
       editPrayerModal.close();
     }
   });
-}
-
-function renderEditPersonModal(){
-  document.querySelector('.edit-person-modal-js').innerHTML =
-  `<button class="close-button close-modal-js" aria-label="Close">&times;</button>
-    <form class="edit-person-form" method="POST">
-      <h2 class="form-title">Edit Person</h2>
-      <div class="form-data">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" placeholder="Name" required/>
-      </div>
-      <div class="form-data">
-        <label for="relationship">Relationship</label> 
-        <select id="relationship" name="relationship" class="relationship-dropdown-js" required>
-        </select>
-      </div>
-      <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
-    </form>`;
 }
 
 function initEditPersonModalListeners(){
@@ -298,7 +263,7 @@ function initEditPersonModalListeners(){
       const personRelationship = personCard.dataset.personRelationship;
 
       if (personId && personName && personRelationship){
-        const editPersonForm = document.querySelector('.edit-person-form');
+        const editPersonForm = document.querySelector('.edit-person-form-js');
         editPersonForm.dataset.personId = personId;
         editPersonForm.dataset.personName = personName;
         editPersonForm.dataset.personRelationship = personRelationship;
@@ -313,7 +278,7 @@ function initEditPersonModalListeners(){
 }
 
 async function handleEditPersonInput(){
-  const editPersonForm = document.querySelector('.edit-person-form');
+  const editPersonForm = document.querySelector('.edit-person-form-js');
 
   editPersonForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -344,13 +309,11 @@ async function handleEditPersonInput(){
 }
 
 function initEditPrayerModal(){
-  renderEditPrayerModal();
   initEditPrayerModalListeners();
   handleEditPrayerInput();
 }
 
 function initEditPersonModal(){
-  renderEditPersonModal();
   initEditPersonModalListeners();
   handleEditPersonInput();
 }

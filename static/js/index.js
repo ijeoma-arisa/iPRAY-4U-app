@@ -18,7 +18,7 @@ export function initCloseModalListeners(){
 function renderPrayerRequestModal() {
   document.querySelector('.add-prayer-request-modal-js').innerHTML = 
     `<button class="close-button close-modal-js" aria-label="Close">&times;</button>
-    <form class="prayer-request-form modal-form-js" method="POST">
+    <form class="prayer-request-form modal-form-js prayer-request-form-js" method="POST">
       <h2 class="form-title">New Prayer Request</h2>
       <div class="form-data">
         <label for="name">Name</label>
@@ -51,7 +51,7 @@ function initPrayerRequestModalListeners(){
         const { personId, personName, personRelationship } = personCard.dataset;
         
         if (personId && personName && personRelationship){
-          const prayerRequestForm = document.querySelector('.prayer-request-form');
+          const prayerRequestForm = document.querySelector('.prayer-request-form-js');
           
           prayerRequestForm.elements.id = personId;
           
@@ -64,40 +64,9 @@ function initPrayerRequestModalListeners(){
       }
 
       addPrayerRequestModal.showModal();
-
-
-      
-      // const personId = addPrayerButton.dataset.personId;
-      // const personName = addPrayerButton.dataset.personName;
-      // const personRelationship = addPrayerButton
-      // if (event.target.classList.contains('add-prayer-button-js')) {
-        
-      //   // const addPrayerButton = event.target.closest('.add-prayer-button-js');
-        
-      //   const personId = addPrayerButton.dataset.personId;
-      //   const personName = addPrayerButton.dataset.personName;
-      //   const personRelationship = addPrayerButton.dataset.personRelationship;
-        
-      //   if (personId && personName && personRelationship) {
-      //     const prayerRequestForm = document.querySelector('.prayer-request-form');
-      //     prayerRequestForm.dataset.personId = personId; 
-
-      //     prayerRequestForm.elements.name.value = personName;
-      //     prayerRequestForm.elements.name.readOnly = true;
-          
-      //     prayerRequestForm.elements.relationship.value = personRelationship;
-      //     prayerRequestForm.elements.relationship.disabled = true;
-      //   }
-
-      //   addPrayerRequestModal.showModal();
-      // }
-
-      // if (event.target.classList.contains('close-prayer-request-modal-js')) {
-      //   addPrayerRequestModal.close();
-      // }
   });
 
-  const prayerRequestForm = document.querySelector('.prayer-request-form');
+  const prayerRequestForm = document.querySelector('.prayer-request-form-js');
 
   addPrayerRequestModal.addEventListener('close', () => {
     prayerRequestForm.reset();
@@ -119,7 +88,7 @@ export async function renderRelationshipDropdown() {
 }
 
 async function handlePrayerRequestInput(){
-  const prayerRequestForm = document.querySelector('.prayer-request-form');
+  const prayerRequestForm = document.querySelector('.prayer-request-form-js');
 
   prayerRequestForm.addEventListener('submit', async (event) => {
     event.preventDefault();
