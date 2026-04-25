@@ -22,11 +22,11 @@
 .relationship-button {
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: var(--main-blue);
+  background-color: var(--main-purple);
   margin-right: 10px;
 }
 
-.add-prayer-button:hover, .save-button:hover, .relationship-button:hover {
+.add-prayer-button:hover, .save-button:hover {
   background: var(--darker-blue);
 }
 
@@ -35,7 +35,7 @@
   width: 50%;
 }
 
-.view-button:hover {
+.view-button:hover, .relationship-button:hover {
   background: var(--darker-purple);
 }
 
@@ -97,6 +97,9 @@ textarea {
 }
 
 .modal:open {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   height: 30rem;
   width: 20rem;
   overflow: hidden;
@@ -262,21 +265,25 @@ textarea {
 }
 
 .edit-person-button,
-.edit-prayer-button {
+.edit-prayer-button,
+.deny-delete-button {
   background-color: var(--gray);
 }
 
 .edit-person-button:hover,
-.edit-prayer-button:hover{
+.edit-prayer-button:hover,
+.deny-delete-button:hover {
   background-color: var(--darker-gray);
 }
 
 .delete-person-button, 
-.delete-prayer-button {
+.delete-prayer-button,
+.confirm-delete-button {
   background-color: var(--main-red);
 }
 
 .delete-person-button:hover, 
-.delete-prayer-button:hover {
+.delete-prayer-button:hover,
+.confirm-delete-button:hover {
   background-color: var(--darker-red);
 }

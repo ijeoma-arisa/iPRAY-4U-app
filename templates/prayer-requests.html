@@ -43,19 +43,25 @@
           </div>
         </div>
         
+        <button class="btn add-prayer-button add-prayer-button-js">Add New Prayer Request</button>
+        
         <div class="relationships-row relationships-row-js"></div>
-
+        
         <div class="person-cards person-cards-js"></div>
+
         <dialog class="modal add-prayer-request-modal-js"></dialog>
+        
         <dialog class="modal delete-item-modal-js">
           <button class="close-button close-delete-item-modal-js" aria-label="Close">&times;</button>
-          <h2 class="form-title">Delete</h2>
-          <h2 class="item-to-delete"></h2>
+          <h2 class="form-title delete-title-js"></h2>
+          <div>Are you sure you want to delete this <span class="item-to-delete-type"></span>?</div>
+          <div class="item-to-delete"></div>
           <div>
-            <button class="btn confirm-delete-button confirm-delete-button-js">Yes</button>
-            <button class="btn deny-delete-button deny-delete-button-js">No</button>
+            <button class="btn confirm-delete-button confirm-delete-button-js">Delete</button>
+            <button class="btn deny-delete-button deny-delete-button-js">Cancel</button>
           </div>
         </dialog>
+
         <dialog class="modal edit-prayer-modal edit-prayer-modal-js"></dialog>
         <dialog class="modal edit-person-modal edit-person-modal-js"></dialog>
 

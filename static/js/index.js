@@ -24,36 +24,7 @@ function renderPrayerRequestModal() {
 }
 
 function initPrayerRequestModalListeners(){
-  // const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
-
-  // const addPrayerButtons = document.querySelectorAll('.add-prayer-button-js').forEach((addPrayerButton) => {
-  //   addPrayerButton.addEventListener('click', () => {
-  //     const personId = addPrayerButton.dataset.personId;
-  //     const personName = addPrayerButton.dataset.personName;
-  //     const personRelationship = addPrayerButton.dataset.personRelationship;
-  
-  //     if (personId && personName && personRelationship) {
-  //       const prayerRequestForm = document.querySelector('.prayer-request-form');
-  //       prayerRequestForm.dataset.personId = personId; 
-  
-  //       prayerRequestForm.elements.name.value = personName;
-  //       prayerRequestForm.elements.name.readOnly = true;
-        
-  //       prayerRequestForm.elements.relationship.value = personRelationship;
-  //       prayerRequestForm.elements.relationship.disabled = true;
-  //     }
-  //       addPrayerRequestModal.showModal();
-  //   });
-  // })
-    
-  // const closeModalButton = document.querySelector('.close-prayer-request-modal-js');
-  
-  // closeModalButton.addEventListener('click', ()  => {
-  //    addPrayerRequestModal.close();
-  // });
-
     const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
-
     document.addEventListener('click', (event) => {
 
     if (event.target.classList.contains('add-prayer-button-js')) {
@@ -82,13 +53,20 @@ function initPrayerRequestModalListeners(){
       addPrayerRequestModal.close();
     }
   });
+
+  const prayerRequestForm = document.querySelector('.prayer-request-form');
+
+  addPrayerRequestModal.addEventListener('close', () => {
+    prayerRequestForm.reset();
+    renderPersonCards();
+  });
 }
 
 export async function renderRelationshipDropdown() {
   const response = await fetch("/api/relationships");
   const {status, data: relationships} = await response.json();
   
-  let relationshipsHTML = '<option value="Select...">Select...</option>';
+  let relationshipsHTML = '<option value="" disabled selected hidden>Select...</option>';
 
   relationships.forEach(relationship => {
     relationshipsHTML += `<option value="${relationship.relationship}">${relationship.relationship}</option>`;
@@ -126,10 +104,6 @@ async function handlePrayerRequestInput(){
 
     if (status === 'success') {
       const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
-      renderPersonCards();
-
-      
-      prayerRequestForm.elements.prayer.value = "";
       addPrayerRequestModal.close();
     }
 

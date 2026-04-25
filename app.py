@@ -153,7 +153,7 @@ def delete_person(person_id):
   db.execute(DELETE_PERSON_QUERY, (person_id,))
   db.commit()
   
-  return success_json("Person deleted"), 204
+  return '', 204
 
 @app.route("/api/prayers", methods=["GET"])
 def get_prayers():
