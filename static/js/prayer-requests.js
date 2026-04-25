@@ -1,4 +1,4 @@
-import { initPrayerRequestModal, renderRelationshipDropdown } from './index.js';
+import { initPrayerRequestModal, renderRelationshipDropdown, initCloseModalListeners } from './index.js';
 
 function displayTime(){
   const today = new Date();
@@ -17,8 +17,7 @@ async function renderRelationshipButtons() {
     relationshipsHTML += `<button class="btn relationship-button relationship-button-${relationship.id}">${relationship.relationship}</button>`;
   });
 
-  document.querySelector('.relationships-row-js')
-    .innerHTML = relationshipsHTML;
+  document.querySelector('.relationships-row-js').innerHTML = relationshipsHTML;
 }
 
 async function loadPrayers(person_id) {
@@ -100,10 +99,11 @@ export async function renderPersonCards() {
             ${prayersHTML}
           </div>
           <button id=${person.id} 
-          class="btn add-prayer-button add-prayer-button-js" 
-          data-person-id=${person.id} 
-          data-person-name="${person.name}" 
-          data-person-relationship="${person.relationship}">
+            class="btn add-prayer-button add-prayer-button-js" 
+            data-person-id=${person.id} 
+            data-person-name="${person.name}" 
+            data-person-relationship="${person.relationship}"
+          >
             Add Prayer 
           </button>
         </div>`;
@@ -184,11 +184,6 @@ function initDeleteModalListeners(){
   const deleteItemModal = document.querySelector('.delete-item-modal-js');
 
   deleteItemModal.addEventListener('click', async (event) => {
-    if (event.target.classList.contains('close-delete-item-modal-js') ||
-        event.target.classList.contains('deny-delete-button-js')){
-      deleteItemModal.close();
-    }
-
     if (event.target.classList.contains('confirm-delete-button-js')){
       const route = deleteItemModal.dataset.route;
       const itemId = deleteItemModal.dataset.itemId;
@@ -206,7 +201,7 @@ function initDeleteModalListeners(){
 
 function renderEditPrayerModal() {
   document.querySelector('.edit-prayer-modal-js').innerHTML =
-  `<button class="close-button close-edit-prayer-modal-js" aria-label="Close">&times;</button>
+  `<button class="close-button close-modal-js" aria-label="Close">&times;</button>
     <form class="edit-prayer-form" method="POST">
       <h2 class="form-title">Edit Prayer</h2>
       <div class="form-data">
@@ -238,10 +233,6 @@ function initEditPrayerModalListeners(){
       }
 
       editPrayerModal.showModal();
-    }
-
-    if (event.target.classList.contains('close-edit-prayer-modal-js')){
-      editPrayerModal.close();
     }
   });
 }
@@ -279,7 +270,7 @@ async function handleEditPrayerInput(){
 
 function renderEditPersonModal(){
   document.querySelector('.edit-person-modal-js').innerHTML =
-  `<button class="close-button close-edit-person-modal-js" aria-label="Close">&times;</button>
+  `<button class="close-button close-modal-js" aria-label="Close">&times;</button>
     <form class="edit-person-form" method="POST">
       <h2 class="form-title">Edit Person</h2>
       <div class="form-data">
@@ -317,10 +308,6 @@ function initEditPersonModalListeners(){
       }
 
       editPersonModal.showModal();
-    }
-
-    if (event.target.classList.contains('close-edit-person-modal-js')){
-      editPersonModal.close();
     }
   });
 }
@@ -380,7 +367,7 @@ async function initPage(){
   renderPersonCards();
   initPrayerEventListeners();
   initDeleteModalListeners();
-  
+  initCloseModalListeners();
 }
 
 initPage();
