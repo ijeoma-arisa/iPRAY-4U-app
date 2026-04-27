@@ -30,12 +30,13 @@ function initPrayerRequestModalListeners(){
       if (!addPrayerButton) return;
       
       const personCard = event.target.closest('.person-card-js');
+      const prayerRequestForm = document.querySelector('.prayer-request-form-js');
+      
       if (personCard){
         
         const { personId, personName, personRelationship } = personCard.dataset;
         
         if (personId && personName && personRelationship){
-          const prayerRequestForm = document.querySelector('.prayer-request-form-js');
           
           prayerRequestForm.dataset.personId = personId;
           
@@ -44,7 +45,7 @@ function initPrayerRequestModalListeners(){
           
           prayerRequestForm.elements.relationship.value = personRelationship;
           prayerRequestForm.elements.relationship.disabled = true;
-        }
+        } 
       }
 
       addPrayerRequestModal.showModal();
@@ -83,7 +84,6 @@ async function handlePrayerRequestInput({ onSuccess }){
       addPrayerRequestModal.close();
       onSuccess();
     }
-
   });
 
 }
@@ -246,14 +246,19 @@ export function initEditPersonModal({ onSuccess }){
 
 export function initCloseModalListeners(){
   document.querySelectorAll('.modal-js').forEach((modal) =>{
+    
+    modal.addEventListener('close', (event) => {
+      const form = modal.querySelector('.modal-form-js');
+      
+      if (form){
+        form.reset();
+        form.querySelectorAll('[disabled').forEach(elem => elem.disabled = false);
+      }
+    })
+
     modal.addEventListener('click', (event) => {
       const closeModalButton = event.target.closest('.close-modal-js');
       if (!closeModalButton) return;
-
-      const form = modal.querySelector('.modal-form-js');
-      console.log(form);
-      
-      if (form) form.reset();
 
       modal.close();
     });
