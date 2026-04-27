@@ -1,31 +1,7 @@
-export async function renderRelationshipButtons() {
-  const response = await fetch("/api/relationships");
-  const { status, data: relationships } = await response.json();
-
-  let relationshipsHTML = '<button class="btn relationship-button relationship-button-fav">Favorites</button>';
-
-  relationships.forEach(relationship => {
-    relationshipsHTML += `<button class="btn relationship-button relationship-button-${relationship.id}">${relationship.relationship}</button>`;
-  });
-
-  document.querySelector('.relationships-row-js').innerHTML = relationshipsHTML;
-}
-
-export async function renderRelationshipDropdown() {
-  const response = await fetch("/api/relationships");
-  const {status, data: relationships} = await response.json();
-  
-  let relationshipsHTML = '<option value="" disabled selected hidden>Select</option>';
-
-  relationships.forEach(relationship => {
-    relationshipsHTML += `<option value="${relationship.relationship}">${relationship.relationship}</option>`;
-  });
-
-  document.querySelectorAll('.relationship-dropdown-js').forEach((dropdown) => dropdown.innerHTML = relationshipsHTML);
-}
+import { GET_PEOPLE_URL } from './api/endpoints.js';
 
 async function loadPrayers(person_id) {
-  const response = await fetch(`/api/people/${person_id}/prayers`);
+  const response = await fetch(`${GET_PEOPLE_URL}/${person_id}/prayers`);
   const {status, data: prayers} = await response.json();
 
   let prayersHTML = '';
@@ -66,16 +42,16 @@ async function loadPrayers(person_id) {
   return prayersHTML;
 }
 
-export async function renderPersonCards() {
-  const response = await fetch("/api/people");
+export async function renderPersonCards(url) {
+  const response = await fetch(url);
   const {status, data: persons} = await response.json();
   
-  let personHTML = '';
+  let personCardsHTML = '';
 
   for (const person of persons){
     const prayersHTML = await loadPrayers(person.id);
     
-    personHTML += `
+    personCardsHTML += `
       <div
           id="person-${person.id}" 
           class="person-card person-card-js" 
@@ -107,8 +83,8 @@ export async function renderPersonCards() {
         </button>
       </div>`;
   }
-
+  
   document.querySelector('.person-cards-js')
-    .innerHTML = personHTML;
+    .innerHTML = personCardsHTML || 'No people found.';
 }
 

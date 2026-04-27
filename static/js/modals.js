@@ -1,3 +1,4 @@
+import { GET_PEOPLE_URL } from './api/endpoints.js';
 
 function renderPrayerRequestModal() {
   document.querySelector('.add-prayer-request-modal-js').innerHTML = 
@@ -73,8 +74,8 @@ async function handlePrayerRequestInput({ onSuccess }){
     const personExists = prayerRequestForm.dataset.personId !== undefined;
     
     const prayerRoute = personExists ? 
-        `/api/people/${prayerRequestForm.dataset.personId}/prayers`:
-        '/api/people'
+        `${GET_PEOPLE_URL}/${prayerRequestForm.dataset.personId}/prayers`:
+        GET_PEOPLE_URL
         
     const response = await fetch(prayerRoute, options);
     const { status, message } = await response.json();
@@ -94,7 +95,6 @@ export function initPrayerRequestModal({ onSuccess }){
   handlePrayerRequestInput({ onSuccess });
 }
 
-
 function initDeleteModalListeners({ onSuccess }){
   const deleteItemModal = document.querySelector('.delete-item-modal-js');
 
@@ -113,7 +113,7 @@ function initDeleteModalListeners({ onSuccess }){
   });
 }
 
-export function initDeleteModal({ onSuccess }){
+function initDeleteModal({ onSuccess }){
   initDeleteModalListeners({ onSuccess });
 }
 
@@ -162,7 +162,9 @@ async function handleEditPrayerInput({ onSuccess }){
       body: JSON.stringify(formData)
     };
 
-    const prayerRoute = `/api/people/${editPrayerForm.dataset.personId}/prayers/${editPrayerForm.dataset.prayerId}`;
+    const personId = editPrayerForm.dataset.personId;
+    const prayerId = editPrayerForm.dataset.prayerId;
+    const prayerRoute = `${GET_PEOPLE_URL}/${personId}/prayers/${prayerId}`;
 
     const response = await fetch(prayerRoute, options);
     const { status, message } = await response.json();
@@ -176,7 +178,7 @@ async function handleEditPrayerInput({ onSuccess }){
   });
 }
 
-export function initEditPrayerModal({ onSuccess }){
+function initEditPrayerModal({ onSuccess }){
   initEditPrayerModalListeners();
   handleEditPrayerInput({ onSuccess });
 }
@@ -225,7 +227,9 @@ async function handleEditPersonInput({ onSuccess }){
       body: JSON.stringify(formData)
     };
 
-    const personRoute = `/api/people/${editPersonForm.dataset.personId}`;
+    const personId = editPersonForm.dataset.personId;
+
+    const personRoute = `${GET_PEOPLE_URL}/${personId}`;
 
     const response = await fetch(personRoute, options);
     const { status, message } = await response.json();
@@ -239,7 +243,7 @@ async function handleEditPersonInput({ onSuccess }){
   });
 }
 
-export function initEditPersonModal({ onSuccess }){
+function initEditPersonModal({ onSuccess }){
   initEditPersonModalListeners();
   handleEditPersonInput({ onSuccess });
 }
@@ -263,4 +267,12 @@ export function initCloseModalListeners(){
       modal.close();
     });
   })
+}
+
+export function initModals({ onSuccess }){
+  initPrayerRequestModal({ onSuccess });
+  initEditPersonModal({ onSuccess });
+  initEditPrayerModal({ onSuccess });
+  initDeleteModal({ onSuccess });
+  initCloseModalListeners();
 }

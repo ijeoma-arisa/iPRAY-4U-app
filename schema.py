@@ -38,11 +38,7 @@ SELECT p.id, p.name, r.relationship
 FROM people AS p
 JOIN relationships AS r ON p.relationship_id = r.id"""
 
-SELECT_RELATIONSHIP_PEOPLE_QUERY = """
-SELECT p.* 
-FROM people AS p
-JOIN relationships AS r ON p.relationship_id = r.id
-WHERE r.relationship = ?"""
+SELECT_RELATIONSHIP_PEOPLE_QUERY = f"{SELECT_ALL_PEOPLE_QUERY} WHERE r.relationship = ?"
 
 SELECT_PERSON_QUERY = "SELECT * FROM people WHERE id = ?"
 

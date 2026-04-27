@@ -61,7 +61,7 @@ def prayer_requests_page():
 def get_people():
   db = get_db_connection()
   
-  relationship = parse_relationship("rel", request.args.get("rel", None))
+  relationship = parse_relationship("rel", request.args.get("rel"))
   
   people = (db.execute(SELECT_RELATIONSHIP_PEOPLE_QUERY, (relationship.value,)).fetchall()
             if type(relationship) is Relationship 

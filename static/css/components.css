@@ -35,7 +35,9 @@
   width: 50%;
 }
 
-.view-button:hover, .relationship-button:hover {
+.view-button:hover, 
+.relationship-button:hover,
+.relationship-button.is-selected {
   background: var(--darker-purple);
 }
 
@@ -178,7 +180,7 @@ textarea {
   gap: 3rem;
 }
 
-.relationships-row {
+.relationship-buttons-row {
   display: flex;
   justify-content: center;
 }

@@ -1,16 +1,12 @@
+import { initModals } from './modals.js';
+import { renderPersonCards } from './person-cards.js';
 import { 
-  initPrayerRequestModal, 
-  initEditPersonModal,
-  initEditPrayerModal,
-  initDeleteModal,
-  initCloseModalListeners 
-} from './modals.js';
-
-import { 
-  renderPersonCards, 
+  renderRelationshipDropdown, 
   renderRelationshipButtons, 
-  renderRelationshipDropdown,
-} from './ui.js';
+  initRelationshipButtonsRowListener 
+} from './relationships.js';
+import { GET_PEOPLE_URL } from './api/endpoints.js';
+
 
 function displayTime(){
   const currentTime = document.querySelector('.current-date-js');
@@ -36,7 +32,7 @@ function initPrayerEventListeners() {
     if (!personCard && !prayerCard) return;
     
     const personId = personCard.dataset.personId;
-    const personRoute = `/api/people/${personId}`;
+    const personRoute = `${GET_PEOPLE_URL}/${personId}`;
     
     if (event.target.classList.contains('delete-person-button-js')){
       deleteTitle.innerHTML = 'Delete Person';
@@ -82,7 +78,7 @@ function initPrayerEventListeners() {
       const response = await fetch(prayerRoute, options);
       const { status, message } = await response.json();
       if (status === 'success') {
-        renderPersonCards();
+        renderPersonCards(GET_PEOPLE_URL);
       }    
     }
   });
@@ -93,15 +89,14 @@ async function initPage(){
   displayTime();
   
   renderRelationshipButtons();
+  initRelationshipButtonsRowListener();
+
   renderRelationshipDropdown();
-  renderPersonCards();
+
+  renderPersonCards(GET_PEOPLE_URL);
   initPrayerEventListeners();
   
-  initPrayerRequestModal({ onSuccess: () => renderPersonCards() });
-  initEditPersonModal({ onSuccess: () => renderPersonCards() });
-  initEditPrayerModal({ onSuccess: () => renderPersonCards() });
-  initDeleteModal({ onSuccess: () => renderPersonCards() });
-  initCloseModalListeners();
+  initModals({onSuccess: (url) => renderPersonCards(url)})
 }
 
 initPage();
