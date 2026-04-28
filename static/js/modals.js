@@ -84,6 +84,8 @@ async function handlePrayerRequestInput({ onSuccess }){
     if (status === 'success') {
       const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
       addPrayerRequestModal.close();
+
+      const url = `${GET_PEOPLE_URL}${window.location.search}`;
       onSuccess();
     }
   });
@@ -110,6 +112,8 @@ function initDeleteModalListeners({ onSuccess }){
       
       await fetch(route, {method: "DELETE"});
       item?.remove();
+
+      const url = `${GET_PEOPLE_URL}${window.location.search}`;
       onSuccess();
 
       deleteItemModal.close();
@@ -175,6 +179,8 @@ async function handleEditPrayerInput({ onSuccess }){
 
     if (status === 'success') {
       const editPrayerModal = document.querySelector('.edit-prayer-modal-js');
+
+      const url = `${GET_PEOPLE_URL}${window.location.search}`;
       onSuccess();
 
       editPrayerModal.close();

@@ -2,6 +2,7 @@ import { initModals } from './modals.js';
 import { renderPersonCards } from './person-cards.js';
 import { renderRelationshipButtons, initRelationshipButtonsRowListener } from './relationships.js';
 import { GET_PEOPLE_URL } from './api/endpoints.js';
+import { buildPeopleApiUrl } from './utils.js';
 
 
 function displayTime(){
@@ -90,7 +91,8 @@ function initPrayerEventListeners({ onSuccess }) {
       const response = await fetch(prayerRoute, options);
       const { status, message } = await response.json();
       if (status === 'success') {
-        onSuccess();
+        const url = `${GET_PEOPLE_URL}${window.location.search}`;
+        onSuccess(url);
       }    
     }
   });
@@ -102,11 +104,9 @@ function initPage(){
 
   initPageLoadListeners();
   initRelationshipButtonsRowListener();
-
-  const url = `${GET_PEOPLE_URL}${window.location.search}`;
   
-  initPrayerEventListeners({onSuccess: () => renderPersonCards(url)});
-  initModals({onSuccess: () => renderPersonCards(url)});
+  initPrayerEventListeners({onSuccess: (url) => renderPersonCards(url)});
+  initModals({onSuccess: () => renderPersonCards(buildPeopleApiUrl())});
 }
 
 initPage();
