@@ -1,7 +1,7 @@
 import { GET_PEOPLE_URL, GET_RELATIONSHIPS_URL } from './api/endpoints.js';
 import { renderPersonCards } from './person-cards.js';
 
-export async function renderRelationshipDropdown() {
+export async function renderRelationshipDropdown(modal) {
   const response = await fetch(GET_RELATIONSHIPS_URL);
   const {status, data: relationships} = await response.json();
   
@@ -11,29 +11,36 @@ export async function renderRelationshipDropdown() {
     relationshipsHTML += `<option value="${relationship.relationship}">${relationship.relationship}</option>`;
   });
 
-  document.querySelectorAll('.relationship-dropdown-js').forEach((dropdown) => dropdown.innerHTML = relationshipsHTML);
+  modal.querySelector('.relationship-dropdown-js').innerHTML = relationshipsHTML;
 }
 
-export async function renderRelationshipButtons() {
+export async function renderRelationshipButtons(selectedRelationship) {
   const response = await fetch(GET_RELATIONSHIPS_URL);
   const { status, data: relationships } = await response.json();
 
-  let relationshipsHTML = '<button class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js is-selected">All</button>';
+  let relationshipsHTML = '<button class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js">All</button>';
 
   relationships.forEach(relationship => {
     relationshipsHTML += 
     `<button 
-      class="btn relationship-button relationship-button-js relationship-button-${relationship.id}"
-      data-rel="${relationship.relationship}"
+      class="btn relationship-button relationship-button-js relationship-button-${relationship.id}" 
+      data-rel="${relationship.relationship.toLowerCase()}"
     >
       ${relationship.relationship}
     </button>`;
   });
 
-  document.querySelector('.relationship-buttons-row-js').innerHTML = relationshipsHTML;
+  const relationshipButtonsRow = document.querySelector('.relationship-buttons-row-js');
+  relationshipButtonsRow.innerHTML = relationshipsHTML;
+  
+  const selectedButton = selectedRelationship
+    ? relationshipButtonsRow.querySelector(`[data-rel="${selectedRelationship.toLowerCase()}"]`)
+    : relationshipButtonsRow.querySelector('.relationship-button-all-js');
+
+  selectedButton.classList.add('is-selected');
 }
 
-function selectRelationshipButton(relationshipButton){
+export function selectRelationshipButton(relationshipButton){
   const relationshipButtonsRow = document.querySelector('.relationship-buttons-row-js');
   
   relationshipButtonsRow.querySelectorAll('.relationship-button-js').forEach((button) => {
@@ -58,18 +65,22 @@ export function initRelationshipButtonsRowListener(){
 
       selectRelationshipButton(allButton);
       renderPersonCards(GET_PEOPLE_URL);
+      window.history.pushState({}, '', window.location.pathname);
       return;
     }
     
     if (relationshipButton === allButton){
       selectRelationshipButton(allButton);
       renderPersonCards(GET_PEOPLE_URL);
+      window.history.pushState({}, '', window.location.pathname);
     }
 
     const relationship = relationshipButton.dataset.rel;
     if (!relationship) return;
 
-    const params = new URLSearchParams({ rel: relationship})
+    const params = new URLSearchParams({ rel: relationship});
+    window.history.pushState({}, '', `?${params}`);
+
     const relationshipURL = `${GET_PEOPLE_URL}?${params}`;
 
     selectRelationshipButton(relationshipButton);

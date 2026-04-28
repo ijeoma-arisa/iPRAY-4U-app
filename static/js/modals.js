@@ -1,4 +1,5 @@
 import { GET_PEOPLE_URL } from './api/endpoints.js';
+import { renderRelationshipDropdown } from './relationships.js';
 
 function renderPrayerRequestModal() {
   document.querySelector('.add-prayer-request-modal-js').innerHTML = 
@@ -93,6 +94,9 @@ export function initPrayerRequestModal({ onSuccess }){
   renderPrayerRequestModal();
   initPrayerRequestModalListeners();
   handlePrayerRequestInput({ onSuccess });
+
+  const prayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+  renderRelationshipDropdown(prayerRequestModal);
 }
 
 function initDeleteModalListeners({ onSuccess }){
@@ -244,6 +248,9 @@ async function handleEditPersonInput({ onSuccess }){
 }
 
 function initEditPersonModal({ onSuccess }){
+  const editPersonModal = document.querySelector('.edit-person-modal-js');
+  renderRelationshipDropdown(editPersonModal);
+  
   initEditPersonModalListeners();
   handleEditPersonInput({ onSuccess });
 }
@@ -272,7 +279,9 @@ export function initCloseModalListeners(){
 export function initModals({ onSuccess }){
   initPrayerRequestModal({ onSuccess });
   initEditPersonModal({ onSuccess });
-  initEditPrayerModal({ onSuccess });
+
+  initEditPrayerModal({ onSuccess });  
   initDeleteModal({ onSuccess });
+  
   initCloseModalListeners();
 }

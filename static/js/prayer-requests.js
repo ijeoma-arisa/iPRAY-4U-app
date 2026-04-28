@@ -1,10 +1,6 @@
 import { initModals } from './modals.js';
 import { renderPersonCards } from './person-cards.js';
-import { 
-  renderRelationshipDropdown, 
-  renderRelationshipButtons, 
-  initRelationshipButtonsRowListener 
-} from './relationships.js';
+import { renderRelationshipButtons, initRelationshipButtonsRowListener } from './relationships.js';
 import { GET_PEOPLE_URL } from './api/endpoints.js';
 
 
@@ -16,6 +12,22 @@ function displayTime(){
   const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
   
   document.querySelector('.current-date-js').innerHTML = today.toLocaleDateString('en-US', options);
+}
+
+function initPageLoadListeners(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const relationship = params.get('rel');
+
+    if (relationship){
+      renderPersonCards(`${GET_PEOPLE_URL}?${params}`);
+      renderRelationshipButtons(relationship);
+      return;
+    }
+
+    renderPersonCards(GET_PEOPLE_URL);
+    renderRelationshipButtons(null);
+  });
 }
 
 function initPrayerEventListeners() {
@@ -85,15 +97,11 @@ function initPrayerEventListeners() {
 }
 
 
-async function initPage(){
+function initPage(){
   displayTime();
-  
-  renderRelationshipButtons();
+
+  initPageLoadListeners();
   initRelationshipButtonsRowListener();
-
-  renderRelationshipDropdown();
-
-  renderPersonCards(GET_PEOPLE_URL);
   initPrayerEventListeners();
   
   initModals({onSuccess: (url) => renderPersonCards(url)})
