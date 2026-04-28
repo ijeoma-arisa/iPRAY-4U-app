@@ -18,13 +18,13 @@ export async function renderRelationshipButtons() {
   const response = await fetch(GET_RELATIONSHIPS_URL);
   const { status, data: relationships } = await response.json();
 
-  let relationshipsHTML = '<button class="btn relationship-button relationship-button-js relationship-button-fav">Favorites</button>';
+  let relationshipsHTML = '<button class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js is-selected">All</button>';
 
   relationships.forEach(relationship => {
     relationshipsHTML += 
     `<button 
       class="btn relationship-button relationship-button-js relationship-button-${relationship.id}"
-      data-rel=${relationship.relationship}
+      data-rel="${relationship.relationship}"
     >
       ${relationship.relationship}
     </button>`;
@@ -33,7 +33,7 @@ export async function renderRelationshipButtons() {
   document.querySelector('.relationship-buttons-row-js').innerHTML = relationshipsHTML;
 }
 
-function updateRelationshipButtons(relationshipButton){
+function selectRelationshipButton(relationshipButton){
   const relationshipButtonsRow = document.querySelector('.relationship-buttons-row-js');
   
   relationshipButtonsRow.querySelectorAll('.relationship-button-js').forEach((button) => {
@@ -45,15 +45,25 @@ function updateRelationshipButtons(relationshipButton){
 
 export function initRelationshipButtonsRowListener(){
   const relationshipButtonsRow = document.querySelector('.relationship-buttons-row-js');
-
+  
   relationshipButtonsRow.addEventListener('click', async (event) => {
     const relationshipButton = event.target.closest('.relationship-button-js');
     if (!relationshipButton) return;
-
+    
+    const allButton = relationshipButtonsRow.querySelector('.relationship-button-all-js');
+    
     if (relationshipButton.classList.contains('is-selected')){
-      relationshipButton.classList.remove('is-selected');
+      
+      if (relationshipButton === allButton) return;
+
+      selectRelationshipButton(allButton);
       renderPersonCards(GET_PEOPLE_URL);
       return;
+    }
+    
+    if (relationshipButton === allButton){
+      selectRelationshipButton(allButton);
+      renderPersonCards(GET_PEOPLE_URL);
     }
 
     const relationship = relationshipButton.dataset.rel;
@@ -62,7 +72,7 @@ export function initRelationshipButtonsRowListener(){
     const params = new URLSearchParams({ rel: relationship})
     const relationshipURL = `${GET_PEOPLE_URL}?${params}`;
 
-    updateRelationshipButtons(relationshipButton);
+    selectRelationshipButton(relationshipButton);
     renderPersonCards(relationshipURL);
   })
 
