@@ -4,7 +4,7 @@ from enum import Enum
 class Relationship(Enum):
   FAMILY = "Family"
   FRIENDS = "Friends"
-  KNOWN = "Known"
+  KNOWN = "People I Know"
 
 class Prayer:
   def __init__(self, text: Optional[str] = None, has_prayed: bool = False):

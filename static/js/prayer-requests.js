@@ -30,7 +30,7 @@ function initPageLoadListeners(){
   });
 }
 
-function initPrayerEventListeners() {
+function initPrayerEventListeners({ onSuccess }) {
   const personCards = document.querySelector('.person-cards-js');
   const deleteItemModal = document.querySelector('.delete-item-modal-js');
   const deleteTitle = document.querySelector('.delete-title-js');
@@ -90,7 +90,7 @@ function initPrayerEventListeners() {
       const response = await fetch(prayerRoute, options);
       const { status, message } = await response.json();
       if (status === 'success') {
-        renderPersonCards(GET_PEOPLE_URL);
+        onSuccess();
       }    
     }
   });
@@ -102,9 +102,11 @@ function initPage(){
 
   initPageLoadListeners();
   initRelationshipButtonsRowListener();
-  initPrayerEventListeners();
+
+  const url = `${GET_PEOPLE_URL}${window.location.search}`;
   
-  initModals({onSuccess: (url) => renderPersonCards(url)})
+  initPrayerEventListeners({onSuccess: () => renderPersonCards(url)});
+  initModals({onSuccess: () => renderPersonCards(url)});
 }
 
 initPage();

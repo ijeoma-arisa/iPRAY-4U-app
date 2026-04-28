@@ -30,7 +30,7 @@ def init_db():
     
     # Insert relationship values
     relationship_values = [(r.value,) for r in Relationship]
-    cursor.executemany(schema.INSERT_RELATIONSHIP_ROWS, relationship_values)
+    cursor.executemany(schema.INSERT_RELATIONSHIP_ROWS, relationship_values)    
   
 def get_db_connection():
   if "db" not in g:
