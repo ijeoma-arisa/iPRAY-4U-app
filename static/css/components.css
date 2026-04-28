@@ -140,38 +140,6 @@ textarea {
   width: 50px;
 }
 
-.nav-search {
-  display: flex;
-  flex: 1;
-  max-width: 700px;
-  margin: 0 1rem;
-  border-radius: 6px;
-  overflow: hidden;
-  height: 40px;
-  flex-shrink: 0;
-}
-
-.nav-search input {
-  flex: 1;
-  border: none;
-  padding: 0 10px;
-  overflow: hidden;
-  outline: none;
-}
-
-.nav-search button {
-  background-color: var(--main-purple);
-  color: white;
-  border: none;
-  width: 45px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.nav-search button:hover{
-  background-color: var(--darker-purple);
-}
-
 .nav-links {
   list-style: none;
   display: flex;
