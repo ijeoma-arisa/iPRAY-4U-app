@@ -21,7 +21,7 @@ main {
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(0, 0, 0, 0.4);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .homepage-title-banner {
@@ -67,7 +67,7 @@ main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--light-purple);
+  background-color: #efe7fb;  
 }
 
 .prayer-requests-panel {
@@ -87,7 +87,7 @@ main {
   width: 100%;
   background: white;
   color: black;
-  border-radius: 1rem;
+  border-radius: 10px;
   padding: 1.5rem;
   text-align: center;
 }

@@ -22,7 +22,7 @@
 
 .relationship-button {
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
   background-color: var(--main-purple);
 }
 
@@ -108,7 +108,7 @@ textarea {
   padding: 50px;
   border: 1px solid rgb(128, 128, 128, 0.6);
   border-radius: 8px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .nav-bar {
@@ -118,7 +118,7 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: black;
+  background-color: var(--darker-purple);
   color: white;
   font-weight: bold;
   font-size: 1rem;
@@ -159,25 +159,30 @@ textarea {
 }
 
 .person-cards {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   color: black;
-  width: 100%;
+  gap: 1rem;
 }
 
 .person-card {
+  width: 100%;
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
   align-items: center;
   background-color: white;
-  width: 80%;
-  margin: 20px;
-  padding: 10px 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease-out;
+  border-radius: 12px;
+  border: 1px solid rgba(69, 43, 111, 0.12);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.person-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 12px 8px rgba(0, 0, 0, 0.12);
 }
 
 .person-buttons {
@@ -186,13 +191,12 @@ textarea {
   gap: 0.5rem;
 }
 
-
 .person-info-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 0.5rem;
-  flex: 0.25;
+  min-width: 140px;
   gap: 0.5rem;
 }
 
@@ -202,28 +206,29 @@ textarea {
   flex: 1;
   overflow-y: auto;
   max-height: 220px;
+  min-width: 280px;
+  gap: 0.5rem;
 }
 
 .prayer-card {
   display: flex;
-  align-items: center;
-  border: 1px solid rgb(128, 128, 128, 0.2);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 4px;
-  border-radius: 8px;
-  flex: 1;
+  align-items: flex-start;
+  border: 1px solid rgba(69, 43, 111, 0.10);
+  border-radius: 10px;
   transition: all 0.3s ease-out;
+  gap: 0.75rem;
+  padding: 0.75rem;
 }
 
 .prayer-text {
-  padding: 20px;
   flex: 1;
 }
 
 .update-prayer-buttons {
   display: flex;
-  gap: 5px;
-  padding: 5px;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .add-prayer-card {

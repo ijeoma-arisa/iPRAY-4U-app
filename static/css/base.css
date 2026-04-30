@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
   --main-purple: #966fd6;
   --light-purple: #c9b0f1;
