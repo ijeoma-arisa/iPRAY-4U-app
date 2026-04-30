@@ -1,3 +1,8 @@
+main {
+  width: 100%;
+  padding: 2rem 1rem;
+}
+
 .homepage {
   display: flex;
   color: black;
@@ -59,42 +64,63 @@
 }
 
 .prayer-requests-page {
-  background-color: var(--light-purple);
-  margin: 0;
-  padding: 0;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  height: 100%;
-  width: 100%;
+  background-color: var(--light-purple);
 }
 
 .prayer-requests-panel {
+  width: min(100%, 1100px);
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 2rem;
   border-radius: 1rem; 
-  width: 95%;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .prayer-requests-banner {
+  width: 100%;
+}
+
+.prayer-requests-title {
+  width: 100%;
+  background: white;
+  color: black;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.prayer-requests-title h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.prayer-requests-controls {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  border-radius: 6px;
   width: 100%;
   gap: 1rem;
 }
 
-.prayer-requests-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: black;
-  border-radius: 6px;
-  background-color: white;
-  width: 80%;
+.prayer-requests-controls > .add-prayer-button {
+  width: 100%;
 }
+
+@media (min-width: 768px) {
+  .prayer-requests-controls{
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .prayer-requests-controls > .add-prayer-button {
+    width: auto;
+  }
+
+  .relationship-buttons-row {
+    justify-content: flex-end;
+  }
+}
+

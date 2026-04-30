@@ -17,13 +17,13 @@
 
 .add-prayer-button, .save-button {
   background-color: var(--main-blue);
+
 }
 
 .relationship-button {
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   background-color: var(--main-purple);
-  margin-right: 10px;
 }
 
 .add-prayer-button:hover, .save-button:hover {
@@ -112,17 +112,18 @@ textarea {
 }
 
 .nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 8rem;
   background-color: black;
   color: white;
   font-weight: bold;
   font-size: 1rem;
-  position: sticky;
+  gap: 2rem;
   padding: 0.5rem 1rem;
-  width: 100vw;
 }
 
 .nav-logo {
@@ -133,24 +134,28 @@ textarea {
   border-radius: 6px;
   gap: 0.5rem;
   align-items: center;
-  cursor: pointer;
 }
 
 .nav-logo img {
-  width: 50px;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  margin: 2rem;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
   padding: 0;
-  gap: 3rem;
 }
 
 .relationship-buttons-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 0.5rem;
 }
 
 .person-cards {
