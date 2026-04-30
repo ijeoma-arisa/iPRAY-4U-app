@@ -67,7 +67,7 @@ main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #efe7fb;  
+  background-color: var(--app-bg);
 }
 
 .prayer-requests-panel {
@@ -83,10 +83,44 @@ main {
   width: 100%;
 }
 
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-hover);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .prayer-requests-title {
   width: 100%;
-  background: white;
-  color: black;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-left: 6px solid var(--primary);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: left;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.prayer-requests-title h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: var(--text-main);
+}
+
+.page-subtitle {
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* .prayer-requests-title {
+  width: 100%;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
   border-radius: 10px;
   padding: 1.5rem;
   text-align: center;
@@ -95,7 +129,8 @@ main {
 .prayer-requests-title h1 {
   margin: 0;
   font-size: 2rem;
-}
+  color: var(--text-main);
+} */
 
 .prayer-requests-controls {
   display: flex;

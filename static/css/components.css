@@ -16,18 +16,26 @@
 }
 
 .add-prayer-button, .save-button {
-  background-color: var(--main-blue);
+  background-color: var(--primary);
 
-}
-
-.relationship-button {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-  background-color: var(--main-purple);
 }
 
 .add-prayer-button:hover, .save-button:hover {
-  background: var(--darker-blue);
+  background: var(--primary-hover);
+}
+
+.relationship-button {
+  border: 1px solid #d8c8ee;
+  background-color: #f3ecfb;
+  color: #5f4f86;
+  box-shadow: none;
+}
+
+.relationship-button:hover,
+.relationship-button.is-selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
 }
 
 .view-button {
@@ -35,9 +43,7 @@
   width: 50%;
 }
 
-.view-button:hover, 
-.relationship-button:hover,
-.relationship-button.is-selected {
+.view-button:hover {
   background: var(--darker-purple);
 }
 
@@ -118,8 +124,11 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--darker-purple);
+
+  background-color: #7c6aa6;
   color: white;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
+
   font-weight: bold;
   font-size: 1rem;
   gap: 2rem;
@@ -128,8 +137,7 @@ textarea {
 
 .nav-logo {
   display: flex;
-  background-color: white;
-  color: black;
+  background: transparent;
   padding: 0 1rem;
   border-radius: 6px;
   gap: 0.5rem;

@@ -5,6 +5,19 @@
 }
 
 :root {
+  --app-bg: #fbf7f2;
+  --surface: #fffdf9;
+  --text-main: #3f352e;
+  --text-muted: #7a6d64;
+
+  --border-subtle: #eadfd4;
+
+--primary: #9a7fd1;
+--primary-hover: #7f66b8;
+--primary-soft: #f4efff;
+
+  --accent: #d9a86c;
+
   --main-purple: #966fd6;
   --light-purple: #c9b0f1;
   --darker-purple: #452b6f;
@@ -29,8 +42,8 @@ html, body {
 
 body {
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
-  background: var(--light-purple);
-  color: white;
+  background: var(--app-bg);
+  color: var(--text-main);
 }
 
 a {
