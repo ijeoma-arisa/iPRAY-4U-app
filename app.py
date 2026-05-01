@@ -9,10 +9,12 @@ from utils.validators import (
 )
 import schema
 import sqlite3
+import os
 
 app = Flask(__name__)
 
-DB_PATH = "./instance/prayer_requests.db"
+DB_PATH = os.getenv("DB_PATH", "instance/prayer_requests.db")
+os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 def init_db():
   
@@ -271,7 +273,13 @@ def get_relationships():
         
     return success_json("Relationships retrieved", relationships)
     
+def create_app():
+  app = Flask(__name__)
+  init_db()
+  return app
 
+app = create_app()
+    
 if __name__ == "__main__":
   init_db()
   app.run(debug=True)
