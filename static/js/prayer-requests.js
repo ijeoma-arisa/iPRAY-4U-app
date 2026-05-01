@@ -1,111 +1,112 @@
-import {initPrayerRequestModal} from './index.js';
+import { initModals } from './modals.js';
+import { renderPersonCards } from './person-cards.js';
+import { renderRelationshipButtons, initRelationshipButtonsRowListener } from './relationships.js';
+import { GET_PEOPLE_URL } from './api/endpoints.js';
+import { buildPeopleApiUrl } from './utils.js';
+
 
 function displayTime(){
+  const currentTime = document.querySelector('.current-date-js');
+  if (!currentTime) return;
+  
   const today = new Date();
   const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
   
   document.querySelector('.current-date-js').innerHTML = today.toLocaleDateString('en-US', options);
 }
 
-async function renderRelationshipButtons() {
-  const response = await fetch("/relationships");
-  const relationships = await response.json();
+function initPageLoadListeners(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const relationship = params.get('rel');
 
-  let relationshipsHTML = '<button class="btn relationship-button relationship-button-fav">Favorites</button>';
+    if (relationship){
+      renderPersonCards(`${GET_PEOPLE_URL}?${params}`);
+      renderRelationshipButtons(relationship);
+      return;
+    }
 
-  relationships.forEach(relationship => {
-    relationshipsHTML += `<button class="btn relationship-button relationship-button-${relationship.id}">${relationship.relationship}</button>`;
+    renderPersonCards(GET_PEOPLE_URL);
+    renderRelationshipButtons(null);
   });
-
-  document.querySelector('.relationships-row-js')
-    .innerHTML = relationshipsHTML;
 }
 
+function initPrayerEventListeners({ onSuccess }) {
+  const personCards = document.querySelector('.person-cards-js');
+  const deleteItemModal = document.querySelector('.delete-item-modal-js');
+  const deleteTitle = document.querySelector('.delete-title-js');
+  const itemToDeleteType = document.querySelector('.item-to-delete-type');
+  const itemToDelete = document.querySelector('.item-to-delete');
 
-async function loadPrayers(person_id) {
-  const response = await fetch(`people/${person_id}/prayers`);
-  const prayers = await response.json();
+  personCards.addEventListener('click', async (event) => {
+    const personCard = event.target.closest('.person-card-js');
+    const prayerCard = event.target.closest('.prayer-card-js');
 
-  let prayersHTML = '';
-
-  prayers.forEach(prayer => {
-    prayersHTML += `
-          <div class="prayer-card" data-id="${prayer.id}">
-            <div class="prayer-text">
-              ${prayer.text}
-            </div>
-            <div class="update-prayer-buttons">
-              <button class="btn delete-prayer-button"><i class="fa fa-trash-o"></i></button>
-            </div>
-          </div>`;
-  });
-  return prayersHTML;
-}
-
-async function renderPrayerRequests() {
-  const response = await fetch("/people");
-  const persons = await response.json();
-  
-  let personHTML = '';
-
-  for (const person of persons){
-    const prayersHTML = await loadPrayers(person.id);
+    if (!personCard && !prayerCard) return;
     
-    personHTML += `
-        <div class="prayer-request-card" data-person-id=${person.id}>
-          <div class="person-info-section">
-            <h3>${person.name}</h3>
-            <p>${person.relationship}</p>
-          </div>
-          <div class="prayer-cards-section">
-            ${prayersHTML}
-          </div>
-          <button id=${person.id} 
-          class="btn add-prayer-button add-prayer-button-js" 
-          data-person-id=${person.id} 
-          data-person-name="${person.name}" 
-          data-person-relationship="${person.relationship}">
-        Add Prayer 
-        </button>
-        </div>`;
-  }
+    const personId = personCard.dataset.personId;
+    const personRoute = `${GET_PEOPLE_URL}/${personId}`;
+    
+    if (event.target.classList.contains('delete-person-button-js')){
+      deleteTitle.innerHTML = 'Delete Person';
+      itemToDeleteType.innerHTML = 'person';
+      itemToDelete.innerHTML = personCard.dataset.personName;
 
-  document.querySelector('.prayer-request-cards')
-    .innerHTML = personHTML;
-}
+      deleteItemModal.dataset.route = personRoute;
+      deleteItemModal.dataset.itemId = personCard.id;
 
-function initPrayerEventListeners() {
-  const prayerRequestCards = document.querySelector('.prayer-request-cards');
+      deleteItemModal.showModal();
+    }
+    
+    if (event.target.classList.contains('delete-prayer-button-js')){
+      const prayerId = prayerCard.dataset.prayerId;
+      const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
-  prayerRequestCards.addEventListener('click', async (event) => {
-  const prayerRequestCard = event.target.closest('.prayer-request-card');
-  const prayerCard = event.target.closest('.prayer-card');
+      deleteTitle.innerHTML = 'Delete Prayer';
+      itemToDeleteType.innerHTML = 'prayer';
+      itemToDelete.innerHTML = prayerCard.dataset.prayerText;
 
-  if (!prayerRequestCard && !prayerCard) return;
-  
-  const personId = prayerRequestCard.dataset.personId;
-  const prayerId = prayerCard.dataset.id;
+      deleteItemModal.dataset.route = prayerRoute;
+      deleteItemModal.dataset.itemId = prayerCard.id;
 
-  const personRoute = `/people/${personId}`;
-  const prayerRoute = `${personRoute}/prayers/${prayerId}`;
+      deleteItemModal.showModal();
+    }
+    
+    if (event.target.classList.contains('mark-prayed-button-js')){
+      const prayerId = prayerCard.dataset.prayerId;
+      const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
-  if (event.target.classList.contains('delete-prayer-button')){
-    await fetch(prayerRoute, {method: "DELETE"});
-    prayerCard.remove();
-  }
+      const toggledHasPrayed = prayerCard.dataset.hasPrayed === "1" ? 0 : 1;
+
+      const data = {
+        ['has_prayed']: toggledHasPrayed,
+      };
+      
+      const options = {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      };
+      
+      const response = await fetch(prayerRoute, options);
+      const { status, message } = await response.json();
+      if (status === 'success') {
+        const url = `${GET_PEOPLE_URL}${window.location.search}`;
+        onSuccess(url);
+      }    
+    }
   });
 }
 
 
-async function initPage(){
+function initPage(){
   displayTime();
 
-  initPrayerRequestModal();
-  initPrayerEventListeners();
-
-  renderRelationshipButtons();
-  renderPrayerRequests();
+  initPageLoadListeners();
+  initRelationshipButtonsRowListener();
   
+  initPrayerEventListeners({onSuccess: (url) => renderPersonCards(url)});
+  initModals({onSuccess: () => renderPersonCards(buildPeopleApiUrl())});
 }
 
 initPage();

@@ -6,43 +6,57 @@
   border-radius: 6px;
   border: none;
   font-weight: bold;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   color: white;
   text-align: center;
 }
 
+.btn:hover {
+  transform: scale(1.05);
+}
 .add-prayer-button, .save-button {
-  background-color: var(--main-blue);
+  background-color: var(--primary);
+}
+
+.save-button {
+  margin-top: 0.5rem;
+}
+.add-prayer-button:hover, .save-button:hover {
+  background: var(--primary-hover);
 }
 
 .relationship-button {
-  background-color: var(--main-blue);
-  margin-right: 10px;
+  border: 1px solid #d8c8ee;
+  background-color: #f3ecfb;
+  color: #5f4f86;
+  box-shadow: none;
 }
 
-.add-prayer-button:hover, .save-button:hover, .relationship-button:hover {
-  background: var(--darker-blue);
+.relationship-button:hover,
+.relationship-button.is-selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
 }
 
 .view-button {
-  background: var(--main-purple);
+  background: var(--main-blue);
   width: 50%;
 }
 
 .view-button:hover {
-  background: var(--darker-purple);
+  background: var(--darker-blue);
 }
 
 .close-button {
   position: absolute;
-  top: 30px;
-  right: 30px;
+  top: 0.75rem;
+  right: 0.75rem;
   background: transparent;
   border: none;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  color: #555;
-  transition: color 0.3s ease;
+  color: var(--text-muted);
   cursor: pointer;
 }
 
@@ -50,147 +64,176 @@
   color:red;
 }
 
-.form-title {
-  text-align: center;
-}
 
-.new-prayer-request-form {
+form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 300px;
-  background: white;
-  padding: 1rem;
-  border-radius: 10px;
+  width: 100%;
+}
+
+.form-title {
+  text-align: center;
 }
 
 .form-data {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
 label {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-main);
 }
 
-input, textarea, select {
+.modal {
+  position: relative;
+}
+
+.modal:open {
+  display: flex;
+  flex-direction: column;
+  width: min(90vw, 420px);
+  max-height: 85vh;
+  padding: 2rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-main);
+  box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.16);
+  align-items: center;
+  overflow: auto;
+}
+
+.modal form input, 
+.modal textarea, 
+.modal select {
   font-family: inherit;
   font-size: 1rem;
-  padding: 0.6rem;
-  border: 1px solid var(--light-gray);
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-main);
 }
 
-textarea {
+.modal textarea {
   overflow: auto;
   resize: none;
 }
 
-.modal:open {
-  height: 500px;
-  overflow: hidden;
-  padding: 50px;
-  border: none;
-  border-radius: 6px;
+.modal form input:focus, 
+.modal textarea:focus, 
+.modal select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(154, 127, 209, 0.2);
 }
 
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-row input {
+  width: 16px;
+  height: 16px;
+}
+
+
 .nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: black;
+
+  background-color: #7c6aa6;
   color: white;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
+
   font-weight: bold;
   font-size: 1rem;
-  position: sticky;
+  gap: 2rem;
   padding: 0.5rem 1rem;
-  width: 100%;
 }
 
 .nav-logo {
   display: flex;
-  background-color: white;
-  color: black;
+  background: transparent;
   padding: 0 1rem;
   border-radius: 6px;
   gap: 0.5rem;
   align-items: center;
-  cursor: pointer;
+  color: var(--text-main);
+  background-color: var(--surface);
 }
 
 .nav-logo img {
-  width: 50px;
-}
-
-.nav-search {
-  display: flex;
-  flex: 1;
-  max-width: 700px;
-  margin: 0 1rem;
-  border-radius: 6px;
-  overflow: hidden;
+  width: 40px;
   height: 40px;
-}
-
-.nav-search input {
-  flex: 1;
-  border: none;
-  padding: 0 10px;
-  overflow: hidden;
-  outline: none;
-}
-
-.nav-search button {
-  background-color: var(--main-purple);
-  color: white;
-  border: none;
-  width: 45px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.nav-search button:hover{
-  background-color: var(--darker-purple);
+  object-fit: cover;
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  margin: 2rem;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
   padding: 0;
-  gap: 3rem;
 }
 
-.relationships-row {
+.relationship-buttons-row {
   display: flex;
-  margin-bottom: 10px;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 0.5rem;
 }
 
-.prayer-request-cards {
+.person-cards {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   color: black;
+  gap: 1rem;
 }
 
-.prayer-request-card {
+.person-card {
+  width: 100%;
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
   align-items: center;
   background-color: white;
-  width: 1000px;
-  margin: 20px;
-  padding: 10px 20px;
-  border-radius: 16px;
-  border: 1px solid black;
+  border-radius: 12px;
+  border: 1px solid rgba(69, 43, 111, 0.12);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.person-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 12px 8px rgba(0, 0, 0, 0.12);
+}
+
+.person-buttons {
+  display:flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .person-info-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
-  flex: 0.25;
+  padding: 0.5rem;
+  min-width: 140px;
+  gap: 0.5rem;
 }
 
 .prayer-cards-section {
@@ -198,27 +241,37 @@ textarea {
   flex-direction: column;
   flex: 1;
   overflow-y: auto;
-  max-height: 220px;
+  height: 220px;
+  min-width: 280px;
+  gap: 0.5rem;
+  
+  background-color: var(--primary-soft);
+  border-radius: 10px;
+  padding: 0.5rem;
+  border: 1px solid var(--primary-border);
+  box-shadow: 0 1px 2px rgba(63, 53, 46, 0.05);
 }
 
 .prayer-card {
   display: flex;
-  align-items: center;
-  border: 1px solid gray;
-  margin: 4px;
-  border-radius: 8px;
-  flex: 1;
+  align-items: flex-start;
+  border: 1px solid rgba(69, 43, 111, 0.10);
+  border-radius: 10px;
+  transition: all 0.3s ease-out;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: white;
 }
 
 .prayer-text {
-  padding: 20px;
   flex: 1;
 }
 
 .update-prayer-buttons {
   display: flex;
-  gap: 5px;
-  padding: 5px;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .add-prayer-card {
@@ -226,10 +279,34 @@ textarea {
   justify-content: center;
 }
 
-.delete-prayer-button {
+.mark-prayed-button {
+  background-color: var(--main-green);
+}
+
+.mark-prayed-button:hover  {
+  background-color: var(--darker-green);
+}
+
+.edit-person-button,
+.edit-prayer-button,
+.deny-delete-button {
+  background-color: var(--gray);
+}
+
+.edit-person-button:hover,
+.edit-prayer-button:hover,
+.deny-delete-button:hover {
+  background-color: var(--darker-gray);
+}
+
+.delete-person-button, 
+.delete-prayer-button,
+.confirm-delete-button {
   background-color: var(--main-red);
 }
 
-.delete-prayer-button:hover {
+.delete-person-button:hover, 
+.delete-prayer-button:hover,
+.confirm-delete-button:hover {
   background-color: var(--darker-red);
 }

@@ -1,3 +1,10 @@
+main {
+  width: 100%;
+  padding: 2rem 1rem;
+}
+
+/* Homepage */
+
 .homepage {
   display: flex;
   color: black;
@@ -5,16 +12,30 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background: var(--primary);
 }
 
-.homepage-banner {
+.homepage-content {
   display: flex;
   background-color: white;
-  border-radius: 20px;
+  border-radius: 1rem;
   padding: 1.5rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.homepage-phone-card {
+  display: flex;
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
 }
 
 .homepage-title-banner {
@@ -25,7 +46,7 @@
   gap: 1px;
 }
 
-.homepage-image-banner {
+.homepage-image-card {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -33,42 +54,97 @@
   width: 100%;
   background-color: rgb(57, 186, 189);
   margin-bottom: 1rem;
+  border-radius: 0.8rem;
+  gap: 1rem;
 }
 
 .homepage-image {
   width: 200px;
 }
 
-.homepage-image-caption{
+.homepage-image-caption {
   color: white;
+  padding: 0.8rem;
 }
 
 .homepage-buttons-banner {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1rem;
   padding: 10px;
   justify-content: center;
   align-items: center;
   width: 100%;
 }
 
+/* Prayer Requests Page */
 .prayer-requests-page {
-  margin: 0;
-  padding: 0;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  background-color: var(--app-bg);
+}
+
+.prayer-requests-panel {
+  width: min(100%, 1100px);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1rem; 
+  gap: 1rem;
 }
 
 .prayer-requests-banner {
-  border-radius: 6px;
   width: 100%;
-  text-align: center;
 }
 
 .prayer-requests-title {
-  background-color: white;
-  color: black;
-  border-radius: 6px;
+  width: 100%;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.06);
 }
+
+.prayer-requests-title h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: var(--text-main);
+}
+
+.page-subtitle {
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.prayer-requests-controls {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 1rem;
+}
+
+.prayer-requests-controls > .add-prayer-button {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .prayer-requests-controls{
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .prayer-requests-controls > .add-prayer-button {
+    width: auto;
+  }
+
+  .relationship-buttons-row {
+    justify-content: flex-end;
+  }
+}
+

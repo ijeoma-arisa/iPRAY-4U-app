@@ -1,11 +1,39 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
+  --app-bg: #fbf7f2;
+  --surface: #fffdf9;
+  --text-main: #3f352e;
+  --text-muted: #7a6d64;
+
+  --border-subtle: #eadfd4;
+  --primary-border: #e3d9fb;
+
+  --primary: #9a7fd1;
+  --primary-hover: #7f66b8;
+  --primary-soft: #f4efff;
+
+  --accent: #d9a86c;
+
   --main-purple: #966fd6;
+  --light-purple: #c9b0f1;
   --darker-purple: #452b6f;
   --main-blue: rgb(57, 186, 189);
+  --light-blue: rgb(148, 246, 248);
   --darker-blue: rgb(8, 90, 91);
   --light-gray: #ccc;
+  --gray: #6d6d6d;
+  --darker-gray: #3c3c3c;
   --main-red: rgb(255, 82, 82);
   --darker-red: rgb(137, 39, 39);
+  --main-green: rgb(66, 189, 57);
+  --darker-green: rgb(41, 115, 36);
+  --main-yellow: rgb(255, 216, 76);
+  --darker-yellow: rgb(202, 172, 65);
 }
 
 html, body {
@@ -15,11 +43,17 @@ html, body {
 
 body {
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
-  background: #966fd6;
-  color: white;
+  background: var(--app-bg);
+  color: var(--text-main);
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+textarea:focus, 
+input:focus,
+select:focus {
+  outline: none;
 }

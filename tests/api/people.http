@@ -1,0 +1,173 @@
+@baseUrl = http://localhost:5000
+
+
+### GET REQUESTS
+
+### Get all people
+GET {{baseUrl}}/api/people
+
+### Get person 1
+GET {{baseUrl}}/api/people/1
+
+### Get person 2
+GET {{baseUrl}}/api/people/2
+
+### Get person 5
+GET {{baseUrl}}/api/people/5
+
+
+### Get invalid person id
+GET {{baseUrl}}/api/people/74
+
+
+### POST REQUESTS
+
+### Add valid person
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Billy",
+  "relationship": "Friends",
+  "prayer": "To pass my exam"
+}
+
+### Add missing name
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "relationship": "Friends",
+  "prayer": "To pass my exam"
+}
+
+### Add missing relationship
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Sarah",
+  "prayer": "To pass my exam"
+}
+
+### Add missing prayer
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Sarah",
+  "relationship": "Friends"
+}
+
+
+### Add missing fields (multiple)
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+
+}
+
+
+### Add invalid name
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "",
+  "relationship": "Family",
+  "prayer": "For peace and protection"
+}
+
+### Add invalid relationship
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Nathan",
+  "relationship": "bro",
+  "prayer": "For peace and protection"
+}
+
+### Add invalid prayer
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Nathan",
+  "relationship": "Family",
+  "prayer": "   "
+}
+
+### Add multiple invalid fields
+POST {{baseUrl}}/api/people
+Content-Type: application/json
+
+{
+  "name": "Nathan",
+  "relationship": "Father",
+  "prayer": "   "
+}
+
+
+### PATCH Requests
+
+### Patch name
+PATCH {{baseUrl}}/api/people/1
+Content-Type: application/json
+
+{
+  "name": "Samantha"
+}
+
+### Patch relationship
+PATCH {{baseUrl}}/api/people/1
+Content-Type: application/json
+
+{
+  "relationship": "Family"
+}
+
+
+### Patch both
+PATCH {{baseUrl}}/api/people/14
+Content-Type: application/json
+
+{
+  "name": "Julia",
+  "relationship": "Ministry"
+}
+
+### Patch invalid name
+PATCH {{baseUrl}}/api/people/14
+Content-Type: application/json
+
+{
+  "name": "   "
+}
+
+### Patch invalid relationship
+PATCH {{baseUrl}}/api/people/14
+Content-Type: application/json
+
+{
+  "relationship": "Girl"
+}
+
+
+### Patch invalid person with valid parameters
+PATCH {{baseUrl}}/api/people/9
+Content-Type: application/json
+
+{
+  "name": "Susie",
+  "relationship": "Family"
+}
+
+### DELETE Requests
+
+### Delete valid person
+DELETE {{baseUrl}}/api/people/12
+
+### Delete invalid person
+DELETE {{baseUrl}}/api/people/323

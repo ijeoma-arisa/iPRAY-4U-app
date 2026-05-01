@@ -1,0 +1,112 @@
+@baseUrl = http://localhost:5000
+@person1Route = /api/people/1
+@person2Route = /api/people/2
+@person5Route = /api/people/5
+
+### GET Requests
+
+### Get all prayers
+GET {{baseUrl}}/api/prayers
+
+## TODO: Get prayers by prayer id (optional)
+
+### Get Person 1 prayers
+GET {{baseUrl}}{{person1Route}}/prayers
+
+### Get Person 2 prayers 
+GET {{baseUrl}}{{person2Route}}/prayers
+
+### Get Person 5 prayers
+GET {{baseUrl}}{{person5Route}}/prayers
+
+
+### POST Requests
+
+### Add valid prayer - no has_prayed provided (default)
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+  "prayer": "Strength"
+}
+
+### Add valid prayer - valid has_prayed
+
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+  "prayer": "Perseverance",
+  "has_prayed": true
+}
+
+### Add invalid prayer - missing prayer
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+  "has_prayed": true
+}
+
+### Add invalid prayer - missing has_prayed
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+  "prayer": "Perseverance"
+}
+
+### Add invalid prayer - missing both
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+
+}
+
+### Add invalid prayer - person does not exist
+POST {{baseUrl}}/api/people/0/prayers
+Content-Type: application/json
+
+{
+  "prayer": "Love",
+  "has_prayed": true
+}
+
+### Add invalid prayer - invalid text
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+  "prayer": "       ",
+  "has_prayed": true
+}
+
+### Add invalid prayer - invalid has_prayed
+POST {{baseUrl}}{{person5Route}}/prayers
+Content-Type: application/json
+
+{
+  "prayer": "Perseverance",
+  "has_prayed": "true"
+}
+
+### PATCH Requests
+
+
+### DELETE Requests
+
+### Delete valid valid prayer
+DELETE {{baseUrl}}{{person5Route}}/prayers/60
+
+### Delete invalid prayer (prayer id does not exist)
+DELETE {{baseUrl}}{{person5Route}}/prayers/60
+
+### Delete invalid prayer (prayer id belongs to different person)
+DELETE {{baseUrl}}{{person5Route}}/prayers/50
+
+### Delete invalid prayer (person does not exist)
+DELETE {{baseUrl}}/api/people/356/prayers/50
+
+### Delete invalid prayer (person and prayer do not exist)
+DELETE {{baseUrl}}/api/people/356/prayers/203203
