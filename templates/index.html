@@ -16,31 +16,44 @@
 
 </head>
 <body>
-  <div class="homepage">
-    <div class="homepage-banner">
-      <div class="homepage-title-banner">
-        <h1>iPray 4U</h1>
-        <h3>A simple way of organizing prayer requests</h3>
-      </div>
+  <main class="homepage">
+    <section class="homepage-phone-card">
       
-      <div class="homepage-image-banner">
-        <div class="homepage-image">
-          <img src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}" class="homepage-image">
+      <div class="homepage-content">
+        <div class="homepage-title-banner">
+          <h1>iPray 4U</h1>
+          
+          <p class="homepage-subtitle">
+            Keep track of prayer requests and who you're praying for
+          </p>
         </div>
-        <div class="homepage-image-caption">
-          <a href="http://www.freepik.com">Designed by studiogstock / Freepik</a>
+
+        <div class="homepage-image-card">
+          <img 
+            src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}" 
+            alt="Phone with a heart on the screen and text messages alongside it"
+            class="homepage-image"
+          >
+
+          <div class="homepage-image-caption">
+            <a href="http://www.freepik.com">Designed by studiogstock / Freepik</a>
+          </div>
+        </div>
+
+        <div class="homepage-buttons-banner">
+          <button class="btn add-prayer-button add-prayer-button-js">
+            Add Prayer Request
+          </button>
+
+          <a class="btn view-button" href="{{ url_for('prayer_requests_page') }}">
+            View Prayer Requests
+          </a>
         </div>
       </div>
-  
-      <div class="homepage-buttons-banner">
-        <button class="btn add-prayer-button add-prayer-button-js">Add New Prayer Request</button>
-        <a class="btn view-button" href="{{ url_for('prayer_requests_page') }}">View Prayer Requests</a>
-        
-        <dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
-        
-      </div>
-    </div>
-  </div>
+
+    </section>
+  </main>
+  <dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
   <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>
 </html>

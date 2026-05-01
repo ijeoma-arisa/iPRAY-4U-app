@@ -3,6 +3,8 @@ main {
   padding: 2rem 1rem;
 }
 
+/* Homepage */
+
 .homepage {
   display: flex;
   color: black;
@@ -10,9 +12,10 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background: var(--primary);
 }
 
-.homepage-banner {
+.homepage-content {
   display: flex;
   background-color: white;
   border-radius: 1rem;
@@ -20,8 +23,19 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.homepage-phone-card {
+  display: flex;
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
 }
 
 .homepage-title-banner {
@@ -32,7 +46,7 @@ main {
   gap: 1px;
 }
 
-.homepage-image-banner {
+.homepage-image-card {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -56,13 +70,14 @@ main {
 .homepage-buttons-banner {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1rem;
   padding: 10px;
   justify-content: center;
   align-items: center;
   width: 100%;
 }
 
+/* Prayer Requests Page */
 .prayer-requests-page {
   min-height: 100vh;
   display: flex;
@@ -83,24 +98,14 @@ main {
   width: 100%;
 }
 
-.eyebrow {
-  margin: 0 0 0.35rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--primary-hover);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
 .prayer-requests-title {
   width: 100%;
   background: var(--surface);
   color: var(--text-main);
   border: 1px solid var(--border-subtle);
-  border-left: 6px solid var(--primary);
   border-radius: 10px;
   padding: 1.5rem;
-  text-align: left;
+  text-align: center;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -115,22 +120,6 @@ main {
   color: var(--text-muted);
   font-size: 1rem;
 }
-
-/* .prayer-requests-title {
-  width: 100%;
-  background: var(--surface);
-  color: var(--text-main);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.prayer-requests-title h1 {
-  margin: 0;
-  font-size: 2rem;
-  color: var(--text-main);
-} */
 
 .prayer-requests-controls {
   display: flex;

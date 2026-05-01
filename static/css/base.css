@@ -12,9 +12,9 @@
 
   --border-subtle: #eadfd4;
 
---primary: #9a7fd1;
---primary-hover: #7f66b8;
---primary-soft: #f4efff;
+  --primary: #9a7fd1;
+  --primary-hover: #7f66b8;
+  --primary-soft: #f4efff;
 
   --accent: #d9a86c;
 
@@ -51,6 +51,8 @@ a {
   text-decoration: none;
 }
 
-textarea:focus, input:focus {
+textarea:focus, 
+input:focus,
+select:focus {
   outline: none;
 }
