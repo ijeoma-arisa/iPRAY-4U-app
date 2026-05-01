@@ -58,7 +58,7 @@ export async function renderPersonCards(url) {
           data-person-id="${person.id}"
           data-person-name="${person.name}"
           data-person-relationship="${person.relationship}"
-        >
+      >
         <div class="person-info-section">
           <h3>${person.name}</h3>
           <p>${person.relationship}</p>
