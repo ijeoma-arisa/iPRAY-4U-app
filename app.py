@@ -1,45 +1,48 @@
+import psycopg
+import os
 from flask import Flask, g, jsonify, request, render_template, current_app
+import db.schema_postgres as schema_postgres
 from models import Relationship
 from utils.validators import (
   is_valid_string,
-  is_valid_int_as_bool,
+  is_valid_bool,
   require_fields,
   parse_str,
   parse_relationship,
 )
-import schema
-import sqlite3
-import os
 
 def init_db():
-  with sqlite3.connect(current_app.config["DATABASE"]) as conn:
+  with psycopg.connect(
+    os.environ["DATABASE_URL"],
+    row_factory=psycopg.rows.dict_row
+  ) as conn:
     cursor = conn.cursor()
     
     # Create tables
-    cursor.execute(schema.CREATE_RELATIONSHIPS_TABLE)
-    cursor.execute(schema.CREATE_PEOPLE_TABLE)
-    cursor.execute(schema.CREATE_PRAYERS_TABLE)
+    cursor.execute(schema_postgres.CREATE_RELATIONSHIPS_TABLE)
+    cursor.execute(schema_postgres.CREATE_PEOPLE_TABLE)
+    cursor.execute(schema_postgres.CREATE_PRAYERS_TABLE)
     
     # Create indexes
-    cursor.execute(schema.CREATE_INDEX_ON_PEOPLE_RELATIONSHIP)
-    cursor.execute(schema.CREATE_INDEX_ON_PRAYERS_PERSON)
+    cursor.execute(schema_postgres.CREATE_INDEX_ON_PEOPLE_RELATIONSHIP)
+    cursor.execute(schema_postgres.CREATE_INDEX_ON_PRAYERS_PERSON)
     
     # Insert relationship values
     relationship_values = [(r.value,) for r in Relationship]
-    cursor.executemany(schema.INSERT_RELATIONSHIP_ROWS, relationship_values)  
+    cursor.executemany(schema_postgres.INSERT_RELATIONSHIP_ROWS, relationship_values)  
       
 def create_app():
   app = Flask(__name__, instance_relative_config=True)
-  os.makedirs(app.instance_path, exist_ok=True)
-  app.config["DATABASE"] = os.path.join(app.instance_path, "prayer_requests.db")
   
   with app.app_context():
     init_db()
     
   def get_db_connection():
     if "db" not in g:
-      g.db = sqlite3.connect(current_app.config["DATABASE"])
-      g.db.row_factory = sqlite3.Row
+      g.db = psycopg.connect(
+        os.environ["DATABASE_URL"],
+        row_factory=psycopg.rows.dict_row
+      )
     return g.db
 
   @app.teardown_appcontext
@@ -53,7 +56,6 @@ def create_app():
 
   def success_json(message, data={}):
     data = dict(data) if not isinstance(data, list) else rows_to_dict(data) 
-    # print(data)
     return jsonify({"status": "success", "message": message, "data": data})
 
   def error_json(message):
@@ -74,9 +76,9 @@ def create_app():
     
     relationship = parse_relationship("rel", request.args.get("rel"))
     
-    people = (db.execute(schema.SELECT_RELATIONSHIP_PEOPLE_QUERY, (relationship.value,)).fetchall()
+    people = (db.execute(schema_postgres.SELECT_RELATIONSHIP_PEOPLE_QUERY, (relationship.value,)).fetchall()
               if type(relationship) is Relationship 
-              else db.execute(schema.SELECT_ALL_PEOPLE_QUERY).fetchall())
+              else db.execute(schema_postgres.SELECT_ALL_PEOPLE_QUERY).fetchall())
     
     return success_json("People retrieved", people)
 
@@ -103,14 +105,15 @@ def create_app():
 
     db = get_db_connection()
           
-    relationship_row = db.execute(schema.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()
-    db.execute(schema.INSERT_PERSON_QUERY, (name, relationship_row["id"]))
+    relationship_row = db.execute(schema_postgres.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()
     
-    person_id = db.execute(schema.SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]      
-    db.execute(schema.INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer)) 
+    person_id = db.execute(schema_postgres.INSERT_PERSON_QUERY, (name, relationship_row["id"])).fetchone()["id"]
+    
+    db.execute(schema_postgres.INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer)) 
+    
+    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    
     db.commit()
-    
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     return success_json("Prayer added", person), 201
       
 
@@ -118,7 +121,7 @@ def create_app():
   def get_person(person_id):
     db = get_db_connection()
     
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
       return error_json("Person not found"), 404
@@ -130,7 +133,7 @@ def create_app():
     data = request.get_json()
     
     db = get_db_connection()
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
       return error_json("Person not found"), 404 
@@ -140,28 +143,28 @@ def create_app():
     
     # TODO: Add error message for invalid name
     if is_valid_string(name):
-      db.execute(schema.UPDATE_PERSON_NAME_QUERY, (name, person_id))
+      db.execute(schema_postgres.UPDATE_PERSON_NAME_QUERY, (name, person_id))
     
     # TODO: Add error message for invalid relationship
     if relationship is not None:
-      relationship_id = db.execute(schema.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"]
-      db.execute(schema.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id))
+      relationship_id = db.execute(schema_postgres.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"]
+      db.execute(schema_postgres.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id))
+      
+      
+    updated_person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
       
     db.commit()
-      
-    updated_person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
-      
     return success_json("Person updated", updated_person)
     
   @app.route("/api/people/<int:person_id>", methods=["DELETE"])
   def delete_person(person_id):
     db = get_db_connection()
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
       return error_json("Person not found"), 404
     
-    db.execute(schema.DELETE_PERSON_QUERY, (person_id,))
+    db.execute(schema_postgres.DELETE_PERSON_QUERY, (person_id,))
     db.commit()
     
     return '', 204
@@ -169,14 +172,14 @@ def create_app():
   @app.route("/api/prayers", methods=["GET"])
   def get_prayers():
     db = get_db_connection()
-    prayers = db.execute(schema.SELECT_ALL_PRAYERS_QUERY).fetchall()
+    prayers = db.execute(schema_postgres.SELECT_ALL_PRAYERS_QUERY).fetchall()
     
     return success_json("Prayers retrieved", prayers)
 
   @app.route("/api/people/<int:person_id>/prayers", methods=["GET"])
   def get_prayers_by_person(person_id):
     db = get_db_connection()
-    prayers = db.execute(schema.SELECT_ALL_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchall()
+    prayers = db.execute(schema_postgres.SELECT_ALL_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchall()
     
     if prayers is None:
       return error_json("Person not found"), 404
@@ -187,7 +190,7 @@ def create_app():
   @app.route("/api/people/<int:person_id>/prayers", methods=["POST"])
   def add_prayer(person_id):
     db = get_db_connection()
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
       return error_json("Person not found"), 404
@@ -205,13 +208,11 @@ def create_app():
     # Edge case: either field is present but assigned None value
     # May update validator functions used, then delete later
     
-    if is_valid_string(prayer) and is_valid_int_as_bool(has_prayed):
-      db.execute(schema.INSERT_PRAYER_QUERY, (person_id, prayer, has_prayed))
+    if is_valid_string(prayer) and is_valid_bool(has_prayed):
+      prayer_id = db.execute(schema_postgres.INSERT_PRAYER_QUERY, (person_id, prayer, has_prayed))      
+      prayer = db.execute(schema_postgres.SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
+      
       db.commit()
-      
-      prayer_id = db.execute(schema.SELECT_LAST_INSERTED_ID_QUERY).fetchone()["id"]
-      prayer = db.execute(schema.SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
-      
       return success_json("Prayer added", prayer), 201
     
     return error_json("Missing or invalid fields"), 400
@@ -220,12 +221,12 @@ def create_app():
   @app.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
   def update_prayer(person_id, prayer_id):
     db = get_db_connection()
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
       return error_json("Person not found"), 404 
     
-    prayer = db.execute(schema.SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
+    prayer = db.execute(schema_postgres.SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
     
     if prayer is None:
         return error_json("Prayer not found"), 404
@@ -235,35 +236,35 @@ def create_app():
     prayer = data.get("prayer", None)
     has_prayed = data.get("has_prayed", None)
     
-    if not is_valid_string(prayer) and not is_valid_int_as_bool(has_prayed):
+    if not is_valid_string(prayer) and not is_valid_bool(has_prayed):
       return error_json("Missing or invalid fields"), 400
     
     if is_valid_string(prayer):
-      db.execute(schema.UPDATE_PRAYER_TEXT_QUERY, (prayer, prayer_id))
+      db.execute(schema_postgres.UPDATE_PRAYER_TEXT_QUERY, (prayer, prayer_id))
       
-    if is_valid_int_as_bool(has_prayed):
-      db.execute(schema.UPDATE_PRAYER_HAS_PRAYED_QUERY, (has_prayed, prayer_id))
+    if is_valid_bool(has_prayed):
+      db.execute(schema_postgres.UPDATE_PRAYER_HAS_PRAYED_QUERY, (has_prayed, prayer_id))
       
-    db.commit()
+    updated_prayer = db.execute(schema_postgres.SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
     
-    updated_prayer = db.execute(schema.SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
+    db.commit()
     return success_json("Prayer updated", updated_prayer)
     
   #TODO: Maybe distinguish "prayer id does not exist" from that "prayer id does not belong to that person"
   @app.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
   def delete_prayer(person_id, prayer_id):
     db = get_db_connection()
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if not person:
       return error_json("Person not found"), 404 
     
-    prayer = db.execute(schema.SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
+    prayer = db.execute(schema_postgres.SELECT_PRAYER_BY_PERSON_QUERY, (prayer_id, person_id)).fetchone()
     
     if not prayer:
       return error_json("Prayer not found"), 404 
     
-    db.execute(schema.DELETE_PRAYER_QUERY, (prayer_id,))
+    db.execute(schema_postgres.DELETE_PRAYER_QUERY, (prayer_id,))
     db.commit() 
         
     return '', 204
@@ -271,7 +272,7 @@ def create_app():
   @app.route("/api/relationships", methods=["GET"])
   def get_relationships():
       db = get_db_connection()
-      relationships = db.execute(schema.SELECT_ALL_RELATIONSHIPS_QUERY).fetchall()
+      relationships = db.execute(schema_postgres.SELECT_ALL_RELATIONSHIPS_QUERY).fetchall()
           
       return success_json("Relationships retrieved", relationships)
   

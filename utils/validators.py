@@ -9,6 +9,9 @@ def is_valid_int(value) -> bool:
 def is_valid_int_as_bool(value) -> bool:
   return isinstance(value, int) and (value == 0 or value == 1)
 
+def is_valid_bool(value) -> bool:
+  return isinstance(value, bool)
+  
 def require_str(value, field_name):
   if not is_valid_string(value):
     raise ValueError(f"{field_name} must be a non-empty string.")

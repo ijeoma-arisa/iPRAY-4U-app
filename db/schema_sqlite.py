@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS people (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   relationship_id INTEGER NOT NULL,
-  CONSTRAINT fk_relationship FOREIGN KEY (relationship_id) REFERENCES relationships (id)
+  CONSTRAINT fk_relationship FOREIGN KEY (relationship_id) REFERENCES relationships(id)
   );"""
   
 CREATE_PRAYERS_TABLE = """
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS prayers (
   person_id INTEGER NOT NULL,
   prayer TEXT NOT NULL,
   has_prayed INTEGER NOT NULL DEFAULT 0 CHECK (has_prayed IN (0,1)),
-  CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE
+  CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES people(id) ON DELETE CASCADE
   );"""
 
 # INDEXES
