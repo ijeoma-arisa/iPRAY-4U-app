@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:5000
 @person1Route = /api/people/1
 @person2Route = /api/people/2
-@person5Route = /api/people/5
+@person6Route = /api/people/6
 
 ### GET Requests
 
@@ -16,14 +16,17 @@ GET {{baseUrl}}{{person1Route}}/prayers
 ### Get Person 2 prayers 
 GET {{baseUrl}}{{person2Route}}/prayers
 
-### Get Person 5 prayers
-GET {{baseUrl}}{{person5Route}}/prayers
+### Get Person 6 prayers
+GET {{baseUrl}}{{person6Route}}/prayers
+
+### Test
+GET {{baseUrl}}/api/people/7/prayers
 
 
 ### POST Requests
 
 ### Add valid prayer - no has_prayed provided (default)
-POST {{baseUrl}}{{person5Route}}/prayers
+POST {{baseUrl}}{{person6Route}}/prayers
 Content-Type: application/json
 
 {
@@ -32,7 +35,7 @@ Content-Type: application/json
 
 ### Add valid prayer - valid has_prayed
 
-POST {{baseUrl}}{{person5Route}}/prayers
+POST {{baseUrl}}{{person6Route}}/prayers
 Content-Type: application/json
 
 {
@@ -41,15 +44,15 @@ Content-Type: application/json
 }
 
 ### Add invalid prayer - missing prayer
-POST {{baseUrl}}{{person5Route}}/prayers
+POST {{baseUrl}}{{person6Route}}/prayers
 Content-Type: application/json
 
 {
   "has_prayed": true
 }
 
-### Add invalid prayer - missing has_prayed
-POST {{baseUrl}}{{person5Route}}/prayers
+### Add valid prayer - missing has_prayed (default)
+POST {{baseUrl}}{{person6Route}}/prayers
 Content-Type: application/json
 
 {
@@ -57,7 +60,7 @@ Content-Type: application/json
 }
 
 ### Add invalid prayer - missing both
-POST {{baseUrl}}{{person5Route}}/prayers
+POST {{baseUrl}}{{person6Route}}/prayers
 Content-Type: application/json
 
 {
@@ -74,7 +77,7 @@ Content-Type: application/json
 }
 
 ### Add invalid prayer - invalid text
-POST {{baseUrl}}{{person5Route}}/prayers
+POST {{baseUrl}}{{person6Route}}/prayers
 Content-Type: application/json
 
 {
@@ -83,7 +86,7 @@ Content-Type: application/json
 }
 
 ### Add invalid prayer - invalid has_prayed
-POST {{baseUrl}}{{person5Route}}/prayers
+POST {{baseUrl}}{{person6Route}}/prayers
 Content-Type: application/json
 
 {
@@ -96,14 +99,14 @@ Content-Type: application/json
 
 ### DELETE Requests
 
-### Delete valid valid prayer
-DELETE {{baseUrl}}{{person5Route}}/prayers/60
+### Delete valid prayer
+DELETE {{baseUrl}}{{person6Route}}/prayers/12
 
 ### Delete invalid prayer (prayer id does not exist)
-DELETE {{baseUrl}}{{person5Route}}/prayers/60
+DELETE {{baseUrl}}{{person6Route}}/prayers/60
 
 ### Delete invalid prayer (prayer id belongs to different person)
-DELETE {{baseUrl}}{{person5Route}}/prayers/50
+DELETE {{baseUrl}}{{person6Route}}/prayers/5
 
 ### Delete invalid prayer (person does not exist)
 DELETE {{baseUrl}}/api/people/356/prayers/50

@@ -161,7 +161,7 @@ async function handleEditPrayerInput({ onSuccess }){
 
     const formData = {
       prayer: editPrayerForm.elements.prayer.value,
-      ['has_prayed']: editPrayerForm.elements['has-prayed'].checked ? 1 : 0,
+      ['has_prayed']: editPrayerForm.elements['has-prayed'].checked,
     }
 
     const options = {
@@ -265,11 +265,20 @@ export function initCloseModalListeners(){
   document.querySelectorAll('.modal-js').forEach((modal) =>{
     
     modal.addEventListener('close', (event) => {
+      Object.keys(modal.dataset).forEach(key => {
+        delete modal.dataset[key];
+      });
+
       const form = modal.querySelector('.modal-form-js');
       
       if (form){
         form.reset();
+
         form.querySelectorAll('[disabled').forEach(elem => elem.disabled = false);
+
+        Object.keys(form.dataset).forEach(key => {
+          delete form.dataset[key];
+        });
       }
     })
 

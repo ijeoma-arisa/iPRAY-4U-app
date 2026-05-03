@@ -1,6 +1,7 @@
 import psycopg
 import os
-from flask import Flask, g, jsonify, request, render_template, current_app
+from flask import Flask, g, jsonify, request, render_template
+from dotenv import load_dotenv
 import db.schema_postgres as schema_postgres
 from models import Relationship
 from utils.validators import (
@@ -10,6 +11,8 @@ from utils.validators import (
   parse_str,
   parse_relationship,
 )
+
+load_dotenv()
 
 def init_db():
   with psycopg.connect(
@@ -90,7 +93,7 @@ def create_app():
     # Check to see if any fields are missing  
     missing_fields = require_fields(data, ["name", "relationship", "prayer"])
     if missing_fields:
-      return error_json(f"Missing fields: {", ".join(missing_fields)}"), 400
+      return error_json(f"Missing fields: {missing_fields}"), 400
     
     # Validate fields
     name = parse_str("name", data.get("name"))
@@ -146,7 +149,7 @@ def create_app():
       db.execute(schema_postgres.UPDATE_PERSON_NAME_QUERY, (name, person_id))
     
     # TODO: Add error message for invalid relationship
-    if relationship is not None:
+    if type(relationship) is Relationship:
       relationship_id = db.execute(schema_postgres.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"]
       db.execute(schema_postgres.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id))
       
@@ -179,6 +182,12 @@ def create_app():
   @app.route("/api/people/<int:person_id>/prayers", methods=["GET"])
   def get_prayers_by_person(person_id):
     db = get_db_connection()
+    
+    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    
+    if person is None:
+      return error_json("Person not found"), 404
+    
     prayers = db.execute(schema_postgres.SELECT_ALL_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchall()
     
     if prayers is None:
@@ -194,7 +203,7 @@ def create_app():
     
     if person is None:
       return error_json("Person not found"), 404
-    
+    print(person_id)
     data = request.get_json()
     
     missing_fields = require_fields(data, ["prayer"])
@@ -209,7 +218,7 @@ def create_app():
     # May update validator functions used, then delete later
     
     if is_valid_string(prayer) and is_valid_bool(has_prayed):
-      prayer_id = db.execute(schema_postgres.INSERT_PRAYER_QUERY, (person_id, prayer, has_prayed))      
+      prayer_id = db.execute(schema_postgres.INSERT_PRAYER_QUERY, (person_id, prayer, has_prayed)).fetchone()["id"]      
       prayer = db.execute(schema_postgres.SELECT_PRAYER_QUERY, (prayer_id,)).fetchone()
       
       db.commit()

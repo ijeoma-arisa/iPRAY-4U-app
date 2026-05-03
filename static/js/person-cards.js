@@ -14,11 +14,11 @@ async function loadPrayers(person_id) {
           data-person-id="${person_id}" 
           data-prayer-id="${prayer.id}"
           data-prayer-text="${prayer.prayer}"
-          data-has-prayed="${prayer['has_prayed'] === 1}"  
+          data-has-prayed="${prayer['has_prayed']}"  
       >
         <div class="prayer-text">
           ${prayer.prayer}
-          ${prayer['has_prayed'] === 1 ? "Prayed!" : ""}
+          ${prayer['has_prayed'] ? "Prayed!" : ""}
         </div>
         <div class="update-prayer-buttons">
           <button 

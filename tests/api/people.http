@@ -125,21 +125,21 @@ PATCH {{baseUrl}}/api/people/1
 Content-Type: application/json
 
 {
-  "relationship": "Family"
+  "relationship": "Friends"
 }
 
 
 ### Patch both
-PATCH {{baseUrl}}/api/people/14
+PATCH {{baseUrl}}/api/people/5
 Content-Type: application/json
 
 {
   "name": "Julia",
-  "relationship": "Ministry"
+  "relationship": "People I Know"
 }
 
 ### Patch invalid name
-PATCH {{baseUrl}}/api/people/14
+PATCH {{baseUrl}}/api/people/5
 Content-Type: application/json
 
 {
@@ -147,7 +147,7 @@ Content-Type: application/json
 }
 
 ### Patch invalid relationship
-PATCH {{baseUrl}}/api/people/14
+PATCH {{baseUrl}}/api/people/5
 Content-Type: application/json
 
 {
@@ -167,7 +167,7 @@ Content-Type: application/json
 ### DELETE Requests
 
 ### Delete valid person
-DELETE {{baseUrl}}/api/people/12
+DELETE {{baseUrl}}/api/people/5
 
 ### Delete invalid person
 DELETE {{baseUrl}}/api/people/323
