@@ -108,37 +108,42 @@ class TestParseRelationship(unittest.TestCase):
     """Test cases for parse_relationship function."""
     
     def test_valid_relationship_lowercase(self):
-        self.assertEqual(parse_relationship("friends"), Relationship.FRIENDS)
-        self.assertEqual(parse_relationship("family"), Relationship.FAMILY)
-        self.assertEqual(parse_relationship("ministry"), Relationship.MINISTRY)
-        self.assertEqual(parse_relationship("custom"), Relationship.CUSTOM)
+        self.assertEqual(parse_relationship("relationship", "friends"), Relationship.FRIENDS)
+        self.assertEqual(parse_relationship("relationship", "family"), Relationship.FAMILY)
+        self.assertEqual(parse_relationship("relationship", "people i know"), Relationship.KNOWN)
     
     def test_valid_relationship_uppercase(self):
-        self.assertEqual(parse_relationship("FRIENDS"), Relationship.FRIENDS)
-        self.assertEqual(parse_relationship("FAMILY"), Relationship.FAMILY)
-        self.assertEqual(parse_relationship("MINISTRY"), Relationship.MINISTRY)
-        self.assertEqual(parse_relationship("CUSTOM"), Relationship.CUSTOM)
+        self.assertEqual(parse_relationship("relationship", "FRIENDS"), Relationship.FRIENDS)
+        self.assertEqual(parse_relationship("relationship", "FAMILY"), Relationship.FAMILY)
+        self.assertEqual(parse_relationship("relationship", "PEOPLE I KNOW"), Relationship.KNOWN)
     
     def test_valid_relationship_mixed_case(self):
-        self.assertEqual(parse_relationship("Friends"), Relationship.FRIENDS)
-        self.assertEqual(parse_relationship("fAmILy"), Relationship.FAMILY)
-        self.assertEqual(parse_relationship("MiniStry"), Relationship.MINISTRY)
-        self.assertEqual(parse_relationship("CuStOm"), Relationship.CUSTOM)
+        self.assertEqual(parse_relationship("relationship", "Friends"), Relationship.FRIENDS)
+        self.assertEqual(parse_relationship("relationship", "fAmILy"), Relationship.FAMILY)
+        self.assertEqual(parse_relationship("relationship", "pEoPle i KNOW"), Relationship.KNOWN)
     
     def test_invalid_relationship_string(self):
-        self.assertIsNone(parse_relationship("Customer"))
-        self.assertIsNone(parse_relationship("Friend"))
-        self.assertIsNone(parse_relationship("Fam"))        
+        def error_msg(rel):
+            return f"Invalid relationship: Relationship '{rel}' does not exist." 
+
+        self.assertEqual(parse_relationship("relationship", "Customer"), [error_msg("Customer")])
+        self.assertEqual(parse_relationship("relationship", "Friend"), [error_msg("Friend")])
+        self.assertEqual(parse_relationship("relationship", "Fam"), [error_msg("Fam")])        
     
     def test_empty_string_or_whitespace(self):
-        self.assertIsNone(parse_relationship(""))
-        self.assertIsNone(parse_relationship("   "))
-        self.assertIsNone(parse_relationship("\n"))
+        error_msg = "Invalid string: 'relationship' must be a non-empty string." 
+        
+        self.assertEqual(parse_relationship("relationship", ""), [error_msg])
+        self.assertEqual(parse_relationship("relationship", "   "), [error_msg])
+        self.assertEqual(parse_relationship("relationship", "\n"), [error_msg])
     
     def test_non_string_input_returns_none(self):
-        self.assertIsNone(parse_relationship(123))
-        self.assertIsNone(parse_relationship(None))
-        self.assertIsNone(parse_relationship([]))
+        def error_msg(non_string_input):
+            return f"Invalid type: 'relationship' must be a string. Received type {type(non_string_input)}."
+         
+        self.assertEqual(parse_relationship("relationship", 123), [error_msg(123)])
+        self.assertEqual(parse_relationship("relationship", None), [error_msg(None)])
+        self.assertEqual(parse_relationship("relationship", []), [error_msg([])])
 
 if __name__ == '__main__':
     unittest.main()
