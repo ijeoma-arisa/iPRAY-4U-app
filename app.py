@@ -1,12 +1,12 @@
 from flask import Flask, g, jsonify, request, render_template
 from dotenv import load_dotenv
-from db import init_db, get_db_connection, schema_postgres
 
+from db import init_db, get_db_connection, schema_postgres
 from models import Relationship
 from utils.validators import (
   validate_fields,
   parse_relationship,
-  parse_bool_default,
+  parse_bool_default
 )
 
 load_dotenv()
