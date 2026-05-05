@@ -1,8 +1,7 @@
-import psycopg
-import os
 from flask import Flask, g, jsonify, request, render_template
 from dotenv import load_dotenv
-import db.schema_postgres as schema_postgres
+from db import init_db, get_db_connection, schema_postgres
+
 from models import Relationship
 from utils.validators import (
   validate_fields,
@@ -12,40 +11,12 @@ from utils.validators import (
 
 load_dotenv()
 
-def init_db():
-  with psycopg.connect(
-    os.environ["DATABASE_URL"],
-    row_factory=psycopg.rows.dict_row
-  ) as conn:
-    cursor = conn.cursor()
-    
-    # Create tables
-    cursor.execute(schema_postgres.CREATE_RELATIONSHIPS_TABLE)
-    cursor.execute(schema_postgres.CREATE_PEOPLE_TABLE)
-    cursor.execute(schema_postgres.CREATE_PRAYERS_TABLE)
-    
-    # Create indexes
-    cursor.execute(schema_postgres.CREATE_INDEX_ON_PEOPLE_RELATIONSHIP)
-    cursor.execute(schema_postgres.CREATE_INDEX_ON_PRAYERS_PERSON)
-    
-    # Insert relationship values
-    relationship_values = [(r.value,) for r in Relationship]
-    cursor.executemany(schema_postgres.INSERT_RELATIONSHIP_ROWS, relationship_values)  
-      
 def create_app():
   app = Flask(__name__, instance_relative_config=True)
   
   with app.app_context():
     init_db()
     
-  def get_db_connection():
-    if "db" not in g:
-      g.db = psycopg.connect(
-        os.environ["DATABASE_URL"],
-        row_factory=psycopg.rows.dict_row
-      )
-    return g.db
-
   @app.teardown_appcontext
   def close_db_connection(exception):
     db = g.pop("db", None)
