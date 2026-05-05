@@ -77,19 +77,35 @@ RETURNING id
 
 INSERT_PRAYER_QUERY = """
 INSERT INTO prayers (person_id, prayer, has_prayed) VALUES (%s, %s, %s)
-RETURNING id
+RETURNING *
 """
 
 # UPDATE Queries
-UPDATE_PERSON_NAME_QUERY = "UPDATE people SET name = %s WHERE id = %s"
+UPDATE_PERSON_QUERY = """
+UPDATE people
+SET name = %s,
+SET relationship_id = %s
+WHERE id = %s
+RETURNING *
+"""
 
-UPDATE_PERSON_RELATIONSHIP_QUERY = "UPDATE people SET relationship_id = %s WHERE id = %s"
-
-UPDATE_PRAYER_TEXT_QUERY = "UPDATE prayers SET prayer = %s WHERE id = %s"
-
-UPDATE_PRAYER_HAS_PRAYED_QUERY = "UPDATE prayers SET has_prayed = %s WHERE id = %s"
+UPDATE_PRAYER_QUERY = """
+UPDATE prayers
+SET prayer = %s,
+SET has_prayed = %s
+WHERE id = %s
+RETURNING *
+"""
 
 # DELETE Queries
-DELETE_PERSON_QUERY = "DELETE FROM people WHERE id = %s"
+DELETE_PERSON_QUERY = """
+DELETE FROM people 
+WHERE id = %s
+RETURNING *
+"""
 
-DELETE_PRAYER_QUERY = "DELETE FROM prayers WHERE id = %s"
+DELETE_PRAYER_QUERY = """
+DELETE FROM prayers 
+WHERE id = %s
+RETURNING *
+"""
