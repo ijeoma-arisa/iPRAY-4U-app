@@ -1,12 +1,12 @@
 import os
 import psycopg
-from flask import g
+from flask import g, current_app
 from db import schema_postgres
 from models import Relationship
 
 def init_db():
   with psycopg.connect(
-    os.environ["DATABASE_URL"],
+    current_app.config["DATABASE_URL"],
     row_factory=psycopg.rows.dict_row
   ) as conn:
     cursor = conn.cursor()

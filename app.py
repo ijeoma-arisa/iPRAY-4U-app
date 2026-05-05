@@ -1,3 +1,4 @@
+import os
 from flask import Flask, g, jsonify, request, render_template
 from dotenv import load_dotenv
 
@@ -11,8 +12,13 @@ from utils.validators import (
 
 load_dotenv()
 
-def create_app():
+def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
+  
+  app.config["DATABASE_URL"] = os.environ["DATABASE_URL"]
+  
+  if test_config:
+    app.config.update(test_config)
   
   with app.app_context():
     init_db()
