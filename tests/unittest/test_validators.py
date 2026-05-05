@@ -6,6 +6,7 @@ from utils.validators import (
     validate_fields
 )
 from models import Relationship
+from tests.sample_data_helpers import generate_sample_person
 
 class TestParseBoolDefault(unittest.TestCase):
     """Test cases for parse_bool_default function."""
@@ -135,24 +136,10 @@ class TestValidateFields(unittest.TestCase):
         
         cls.required_fields = ["name", "relationship", "prayer"]
     
-    def sample_data(self, name=None, relationship=None, prayer=None):
-        data = {}
-        
-        if name is not None:
-            data["name"] = name
-        
-        if relationship is not None:
-            data["relationship"] = relationship
-            
-        if prayer is not None:
-            data["prayer"] = prayer
-            
-        return data    
-    
     def test_all_fields_present(self):
         """Test that all fields are parsed and no errors are listed."""
         
-        data = self.sample_data(name="Bob", relationship="Family", prayer="Strength")
+        data = generate_sample_person(name="Bob", relationship="Family", prayer="Strength")
         
         parsed, errors = validate_fields(data, self.required_fields)
         
@@ -165,7 +152,7 @@ class TestValidateFields(unittest.TestCase):
     def test_missing_one_field(self):
         """Test that an error is provided when one field is missing."""
         
-        data = self.sample_data(name=None, relationship="Family", prayer="Strength")
+        data = generate_sample_person(name=None, relationship="Family", prayer="Strength")
         
         parsed, errors = validate_fields(data, self.required_fields)
         
@@ -178,7 +165,7 @@ class TestValidateFields(unittest.TestCase):
     def test_missing_multiple_fields(self):
         """Test that multiple errors are provided when multiple fields are missing."""
         
-        data = self.sample_data(name=None, relationship="Family", prayer=None)
+        data = generate_sample_person(name=None, relationship="Family", prayer=None)
         
         parsed, errors = validate_fields(data, self.required_fields)
         
@@ -189,7 +176,7 @@ class TestValidateFields(unittest.TestCase):
         self.assertListEqual(errors, ["'name' is required.", "'prayer' is required."])
     
     def test_error_message_lists_missing_fields(self):
-        data = self.sample_data(name=None, relationship=None, prayer=None)
+        data = generate_sample_person(name=None, relationship=None, prayer=None)
         
         parsed, errors = validate_fields(data, self.required_fields)
         

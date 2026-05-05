@@ -1,28 +1,57 @@
 import pytest
-from app import create_app, init_db
+import os
+from dotenv import load_dotenv
+from app import create_app
+from db import cleanup_test_db
+from tests.sample_data_helpers import generate_sample_person
+from models import Relationship
 
 PEOPLE_URL = '/api/people'
+
+load_dotenv()
 
 @pytest.fixture
 def client():
   app = create_app({
-    "DATABASE_URL": "test_db_url"
+    "DATABASE_URL": os.environ["TEST_DATABASE_URL"]
   })
+    
+  client = app.test_client()
   
+  cleanup_test_db()
+
   yield client
   
-  return app.test_client()
-
-def test_get_person(client):
-  response = client.get(PEOPLE_URL)
+  cleanup_test_db()
   
-  assert response.status_code == 200
+  
+def assert_success_response(response, expected_status=200):
+  assert response.status_code == expected_status
   assert response.is_json
   
-  data = response.get_json()
-  assert isinstance(data, list)
+  json = response.get_json()
+  assert "data" in json
   
+  return json["data"]
+  
+  
+def test_get_people(client):
+  people = [
+    generate_sample_person("Bob", Relationship.FRIENDS.value, "Strength"),
+    generate_sample_person("Sarah",  Relationship.FAMILY.value, "Peace"),
+    generate_sample_person("Chris", Relationship.KNOWN.value, "Peace"),
+  ]
+  
+  for person in people:
+    client.post(PEOPLE_URL, json=person)
+ 
+  response = client.get(PEOPLE_URL)
+  
+  data = assert_success_response(response)
 
+  assert isinstance(data, list)
+  assert len(data) == 3
+  
 def test_add_person_valid(client):
   person_json = {
     "name": "Billy",
