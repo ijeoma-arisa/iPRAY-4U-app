@@ -6,7 +6,7 @@ from utils.validators import (
     validate_fields
 )
 from models import Relationship
-from tests.sample_data_helpers import generate_sample_person
+from helpers.sample_data import generate_sample_person
 
 class TestParseBoolDefault(unittest.TestCase):
     """Test cases for parse_bool_default function."""
