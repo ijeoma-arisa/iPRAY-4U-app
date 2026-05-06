@@ -1,11 +1,10 @@
-import pytest
-import os
-from dotenv import load_dotenv
-from app import create_app
-from db import cleanup_test_db
-from helpers.sample_data import generate_sample_person
 from models import Relationship
-
+from helpers import (
+  client,
+  assert_success_response, 
+  assert_errors_response,
+  generate_sample_person, 
+)
 
 def get_people_url(relationship = None) -> str:
   people_url = '/api/people'
@@ -15,65 +14,6 @@ def get_people_url(relationship = None) -> str:
   
   return f"{people_url }?rel={relationship.lower()}"
     
-
-load_dotenv()
-
-@pytest.fixture
-def client():
-  app = create_app({
-    "DATABASE_URL": os.environ["TEST_DATABASE_URL"]
-  })
-    
-  client = app.test_client()
-  
-  cleanup_test_db()
-
-  yield client
-  
-  cleanup_test_db()
-
-
-def assert_success_response(response, data_type=dict, expected_status=200):
-  assert response.status_code == expected_status
-  assert response.is_json
-  
-  json = response.get_json()
-  
-  assert "status" in json
-  assert json["status"] == "success"
-  
-  assert "message" in json
-  assert isinstance(json["message"], str)
-  assert len(json["message"]) > 0
-  
-  assert "data" in json
-  assert isinstance(json["data"], data_type)
-  assert len(json["data"]) > 0
-
-  
-  return json["data"]
-  
-def assert_errors_response(response, expected_status=400):
-  assert response.status_code == expected_status
-  assert response.is_json
-  
-  json = response.get_json()
-  
-  assert "status" in json
-  assert isinstance(json["message"], str)
-  assert len(json["message"]) > 0
-    
-  assert "message" in json
-  assert isinstance(json["message"], str)
-  assert len(json["message"]) > 0
-  
-  if "errors" in json:
-    errors = json["errors"]
-    assert isinstance(errors, list)
-    assert len(errors) > 0
-    
-  return json
-  
 def test_get_people_no_filter(client):
   people = [
     generate_sample_person("Bob", Relationship.FRIENDS.value, "Strength"),
