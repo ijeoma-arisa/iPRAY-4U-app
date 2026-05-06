@@ -100,7 +100,7 @@ def create_app(test_config=None):
     person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     db.commit()
-    return success_json("Prayer added", person), 201
+    return success_json("Person added", person), 201
       
 
   @app.route("/api/people/<int:person_id>", methods=["GET"])
