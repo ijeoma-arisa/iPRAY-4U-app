@@ -5,6 +5,14 @@ class Relationship(Enum):
   FAMILY = "Family"
   FRIENDS = "Friends"
   KNOWN = "People I Know"
+  
+  @classmethod
+  def get_value_by_id(self, enum_id):
+    if enum_id < 1 or enum_id > 3:
+      return
+    
+    enum_index = enum_id - 1
+    return list(self)[enum_index].value
 
 class Prayer:
   def __init__(self, text: Optional[str] = None, has_prayed: bool = False):
