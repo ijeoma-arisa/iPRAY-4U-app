@@ -4,18 +4,23 @@ from helpers import (
   assert_success_response, 
   assert_error_response,
   assert_valid_delete_response,
-  generate_sample_person,
+  generate_person_json,
   assert_person_data, 
+  update_existing_json_fields,
 )
 
 PEOPLE_URL = '/api/people'
+#TODO: Find a way to test all types of invalid field structures in each endpoint
+#   e.g.  test_invalid_str for name, prayer
+#         test_invalid_relationship for prayer
+# Assert "Validation failed" errors response for each, not just missing fields
 
 # POST endpoint
 def test_add_person_valid(client):
   people = [
-    generate_sample_person("Bob", Relationship.FRIENDS.value, "Strength"),
-    generate_sample_person("Sarah",  Relationship.FAMILY.value, "Peace"),
-    generate_sample_person("Chris", Relationship.KNOWN.value, "Peace"),
+    generate_person_json("Bob", Relationship.FRIENDS.value, "Strength"),
+    generate_person_json("Sarah",  Relationship.FAMILY.value, "Peace"),
+    generate_person_json("Chris", Relationship.KNOWN.value, "Peace"),
   ]
     
   for person in people:
@@ -30,7 +35,7 @@ def test_add_person_valid(client):
     assert_person_data(person_data, person)
    
 def test_add_person_missing_name(client):
-  person = generate_sample_person(
+  person = generate_person_json(
     name=None, 
     relationship=Relationship.FRIENDS.value, 
     prayer="Forgiveness"
@@ -45,7 +50,7 @@ def test_add_person_missing_name(client):
   )
   
 def test_add_person_missing_relationship(client):
-  person = generate_sample_person(
+  person = generate_person_json(
     name="Bob", 
     relationship=None, 
     prayer="Forgiveness"
@@ -60,7 +65,7 @@ def test_add_person_missing_relationship(client):
   )
   
 def test_add_person_missing_prayer(client):
-  person = generate_sample_person(
+  person = generate_person_json(
     name="Bob", 
     relationship=Relationship.FRIENDS.value, 
     prayer=None
@@ -75,7 +80,7 @@ def test_add_person_missing_prayer(client):
   )
 
 def test_add_person_missing_all_fields(client):
-  person = generate_sample_person(
+  person = generate_person_json(
     name=None,
     relationship=None,
     prayer=None
@@ -93,12 +98,11 @@ def test_add_person_missing_all_fields(client):
   )
 
 # GET endpoint
-
 def test_get_people_no_filter(client):
   people = [
-    generate_sample_person("Bob", Relationship.FRIENDS.value, "Strength"),
-    generate_sample_person("Sarah",  Relationship.FAMILY.value, "Peace"),
-    generate_sample_person("Chris", Relationship.KNOWN.value, "Peace"),
+    generate_person_json("Bob", Relationship.FRIENDS.value, "Strength"),
+    generate_person_json("Sarah",  Relationship.FAMILY.value, "Peace"),
+    generate_person_json("Chris", Relationship.KNOWN.value, "Peace"),
   ]
     
   for person in people:
@@ -117,12 +121,11 @@ def test_get_people_no_filter(client):
   
 def test_get_people_with_relationship_filter(client):
   people = [
-    generate_sample_person("Bob", Relationship.FRIENDS.value, "Strength"),
-    generate_sample_person("Sarah",  Relationship.FAMILY.value, "Peace"),
-    generate_sample_person("Chris", Relationship.KNOWN.value, "Peace"),
+    generate_person_json("Bob", Relationship.FRIENDS.value, "Strength"),
+    generate_person_json("Sarah",  Relationship.FAMILY.value, "Peace"),
+    generate_person_json("Chris", Relationship.KNOWN.value, "Peace"),
   ]
 
-  
   for person in people:
     client.post(PEOPLE_URL, json=person)
     
@@ -139,7 +142,7 @@ def test_get_people_with_relationship_filter(client):
     assert len(data) == 1
     
 def test_get_person_valid(client):
-  person = generate_sample_person("Sam", Relationship.FAMILY.value, "Obedience")
+  person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
 
   client.post(PEOPLE_URL, json=person)
     
@@ -163,7 +166,7 @@ def test_get_person_invalid(client):
     expected_status=404
   )
   
-  person = generate_sample_person("Sam", Relationship.FAMILY.value, "Obedience")
+  person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
   client.post(PEOPLE_URL, json=person)
     
   response = client.get(invalid_person_url)
@@ -174,17 +177,15 @@ def test_get_person_invalid(client):
   )
   
 # PATCH endpoint
-# TODO: Revisit PATCH requests - fix branching logic
 def test_update_person_valid_name_only(client):
-  person = generate_sample_person("Sarah",  Relationship.FAMILY.value, "Peace")
+  person = generate_person_json("Sarah", Relationship.FAMILY.value, "Peace")
   client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"
   
-  response = client.patch(person_url, json={"name": "Julia"})
-  person["name"] = "Julia"
+  updated_name_json = update_existing_json_fields({"name": "Julia"}, person)
+  response = client.patch(person_url, json=updated_name_json)
   
-  print(response.text)
   person_data = assert_success_response(
     response, 
     expected_message="Person updated"
@@ -192,18 +193,71 @@ def test_update_person_valid_name_only(client):
   
   assert_person_data(person_data, person)
 
-# def test_update_person_valid_relationship_only(client):
-#   pass
+def test_update_person_valid_relationship_only(client):
+  person = generate_person_json("Sarah", Relationship.FAMILY.value, "Peace")
+  client.post(PEOPLE_URL, json=person)
+  
+  person_url = f"{PEOPLE_URL}/1"
+  
+  updated_relationship_json = update_existing_json_fields(
+    {"relationship": Relationship.FRIENDS.value}, 
+    person
+  )
+  
+  response = client.patch(person_url, json=updated_relationship_json)
+  
+  person_data = assert_success_response(
+    response, 
+    expected_message="Person updated"
+  )
+  
+  assert_person_data(person_data, person)
 
-# def test_update_person_valid_all_fields(client):
-#   pass
+def test_update_person_valid_all_fields(client):
+  person = generate_person_json("Sarah", Relationship.FAMILY.value, "Peace")
+  client.post(PEOPLE_URL, json=person)
+  
+  person_url = f"{PEOPLE_URL}/1"
+  
+  updated_name_and_relationship_json = update_existing_json_fields(
+    {"name": "Mary", "relationship": Relationship.KNOWN.value},
+    person
+  )
+  response = client.patch(person_url, json=updated_name_and_relationship_json)
 
-# def test_update_person_invalid_(client):
-#   pass
+  person_data = assert_success_response(
+    response, 
+    expected_message="Person updated"
+  )
+  
+  assert_person_data(person_data, person)
+
+def test_update_person_missing_all_fields(client):
+  person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+  client.post(PEOPLE_URL, json=person)
+  
+  person_url = f"{PEOPLE_URL}/1"
+  
+  response = client.patch(person_url, json={})
+  
+  assert_error_response(
+    response,
+    expected_message="Validation failed",
+    expected_errors={"'name' is required.", "'relationship' is required."}
+  )
+  
+  get_response = client.get(person_url)
+  person_data = assert_success_response(
+    get_response,
+    expected_message="Person retrieved"
+  )
+  
+  assert_person_data(person_data, person)
+  
 
 # DELETE endpoint
 def test_delete_person_valid(client):
-  person = generate_sample_person("Sam", Relationship.FAMILY.value, "Obedience")
+  person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
   client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"
@@ -222,7 +276,7 @@ def test_delete_person_nonexistent_id(client):
   )
   
 def test_delete_person_duplicate_request(client):
-  person = generate_sample_person("Sam", Relationship.FAMILY.value, "Obedience")
+  person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
   client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"

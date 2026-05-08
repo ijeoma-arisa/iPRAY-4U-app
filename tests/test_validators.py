@@ -6,7 +6,7 @@ from utils.validators import (
     validate_fields
 )
 from models import Relationship
-from helpers.sample_data import generate_sample_person
+from helpers.sample_data import generate_person_json
 
 class TestParseBoolDefault(unittest.TestCase):
     """Test cases for parse_bool_default function."""
@@ -122,7 +122,7 @@ class TestParseRelationship(unittest.TestCase):
         self.assertIsNone(parse_relationship(self.field, "", self.actual_errors))
         self.assertListEqual(self.actual_errors, self.expected_errors_relationship)
 
-
+#TODO: Test invalid field structures (not just missing)
 class TestValidateFields(unittest.TestCase):
     """Test cases for require_fields function."""
     
@@ -139,7 +139,7 @@ class TestValidateFields(unittest.TestCase):
     def test_all_fields_present(self):
         """Test that all fields are parsed and no errors are listed."""
         
-        data = generate_sample_person(name="Bob", relationship="Family", prayer="Strength")
+        data = generate_person_json(name="Bob", relationship="Family", prayer="Strength")
         
         parsed, errors = validate_fields(data, self.required_fields)
         
@@ -152,7 +152,7 @@ class TestValidateFields(unittest.TestCase):
     def test_missing_one_field(self):
         """Test that an error is provided when one field is missing."""
         
-        data = generate_sample_person(name=None, relationship="Family", prayer="Strength")
+        data = generate_person_json(name=None, relationship="Family", prayer="Strength")
         
         parsed, errors = validate_fields(data, self.required_fields)
         
@@ -165,7 +165,7 @@ class TestValidateFields(unittest.TestCase):
     def test_missing_multiple_fields(self):
         """Test that multiple errors are provided when multiple fields are missing."""
         
-        data = generate_sample_person(name=None, relationship="Family", prayer=None)
+        data = generate_person_json(name=None, relationship="Family", prayer=None)
         
         parsed, errors = validate_fields(data, self.required_fields)
         
@@ -176,7 +176,7 @@ class TestValidateFields(unittest.TestCase):
         self.assertListEqual(errors, ["'name' is required.", "'prayer' is required."])
     
     def test_error_message_lists_missing_fields(self):
-        data = generate_sample_person(name=None, relationship=None, prayer=None)
+        data = generate_person_json(name=None, relationship=None, prayer=None)
         
         parsed, errors = validate_fields(data, self.required_fields)
         

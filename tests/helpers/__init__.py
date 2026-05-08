@@ -6,4 +6,4 @@ from .assertions import (
   assert_valid_delete_response,
 )
 from .fixtures import client
-from .sample_data import generate_sample_person
+from .sample_data import generate_person_json, update_existing_json_fields

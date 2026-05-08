@@ -80,8 +80,8 @@ WHERE id = ?
 
 UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY = """
 UPDATE people
-SET name = ?,
-SET relationship_id = ?
+SET name = ?, 
+    relationship_id = ?
 WHERE id = ?
 """
 

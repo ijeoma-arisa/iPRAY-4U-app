@@ -119,29 +119,14 @@ def create_app(test_config=None):
     data = request.get_json()
     
     valid_fields = ["name", "relationship"]
-    
-    if data.get("name") is None and data.get("relationship") is None:
-      _, errors = validate_fields(data, valid_fields)
-      return error_json("Validation failed", errors), 400
-    
-    parsed = {}
-    errors = []
-    if data.get("name") is not None:
-      parsed_name, name_errors = validate_fields(data, ["name"])
-      parsed.update(parsed_name)
-      errors.extend(name_errors)
-    
-    if data.get("relationship") is not None:
-      parsed_relationship, relationship_errors = validate_fields(data, ["relationship"])
-      parsed.update(parsed_relationship)
-      errors.extend(relationship_errors)
-    
-    if errors:
-      return error_json("Validation failed", errors), 400
+    parsed, errors = validate_fields(data, valid_fields)
     
     name = parsed.get("name")
     relationship = parsed.get("relationship")
-     
+    
+    if not parsed or (name is None and relationship is None):
+      return error_json("Validation failed", errors), 400
+    
     db = get_db_connection()
     
     relationship_id = db.execute(schema_postgres.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"] if relationship is not None else None
@@ -151,8 +136,8 @@ def create_app(test_config=None):
     elif name is not None:
       updated_person = db.execute(schema_postgres.UPDATE_PERSON_NAME_QUERY, (name, person_id)).fetchone()
     else:
-       updated_person = db.execute(schema_postgres.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id)).fetchone()
-    
+      updated_person = db.execute(schema_postgres.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id)).fetchone()
+ 
     if updated_person is None:
       return error_json("Person not found"), 404
     
@@ -218,7 +203,7 @@ def create_app(test_config=None):
     db.commit()
     return success_json("Prayer added", prayer), 201
         
-
+  #TODO: Update logic and queries in both schema files
   @app.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
   def update_prayer(person_id, prayer_id):
     data = request.get_json()

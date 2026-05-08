@@ -96,8 +96,8 @@ RETURNING *
 
 UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY = """
 UPDATE people
-SET name = %s,
-SET relationship_id = %s
+SET name = %s, 
+    relationship_id = %s
 WHERE id = %s
 RETURNING *
 """
