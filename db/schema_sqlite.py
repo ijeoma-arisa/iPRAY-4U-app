@@ -67,7 +67,18 @@ INSERT_DEFAULT_PRAYER_QUERY = "INSERT INTO prayers (person_id, prayer) VALUES (?
 INSERT_PRAYER_QUERY = "INSERT INTO prayers (person_id, prayer, has_prayed) VALUES (?, ?, ?)"
 
 # UPDATE Queries
-UPDATE_PERSON_QUERY = """
+UPDATE_PERSON_NAME_QUERY = """
+UPDATE people
+SET name = ?
+WHERE id = ?
+"""
+UPDATE_PERSON_RELATIONSHIP_QUERY = """
+UPDATE people
+SET relationship_id = ?
+WHERE id = ?
+"""
+
+UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY = """
 UPDATE people
 SET name = ?,
 SET relationship_id = ?

@@ -1,6 +1,6 @@
 from models import Relationship
 
-def assert_delete_response(response):
+def assert_valid_delete_response(response):
   assert response.status_code == 204
   assert len(response.text) == 0
 

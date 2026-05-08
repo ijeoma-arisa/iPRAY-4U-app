@@ -118,19 +118,40 @@ def create_app(test_config=None):
   def update_person(person_id):
     data = request.get_json()
     
-    required_fields = ["name", "relationship"]
-    parsed, errors = validate_fields(data, required_fields)
+    valid_fields = ["name", "relationship"]
+    
+    if data.get("name") is None and data.get("relationship") is None:
+      _, errors = validate_fields(data, valid_fields)
+      return error_json("Validation failed", errors), 400
+    
+    parsed = {}
+    errors = []
+    if data.get("name") is not None:
+      parsed_name, name_errors = validate_fields(data, ["name"])
+      parsed.update(parsed_name)
+      errors.extend(name_errors)
+    
+    if data.get("relationship") is not None:
+      parsed_relationship, relationship_errors = validate_fields(data, ["relationship"])
+      parsed.update(parsed_relationship)
+      errors.extend(relationship_errors)
     
     if errors:
       return error_json("Validation failed", errors), 400
     
-    name = parsed["name"]
-    relationship = parsed["relationship"]
+    name = parsed.get("name")
+    relationship = parsed.get("relationship")
      
     db = get_db_connection()
     
-    relationship_id = db.execute(schema_postgres.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"]
-    updated_person = db.execute(schema_postgres.UPDATE_PERSON_QUERY, (name, relationship_id, person_id)).fetchone()
+    relationship_id = db.execute(schema_postgres.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"] if relationship is not None else None
+    
+    if name is not None and relationship is not None:
+      updated_person = db.execute(schema_postgres.UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY, (name, relationship_id, person_id)).fetchone()
+    elif name is not None:
+      updated_person = db.execute(schema_postgres.UPDATE_PERSON_NAME_QUERY, (name, person_id)).fetchone()
+    else:
+       updated_person = db.execute(schema_postgres.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id)).fetchone()
     
     if updated_person is None:
       return error_json("Person not found"), 404

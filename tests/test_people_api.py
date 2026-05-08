@@ -3,7 +3,7 @@ from helpers import (
   client,
   assert_success_response, 
   assert_error_response,
-  assert_delete_response,
+  assert_valid_delete_response,
   generate_sample_person,
   assert_person_data, 
 )
@@ -174,18 +174,32 @@ def test_get_person_invalid(client):
   )
   
 # PATCH endpoint
-# TODO: Revisit PATCH requests
+# TODO: Revisit PATCH requests - fix branching logic
 def test_update_person_valid_name_only(client):
-  pass
+  person = generate_sample_person("Sarah",  Relationship.FAMILY.value, "Peace")
+  client.post(PEOPLE_URL, json=person)
+  
+  person_url = f"{PEOPLE_URL}/1"
+  
+  response = client.patch(person_url, json={"name": "Julia"})
+  person["name"] = "Julia"
+  
+  print(response.text)
+  person_data = assert_success_response(
+    response, 
+    expected_message="Person updated"
+  )
+  
+  assert_person_data(person_data, person)
 
-def test_update_person_valid_relationship_only(client):
-  pass
+# def test_update_person_valid_relationship_only(client):
+#   pass
 
-def test_update_person_valid_all_fields(client):
-  pass
+# def test_update_person_valid_all_fields(client):
+#   pass
 
-def test_update_person_invalid_(client):
-  pass
+# def test_update_person_invalid_(client):
+#   pass
 
 # DELETE endpoint
 def test_delete_person_valid(client):
@@ -195,7 +209,29 @@ def test_delete_person_valid(client):
   person_url = f"{PEOPLE_URL}/1"
   response = client.delete(person_url)
 
-  assert_delete_response(response)
+  assert_valid_delete_response(response)
   
-def test_delete_person_invalid(client):
-  pass
+def test_delete_person_nonexistent_id(client):
+  person_url = f"{PEOPLE_URL}/1"
+  response = client.delete(person_url)
+  
+  assert_error_response(
+    response,
+    expected_message="Person not found",
+    expected_status=404
+  )
+  
+def test_delete_person_duplicate_request(client):
+  person = generate_sample_person("Sam", Relationship.FAMILY.value, "Obedience")
+  client.post(PEOPLE_URL, json=person)
+  
+  person_url = f"{PEOPLE_URL}/1"
+  client.delete(person_url)
+
+  response = client.delete(person_url)
+  
+  assert_error_response(
+    response,
+    expected_message="Person not found",
+    expected_status=404
+  )

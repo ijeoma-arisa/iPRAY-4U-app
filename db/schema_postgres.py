@@ -81,7 +81,20 @@ RETURNING *
 """
 
 # UPDATE Queries
-UPDATE_PERSON_QUERY = """
+UPDATE_PERSON_NAME_QUERY = """
+UPDATE people
+SET name = %s
+WHERE id = %s
+RETURNING *
+"""
+UPDATE_PERSON_RELATIONSHIP_QUERY = """
+UPDATE people
+SET relationship_id = %s
+WHERE id = %s
+RETURNING *
+"""
+
+UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY = """
 UPDATE people
 SET name = %s,
 SET relationship_id = %s
