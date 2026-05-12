@@ -50,6 +50,9 @@ def validate_fields(data, required_fields=None) -> tuple[list, dict]:
       continue
     
     validator = validators[field]
-    parsed[field] = validator(field, data.get(field), errors)
+    
+    parsed_value = validator(field, data.get(field), errors)
+    if parsed_value is not None:
+      parsed[field] = parsed_value
       
   return parsed, errors

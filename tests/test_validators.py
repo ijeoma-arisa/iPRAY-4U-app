@@ -122,9 +122,8 @@ class TestParseRelationship(unittest.TestCase):
         self.assertIsNone(parse_relationship(self.field, "", self.actual_errors))
         self.assertListEqual(self.actual_errors, self.expected_errors_relationship)
 
-#TODO: Test invalid field structures (not just missing)
 class TestValidateFields(unittest.TestCase):
-    """Test cases for require_fields function."""
+    """Test cases for validate_fields function."""
     
     @classmethod
     def setUpClass(cls):
@@ -136,7 +135,25 @@ class TestValidateFields(unittest.TestCase):
         
         cls.required_fields = ["name", "relationship", "prayer"]
     
-    def test_all_fields_present(self):
+    @classmethod
+    def required_error(cls, fields):
+        return [f"'{f}' is required." for f in fields]
+    
+    @classmethod
+    def string_error(cls, fields):
+        return [f"'{f}' must be a string." for f in fields]
+
+    @classmethod
+    def non_empty_string_error(cls, fields):
+        return [f"'{f}' must be a non-empty string." for f in fields]
+    
+    @classmethod
+    def valid_relationship_error(cls, fields):
+        valid_relationships = [r.value for r in Relationship]
+        return [f"'{f}' must be one of {valid_relationships}" for f in fields]
+    
+
+    def test_all_fields_valid(self):
         """Test that all fields are parsed and no errors are listed."""
         
         data = generate_person_json(name="Bob", relationship="Family", prayer="Strength")
@@ -149,39 +166,58 @@ class TestValidateFields(unittest.TestCase):
         self.assertDictEqual(parsed, expected_data)        
         self.assertEqual(len(errors), 0)
     
-    def test_missing_one_field(self):
-        """Test that an error is provided when one field is missing."""
+    def test_missing_fields(self):
+        """Test that missing fields are shown with errors."""
         
-        data = generate_person_json(name=None, relationship="Family", prayer="Strength")
+        missing_name_json = generate_person_json(name=None, relationship="Family", prayer="Strength")
+        missing_relationship_json =  generate_person_json(name="Bob", relationship=None, prayer="Strength")
+        missing_prayer_json =  generate_person_json(name="Bob", relationship="Family", prayer=None)
+        missing_all_json = generate_person_json(name=None, relationship=None, prayer=None)
         
-        parsed, errors = validate_fields(data, self.required_fields)
+        missing_field_cases = [
+            ("missing name", missing_name_json, self.required_error(["name"])),
+            ("missing relationship", missing_relationship_json, self.required_error(["relationship"])),
+            ("missing prayer", missing_prayer_json, self.required_error(["prayer"])),
+            ("missing all fields", missing_all_json, self.required_error(self.required_fields)),
+        ]
         
-        expected_data = data.copy()
-        expected_data["relationship"] = Relationship.FAMILY
+        for title, data, expected_errors in missing_field_cases:
+            with self.subTest(case=title):
+                parsed, errors = validate_fields(data, self.required_fields)
+                
+                expected_parsed = {field:value for field, value in data.items() if data[field] is not None}
+                
+                if expected_parsed.get("relationship") is not None:
+                    expected_parsed["relationship"] = Relationship.FAMILY
+                                
+                self.assertDictEqual(parsed, expected_parsed)
+                self.assertListEqual(errors, expected_errors)
+
+    def test_invalid_name(self):
+        """Test that an error is provided when name is missing or invalid."""
         
-        self.assertDictEqual(parsed, expected_data)
-        self.assertListEqual(errors, ["'name' is required."])
-    
-    def test_missing_multiple_fields(self):
-        """Test that multiple errors are provided when multiple fields are missing."""
+        missing_name_json = generate_person_json(name=None, relationship="Family", prayer="Strength")
+        non_string_name_json = generate_person_json(name=123, relationship="Family", prayer="Strength")
+        empty_string_name_json = generate_person_json(name="", relationship="Family", prayer="Strength")
+        whitespace_name_json = generate_person_json(name="\t \n   ", relationship="Family", prayer="Strength")
         
-        data = generate_person_json(name=None, relationship="Family", prayer=None)
+        name_field = ["name"]
         
-        parsed, errors = validate_fields(data, self.required_fields)
+        invalid_name_cases = [
+            ("missing name", missing_name_json, self.required_error(name_field)),
+            ("non-string name", non_string_name_json, self.string_error(name_field)),
+            ("empty string name", empty_string_name_json, self.non_empty_string_error(name_field)),
+            ("whitespace name", whitespace_name_json, self.non_empty_string_error(name_field))
+        ]
         
-        expected_data = {}
-        expected_data["relationship"] = Relationship.FAMILY
+        expected_parsed = {"relationship": Relationship.FAMILY, "prayer": "Strength"}
         
-        self.assertDictEqual(parsed, expected_data)
-        self.assertListEqual(errors, ["'name' is required.", "'prayer' is required."])
-    
-    def test_error_message_lists_missing_fields(self):
-        data = generate_person_json(name=None, relationship=None, prayer=None)
-        
-        parsed, errors = validate_fields(data, self.required_fields)
-        
-        self.assertEqual(len(parsed), 0)
-        self.assertListEqual(errors, ["'name' is required.", "'relationship' is required.", "'prayer' is required."])
+        for title, data, expected_errors in invalid_name_cases:
+            with self.subTest(case=title):
+                parsed, errors = validate_fields(data, self.required_fields)
+            
+                self.assertDictEqual(parsed, expected_parsed)
+                self.assertListEqual(errors, expected_errors)
 
 if __name__ == '__main__':
     unittest.main()
