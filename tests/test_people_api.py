@@ -10,10 +10,6 @@ from helpers import (
 )
 
 PEOPLE_URL = '/api/people'
-#TODO: Find a way to test all types of invalid field structures in each endpoint
-#   e.g.  test_invalid_str for name, prayer
-#         test_invalid_relationship for prayer
-# Assert "Validation failed" errors response for each, not just missing fields
 
 # POST endpoint
 def test_add_person_valid(client):
@@ -95,6 +91,53 @@ def test_add_person_missing_all_fields(client):
     response,
     expected_message="Validation failed",
     expected_errors=required_field_errors
+  )
+
+def test_add_person_invalid_name(client):
+  person = generate_person_json(
+    name=123,
+    relationship=Relationship.FRIENDS.value,
+    prayer="Forgiveness"
+  )
+
+  response = client.post(PEOPLE_URL, json=person)
+
+  assert_error_response(
+    response,
+    expected_message="Validation failed",
+    expected_errors={"'name' must be a string."}
+  )
+
+def test_add_person_invalid_prayer(client):
+  person = generate_person_json(
+    name="Bob",
+    relationship=Relationship.FRIENDS.value,
+    prayer=123
+  )
+
+  response = client.post(PEOPLE_URL, json=person)
+
+  assert_error_response(
+    response,
+    expected_message="Validation failed",
+    expected_errors={"'prayer' must be a string."}
+  )
+
+def test_add_person_invalid_relationship(client):
+  person = generate_person_json(
+    name="Bob",
+    relationship="Stranger",
+    prayer="Forgiveness"
+  )
+
+  response = client.post(PEOPLE_URL, json=person)
+  valid_relationships = [r.value for r in Relationship]
+
+
+  assert_error_response(
+    response,
+    expected_message="Validation failed",
+    expected_errors={f"'relationship' must be one of {valid_relationships}"}
   )
 
 # GET endpoint
