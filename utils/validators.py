@@ -1,24 +1,30 @@
 from models import Relationship
+from .error_messages import (
+  required_error,
+  string_error,
+  non_empty_string_error,
+  valid_relationship_error,
+)
 
 def parse_bool_default(value, default_bool: bool = False) -> bool:
   return value if isinstance(value, bool) else default_bool
 
 def parse_str(field, value, errors) -> str | None:
   if not isinstance(value, str):
-    errors.append(f"'{field}' must be a string.")
+    errors.append(string_error(field))
     return None
   
   value = value.strip()
   
   if value == "":
-    errors.append(f"'{field}' must be a non-empty string.")
+    errors.append(non_empty_string_error(field))
     return None
   
   return value
   
 def parse_relationship(field, value, errors) -> Relationship | None:
   if not isinstance(value, str):
-    errors.append(f"'{field}' must be a string.")
+    errors.append(string_error(field))
     return None
   
   relationship_str = value.strip().lower()
@@ -27,8 +33,7 @@ def parse_relationship(field, value, errors) -> Relationship | None:
     if relationship_type.value.lower() == relationship_str:
       return relationship_type
   
-  valid_relationships = [r.value for r in Relationship]
-  errors.append(f"'{field}' must be one of {valid_relationships}")
+  errors.append(valid_relationship_error(field))
   
   return None
 
@@ -46,7 +51,7 @@ def validate_fields(data, required_fields=None) -> tuple[list, dict]:
   
   for field in required_fields:
     if field not in data:
-      errors.append(f"'{field}' is required.")
+      errors.append(required_error(field))
       continue
     
     validator = validators[field]

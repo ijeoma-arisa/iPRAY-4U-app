@@ -1,108 +1,107 @@
-import json
-import pytest
+from models import Relationship
+from helpers.assertions import (
+    assert_success_response, 
+    assert_error_response,
+    assert_valid_delete_response,
+    assert_prayer_data,
+)
+from helpers.fixtures import client
+from helpers.sample_data import (
+    generate_person_json, 
+    generate_prayer_json,
+    update_existing_json_fields  
+)
+from helpers.urls import (
+    PEOPLE_URL, 
+    PERSON_1_PRAYERS_URL,
+    get_prayers_url,
+)
 
-from app import app
-from helpers import get_auth_headers, make_prayer_payload
+# POST endpoint
+def test_add_prayer_valid_default_has_prayed(client):
+    person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+    client.post(PEOPLE_URL, json=person)
+    
+    prayer = generate_prayer_json("Good grades")        
+    response = client.post(PERSON_1_PRAYERS_URL, json=prayer)
+    
+    assert_success_response(
+        response,
+        expected_message="Prayer added",
+        expected_status=201
+    )
+    
+def test_add_prayer_valid_set_has_prayed(client):
+    person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+    client.post(PEOPLE_URL, json=person)
+    
+    prayer = generate_prayer_json("Good grades", has_prayed=True)        
+    response = client.post(PERSON_1_PRAYERS_URL, json=prayer)
+    
+    assert_success_response(
+        response,
+        expected_message="Prayer added",
+        expected_status=201
+    )
+    
+def test_add_prayer_valid_missing_has_prayed(client):
+    person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+    client.post(PEOPLE_URL, json=person)
+    
+    prayer = generate_prayer_json("Good grades", has_prayed=None)        
+    response = client.post(PERSON_1_PRAYERS_URL, json=prayer)
+    
+    assert_success_response(
+        response,
+        expected_message="Prayer added",
+        expected_status=201
+    )
 
-# Constants
-ENDPOINT = '/prayers'
+def test_add_prayer_missing_prayer(client):
+    person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+    client.post(PEOPLE_URL, json=person)
+    
+    prayer = generate_prayer_json(prayer=None, has_prayed=True)        
+    response = client.post(PERSON_1_PRAYERS_URL, json=prayer)
 
-# Sample data
-SAMPLE_PRAYER = make_prayer_payload(title='Healing', description='Pray for healing', urgent=False)
-UPDATED_PRAYER = make_prayer_payload(title='Healing Updated', description='Updated description', urgent=True)
+    assert_error_response(
+        response,
+        expected_message="Validation failed",
+        expected_errors={"'prayer' is required."}
+    )
 
+def test_add_prayer_invalid_prayer(client):
+    person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+    client.post(PEOPLE_URL, json=person)
+    
+    prayer = generate_prayer_json(prayer=123, has_prayed=True)        
+    response = client.post(PERSON_1_PRAYERS_URL, json=prayer)
 
-# GET /prayers - when empty list
-def test_get_prayers_empty(client):
-    resp = client.get(ENDPOINT)
-    assert resp.status_code == 200
-    data = resp.get_json()
-    assert isinstance(data, list)
+    assert_error_response(
+        response,
+        expected_message="Validation failed",
+        expected_errors={"'prayer' is required."}
+    )
 
+def test_add_prayer_invalid_has_prayed(client):
+    person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+    client.post(PEOPLE_URL, json=person)
+    
+    prayer = generate_prayer_json(prayer=None, has_prayed=True)        
+    response = client.post(PERSON_1_PRAYERS_URL, json=prayer)
 
-# POST /prayers - happy path
-def test_post_prayer_success(client):
-    headers = get_auth_headers()
-    resp = client.post(ENDPOINT, json=SAMPLE_PRAYER, headers=headers)
-    assert resp.status_code == 201
-    data = resp.get_json()
-    assert 'id' in data
-    assert data['title'] == SAMPLE_PRAYER['title']
-
-
-# POST /prayers - missing required fields (unhappy path)
-def test_post_prayer_missing_fields(client):
-    headers = get_auth_headers()
-    bad = { 'description': 'no title provided' }
-    resp = client.post(ENDPOINT, json=bad, headers=headers)
-    assert resp.status_code in (400, 422)
-
-
-# POST /prayers - invalid JSON (edge case)
-def test_post_prayer_invalid_json(client):
-    headers = get_auth_headers()
-    resp = client.post(ENDPOINT, data='not-a-json', headers={**headers, 'Content-Type': 'application/json'})
-    assert resp.status_code in (400, 415)
-
-
-# GET /prayers/<id> - happy path
-def test_get_prayer_by_id(client):
-    headers = get_auth_headers()
-    post = client.post(ENDPOINT, json=SAMPLE_PRAYER, headers=headers)
-    pid = post.get_json()['id']
-    resp = client.get(f"{ENDPOINT}/{pid}")
-    assert resp.status_code == 200
-    data = resp.get_json()
-    assert data['id'] == pid
-
-
-# GET /prayers/<id> - not found
-def test_get_prayer_not_found(client):
-    resp = client.get(f"{ENDPOINT}/999999")
-    assert resp.status_code == 404
-
-
-# PUT /prayers/<id> - happy path
-def test_put_prayer_success(client):
-    headers = get_auth_headers()
-    post = client.post(ENDPOINT, json=SAMPLE_PRAYER, headers=headers)
-    pid = post.get_json()['id']
-    resp = client.put(f"{ENDPOINT}/{pid}", json=UPDATED_PRAYER, headers=headers)
-    assert resp.status_code in (200, 204)
-    # verify update via GET
-    get = client.get(f"{ENDPOINT}/{pid}")
-    assert get.get_json()['title'] == UPDATED_PRAYER['title']
-
-
-# PUT /prayers/<id> - not found
-def test_put_prayer_not_found(client):
-    headers = get_auth_headers()
-    resp = client.put(f"{ENDPOINT}/999999", json=UPDATED_PRAYER, headers=headers)
-    assert resp.status_code == 404
-
-
-# DELETE /prayers/<id> - happy path
-def test_delete_prayer_success(client):
-    headers = get_auth_headers()
-    post = client.post(ENDPOINT, json=SAMPLE_PRAYER, headers=headers)
-    pid = post.get_json()['id']
-    resp = client.delete(f"{ENDPOINT}/{pid}", headers=headers)
-    assert resp.status_code in (200, 204)
-    # subsequent GET should be 404
-    assert client.get(f"{ENDPOINT}/{pid}").status_code == 404
-
-
-# DELETE /prayers/<id> - not found
-def test_delete_prayer_not_found(client):
-    headers = get_auth_headers()
-    resp = client.delete(f"{ENDPOINT}/999999", headers=headers)
-    assert resp.status_code == 404
+    assert_error_response(
+        response,
+        expected_message="Validation failed",
+        expected_errors={"'prayer' is required."}
+    )
 
 
-# GET /prayers - pagination/edge case (large offset)
-def test_get_prayers_pagination_edge(client):
-    # request a very large page offset/size to ensure service handles gracefully
-    resp = client.get(ENDPOINT + '?page=9999&per_page=1000')
-    assert resp.status_code == 200
-    data = resp.get_json()
-    assert isinstance(data, list)
+# GET endpoint
+def test_get_prayers(client):    
+    people = [
+        generate_person_json("Bob", Relationship.FRIENDS.value, "Strength"),
+        generate_person_json("Sarah",  Relationship.FAMILY.value, "Peace"),
+    ]
+    
+    

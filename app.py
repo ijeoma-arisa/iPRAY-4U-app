@@ -10,6 +10,17 @@ from utils.validators import (
   parse_bool_default
 )
 
+from utils.error_messages import (
+  not_found_error,
+  validation_failed_error,
+)
+
+from utils.success_messages import (
+  get_success,
+  post_success,
+  patch_success,
+)
+
 load_dotenv()
 
 def create_app(test_config=None):
@@ -74,7 +85,7 @@ def create_app(test_config=None):
               if isinstance(relationship, Relationship)
               else db.execute(schema_postgres.SELECT_ALL_PEOPLE_QUERY).fetchall())
     
-    return success_json("People retrieved", people)
+    return success_json(get_success("People"), people)
 
   @app.route("/api/people", methods=["POST"])
   # TODO: Resolve duplicate people and relationships
@@ -85,7 +96,7 @@ def create_app(test_config=None):
     parsed, errors = validate_fields(data, required_fields)
     
     if errors:
-      return error_json("Validation failed", errors), 400
+      return error_json(validation_failed_error(), errors), 400
     
     name = parsed["name"]
     relationship = parsed["relationship"]
@@ -100,7 +111,7 @@ def create_app(test_config=None):
     person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     db.commit()
-    return success_json("Person added", person), 201
+    return success_json(post_success("Person"), person), 201
       
 
   @app.route("/api/people/<int:person_id>", methods=["GET"])
@@ -110,9 +121,9 @@ def create_app(test_config=None):
     person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
-      return error_json("Person not found"), 404
+      return error_json(not_found_error("Person")), 404
     
-    return success_json("Person retrieved", person)
+    return success_json(get_success("Person"), person)
 
   @app.route("/api/people/<int:person_id>", methods=["PATCH"])
   def update_person(person_id):
@@ -125,7 +136,7 @@ def create_app(test_config=None):
     relationship = parsed.get("relationship")
     
     if not parsed or (name is None and relationship is None):
-      return error_json("Validation failed", errors), 400
+      return error_json(validation_failed_error(), errors), 400
     
     db = get_db_connection()
     
@@ -139,10 +150,10 @@ def create_app(test_config=None):
       updated_person = db.execute(schema_postgres.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id)).fetchone()
  
     if updated_person is None:
-      return error_json("Person not found"), 404
+      return error_json(not_found_error("Person")), 404
     
     db.commit()
-    return success_json("Person updated", updated_person)
+    return success_json(patch_success("Person"), updated_person)
     
   @app.route("/api/people/<int:person_id>", methods=["DELETE"])
   def delete_person(person_id):
@@ -151,7 +162,7 @@ def create_app(test_config=None):
     deleted_person = db.execute(schema_postgres.DELETE_PERSON_QUERY, (person_id,)).fetchone()
     
     if deleted_person is None:
-      return error_json("Person not found"), 404
+      return error_json(not_found_error("Person")), 404
     
     db.commit()
     
@@ -162,7 +173,7 @@ def create_app(test_config=None):
     db = get_db_connection()
     prayers = db.execute(schema_postgres.SELECT_ALL_PRAYERS_QUERY).fetchall()
     
-    return success_json("Prayers retrieved", prayers)
+    return success_json(get_success("Prayers"), prayers)
 
   @app.route("/api/people/<int:person_id>/prayers", methods=["GET"])
   def get_prayers_by_person(person_id):
@@ -171,11 +182,11 @@ def create_app(test_config=None):
     person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
-      return error_json("Person not found"), 404
+      return error_json(not_found_error("Person")), 404
     
     prayers = db.execute(schema_postgres.SELECT_ALL_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchall()
     
-    success_msg = "No prayers found" if not prayers else "Prayers retrieved"
+    success_msg = "No prayers found" if not prayers else get_success("Prayers")
     
     return success_json(success_msg, prayers)
 
@@ -185,7 +196,7 @@ def create_app(test_config=None):
     person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
-      return error_json("Person not found"), 404
+      return error_json(not_found_error("Person")), 404
     
     data = request.get_json()
     
@@ -193,7 +204,7 @@ def create_app(test_config=None):
     parsed, errors = validate_fields(data, required_fields)
     
     if errors:
-      return error_json("Validation failed", errors), 400
+      return error_json(validation_failed_error(), errors), 400
     
     prayer_text = parsed["prayer"]
     has_prayed = parse_bool_default(data.get("has_prayed"))
@@ -201,9 +212,8 @@ def create_app(test_config=None):
     prayer = db.execute(schema_postgres.INSERT_PRAYER_QUERY, (person_id, prayer_text, has_prayed)).fetchone()   
       
     db.commit()
-    return success_json("Prayer added", prayer), 201
+    return success_json(post_success("Prayer"), prayer), 201
         
-  #TODO: Update logic and queries in both schema files
   @app.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
   def update_prayer(person_id, prayer_id):
     data = request.get_json()
@@ -212,7 +222,7 @@ def create_app(test_config=None):
     parsed, errors = validate_fields(data, required_fields)
     
     if errors:
-      return error_json("Validation failed", errors), 400
+      return error_json(validation_failed_error(), errors), 400
     
     prayer_text = parsed["prayer"]
     has_prayed = parse_bool_default(data.get("has_prayed"))
@@ -221,15 +231,15 @@ def create_app(test_config=None):
     person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if person is None:
-      return error_json("Person not found"), 404 
+      return error_json(not_found_error("Person")), 404 
     
     updated_prayer = db.execute(schema_postgres.UPDATE_PRAYER_QUERY, (prayer_text, has_prayed, prayer_id)).fetchone()
   
     if updated_prayer is None:
-        return error_json("Prayer not found"), 404
+        return error_json(not_found_error("Prayer")), 404
       
     db.commit()
-    return success_json("Prayer updated", updated_prayer)
+    return success_json(patch_success("Prayer"), updated_prayer)
     
   @app.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
   def delete_prayer(person_id, prayer_id):
@@ -237,12 +247,12 @@ def create_app(test_config=None):
     person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
     
     if not person:
-      return error_json("Person not found"), 404 
+      return error_json(not_found_error("Person")), 404 
     
     deleted_prayer = db.execute(schema_postgres.DELETE_PRAYER_QUERY, (prayer_id,)).fetchone()
     
     if deleted_prayer is None:
-      return error_json("Prayer not found"), 404 
+      return error_json(not_found_error("Prayer")), 404 
     
     db.commit() 
         
@@ -253,7 +263,7 @@ def create_app(test_config=None):
       db = get_db_connection()
       relationships = db.execute(schema_postgres.SELECT_ALL_RELATIONSHIPS_QUERY).fetchall()
           
-      return success_json("Relationships retrieved", relationships)
+      return success_json(get_success("Relationships"), relationships)
   
   return app
 
