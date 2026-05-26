@@ -1,6 +1,5 @@
 PEOPLE_URL = '/api/people'
-
-PERSON_1_PRAYERS_URL = f"{PEOPLE_URL}/1/prayers"
+RELATIONSHIPS_URL = '/api/relationships'
 
 def get_prayers_url(person_id: int = None, prayer_id: int = None):
     if person_id is None:

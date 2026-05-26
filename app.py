@@ -11,8 +11,8 @@ from utils.validators import (
 )
 
 from utils.error_messages import (
+  VALIDATION_FAILED_ERROR,
   not_found_error,
-  validation_failed_error,
 )
 
 from utils.success_messages import (
@@ -96,7 +96,7 @@ def create_app(test_config=None):
     parsed, errors = validate_fields(data, required_fields)
     
     if errors:
-      return error_json(validation_failed_error(), errors), 400
+      return error_json(VALIDATION_FAILED_ERROR, errors), 400
     
     name = parsed["name"]
     relationship = parsed["relationship"]
@@ -136,7 +136,7 @@ def create_app(test_config=None):
     relationship = parsed.get("relationship")
     
     if not parsed or (name is None and relationship is None):
-      return error_json(validation_failed_error(), errors), 400
+      return error_json(VALIDATION_FAILED_ERROR, errors), 400
     
     db = get_db_connection()
     
@@ -204,7 +204,7 @@ def create_app(test_config=None):
     parsed, errors = validate_fields(data, required_fields)
     
     if errors:
-      return error_json(validation_failed_error(), errors), 400
+      return error_json(VALIDATION_FAILED_ERROR, errors), 400
     
     prayer_text = parsed["prayer"]
     has_prayed = parse_bool_default(data.get("has_prayed"))
@@ -222,7 +222,7 @@ def create_app(test_config=None):
     parsed, errors = validate_fields(data, required_fields)
     
     if errors:
-      return error_json(validation_failed_error(), errors), 400
+      return error_json(VALIDATION_FAILED_ERROR, errors), 400
     
     prayer_text = parsed["prayer"]
     has_prayed = parse_bool_default(data.get("has_prayed"))

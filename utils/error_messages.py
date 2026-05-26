@@ -1,5 +1,6 @@
 from models import Relationship
 
+VALIDATION_FAILED_ERROR = "Validation failed."
 
 def _format_error(field, message, as_list=False):
     def _format_item(item):
@@ -34,6 +35,3 @@ def valid_relationship_error(field, as_list=False):
 
 def not_found_error(data):
     return f"{data} not found."
-
-def validation_failed_error():
-    return "Validation failed."

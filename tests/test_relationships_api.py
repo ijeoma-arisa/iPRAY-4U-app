@@ -4,15 +4,15 @@ from helpers.assertions import (
   assert_success_response, 
   assert_relationship_data,
 )
-
-RELATIONSHIP_URL = '/api/relationships'
+from helpers.urls import RELATIONSHIPS_URL
+from utils.success_messages import get_success
 
 def test_get_relationships(client):
-  response = client.get(RELATIONSHIP_URL)
+  response = client.get(RELATIONSHIPS_URL)
   
   relationships_data = assert_success_response(
     response,
-    expected_message="Relationships retrieved",
+    expected_message=get_success("Relationships"),
     data_type=list
   )
   

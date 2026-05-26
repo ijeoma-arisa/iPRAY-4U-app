@@ -14,12 +14,11 @@ from helpers.sample_data import (
 from helpers.urls import PEOPLE_URL
 
 from utils.error_messages import (
+  VALIDATION_FAILED_ERROR,
   required_error,
   string_error,
-  non_empty_string_error,
   valid_relationship_error,
   not_found_error,
-  validation_failed_error,
 )
 
 from utils.success_messages import (
@@ -27,6 +26,7 @@ from utils.success_messages import (
   post_success,
   patch_success,
 )
+
 # POST endpoint
 def test_add_person_valid(client):
   people = [
@@ -57,7 +57,7 @@ def test_add_person_missing_name(client):
   
   assert_error_response(
     response,
-    expected_message=validation_failed_error(),
+    expected_message=VALIDATION_FAILED_ERROR,
     expected_errors={required_error("name")}
   )
   
@@ -72,7 +72,7 @@ def test_add_person_missing_relationship(client):
   
   assert_error_response(
     response,
-    expected_message=validation_failed_error(),
+    expected_message=VALIDATION_FAILED_ERROR,
     expected_errors={required_error("relationship")}
   )
   
@@ -87,7 +87,7 @@ def test_add_person_missing_prayer(client):
   
   assert_error_response(
     response,
-    expected_message=validation_failed_error(),
+    expected_message=VALIDATION_FAILED_ERROR,
     expected_errors={required_error("prayer")}
   )
 
@@ -104,7 +104,7 @@ def test_add_person_missing_all_fields(client):
     
   assert_error_response(
     response,
-    expected_message=validation_failed_error(),
+    expected_message=VALIDATION_FAILED_ERROR,
     expected_errors=set(required_field_errors),
   )
 
@@ -119,7 +119,7 @@ def test_add_person_invalid_name(client):
 
   assert_error_response(
     response,
-    expected_message=validation_failed_error(),
+    expected_message=VALIDATION_FAILED_ERROR,
     expected_errors={string_error("name")}
   )
 
@@ -134,11 +134,11 @@ def test_add_person_invalid_prayer(client):
 
   assert_error_response(
     response,
-   expected_message=validation_failed_error(),
+   expected_message=VALIDATION_FAILED_ERROR,
     expected_errors={string_error("prayer")}
   )
 
-def test_add_person_invalid_relationship(client):
+def test_add_person_invablid_relationship(client):
   person = generate_person_json(
     name="Bob",
     relationship="Stranger",
@@ -149,7 +149,7 @@ def test_add_person_invalid_relationship(client):
 
   assert_error_response(
     response,
-    expected_message=validation_failed_error(),
+    expected_message=VALIDATION_FAILED_ERROR,
     expected_errors={valid_relationship_error("relationship")}
   )
 
@@ -298,7 +298,7 @@ def test_update_person_missing_all_fields(client):
   
   assert_error_response(
     response,
-    expected_message=validation_failed_error(),
+    expected_message=VALIDATION_FAILED_ERROR,
     expected_errors=set(required_error(["name", "relationship"]))
   )
   
