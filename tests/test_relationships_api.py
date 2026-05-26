@@ -1,6 +1,6 @@
 from models import Relationship
-from helpers import (
-  client,
+from helpers.fixtures import client
+from helpers.assertions import (
   assert_success_response, 
   assert_relationship_data,
 )
