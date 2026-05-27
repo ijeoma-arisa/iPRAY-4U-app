@@ -88,7 +88,7 @@ WHERE id = ?
 UPDATE_PRAYER_QUERY = """
 UPDATE prayers 
 SET prayer = ?,
-SET has_prayed = ?
+    has_prayed = ?
 WHERE id = ?
 """
 

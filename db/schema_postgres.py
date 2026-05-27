@@ -105,7 +105,7 @@ RETURNING *
 UPDATE_PRAYER_QUERY = """
 UPDATE prayers
 SET prayer = %s,
-SET has_prayed = %s
+    has_prayed = %s
 WHERE id = %s
 RETURNING *
 """

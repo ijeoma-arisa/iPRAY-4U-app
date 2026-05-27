@@ -5,10 +5,10 @@ from db import cleanup_test_db
 from dotenv import load_dotenv
 
 from models import Relationship 
-from helpers.urls import PEOPLE_URL
+from helpers.urls import PEOPLE_URL, get_prayers_url
 from helpers.sample_data import generate_person_json
 from helpers.assertions import assert_success_response
-from utils.success_messages import post_success
+from utils.success_messages import get_success, post_success
 
 load_dotenv()
 
@@ -38,3 +38,22 @@ def sample_person(client):
   )
   
   return data
+
+@pytest.fixture
+def sample_prayer(client, sample_person):
+  person_id = sample_person["id"]
+  prayers_url = get_prayers_url(person_id)
+  
+  response = client.get(prayers_url)
+  
+  
+  prayers = assert_success_response(
+    response,
+    expected_message=get_success("Prayers"),
+    data_type=list
+  )
+  
+  assert isinstance(prayers, list)
+  assert len(prayers) == 1
+  
+  return prayers[0]

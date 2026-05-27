@@ -1,5 +1,6 @@
 PEOPLE_URL = '/api/people'
 RELATIONSHIPS_URL = '/api/relationships'
+PRAYERS_URL = '/api/prayers'
 
 def get_prayers_url(person_id: int = None, prayer_id: int = None):
     if person_id is None:
