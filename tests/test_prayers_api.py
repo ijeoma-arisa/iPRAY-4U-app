@@ -169,7 +169,6 @@ def test_update_prayer_valid_has_prayed_only(client, sample_prayer):
     update_existing_json_fields(updated_has_prayed_field, sample_prayer)
     
     response = client.patch(prayer_url, json=updated_has_prayed_field)
-    print([i for i in response.get_json().items()])
     
     prayer_data = assert_success_response(
         response,

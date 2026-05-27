@@ -85,7 +85,19 @@ SET name = ?,
 WHERE id = ?
 """
 
-UPDATE_PRAYER_QUERY = """
+UPDATE_PRAYER_TEXT_QUERY = """
+UPDATE prayers
+SET prayer = ?
+WHERE id = ?
+"""
+
+UPDATE_PRAYER_HAS_PRAYED_QUERY = """
+UPDATE prayers
+SET has_prayed = ?
+WHERE id = ?
+"""
+
+UPDATE_PRAYER_TEXT_AND_HAS_PRAYED_QUERY = """
 UPDATE prayers 
 SET prayer = ?,
     has_prayed = ?

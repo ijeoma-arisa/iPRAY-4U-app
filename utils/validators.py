@@ -41,7 +41,8 @@ def parse_relationship(field, value, errors) -> Relationship | None:
 validators = {
   "name": parse_str,
   "relationship": parse_relationship,
-  "prayer": parse_str
+  "prayer": parse_str,
+  "has_prayed": parse_bool_default
 }
 
 def validate_fields(data, required_fields=None) -> tuple[list, dict]:

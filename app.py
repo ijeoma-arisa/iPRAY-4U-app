@@ -218,23 +218,25 @@ def create_app(test_config=None):
   def update_prayer(person_id, prayer_id):
     data = request.get_json()
     
-    required_fields = ["prayer"]
-    parsed, errors = validate_fields(data, required_fields)
+    valid_fields = ["prayer", "has_prayed"]
+    parsed, errors = validate_fields(data, valid_fields)
     
-    if errors:
+    prayer = parsed.get("prayer")
+    has_prayed = parsed.get("has_prayed")
+    
+    if not parsed or (prayer is None and has_prayed is None):
       return error_json(VALIDATION_FAILED_ERROR, errors), 400
     
-    prayer_text = parsed["prayer"]
-    has_prayed = parse_bool_default(data.get("has_prayed"))
     
     db = get_db_connection()
-    person = db.execute(schema_postgres.SELECT_PERSON_QUERY, (person_id,)).fetchone()
-    
-    if person is None:
-      return error_json(not_found_error("Person")), 404 
-    
-    updated_prayer = db.execute(schema_postgres.UPDATE_PRAYER_QUERY, (prayer_text, has_prayed, prayer_id)).fetchone()
-  
+
+    if prayer is not None and has_prayed is not None:
+      updated_prayer = db.execute(schema_postgres.UPDATE_PRAYER_TEXT_AND_HAS_PRAYED_QUERY, (prayer, has_prayed, prayer_id)).fetchone()
+    elif prayer is not None:
+      updated_prayer = db.execute(schema_postgres.UPDATE_PRAYER_TEXT_QUERY, (prayer, prayer_id)).fetchone()
+    else:
+      updated_prayer = db.execute(schema_postgres.UPDATE_PRAYER_HAS_PRAYED_QUERY, (has_prayed, prayer_id)).fetchone()
+ 
     if updated_prayer is None:
         return error_json(not_found_error("Prayer")), 404
       
