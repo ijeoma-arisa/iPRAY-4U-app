@@ -235,10 +235,38 @@ def test_update_prayer_missing_all_fields(client, sample_prayer):
 
 # DELETE endpoint
 def test_delete_prayer_valid(client, sample_prayer):
-    pass
+    prayer_id = sample_prayer["id"]
+    person_id = sample_prayer["person_id"]
+    prayer_url = get_prayers_url(person_id, prayer_id)
+    
+    response = client.delete(prayer_url)
+    
+    assert_valid_delete_response(response)
 
 def test_delete_prayer_nonexistent_id(client, sample_prayer):
-    pass
+    person_id = sample_prayer["person_id"]
+    prayer_url = get_prayers_url(person_id, 2)
+    
+    response = client.delete(prayer_url)
+    
+    assert_error_response(
+        response,
+        expected_message=not_found_error("Prayer"),
+        expected_status=404
+    )
 
 def test_delete_prayer_duplicate_request(client, sample_prayer):
-    pass
+    prayer_id = sample_prayer["id"]
+    person_id = sample_prayer["person_id"]
+    
+    prayer_url = get_prayers_url(person_id, prayer_id)
+    
+    client.delete(prayer_url)
+    
+    response = client.delete(prayer_url)
+    
+    assert_error_response(
+        response,
+        expected_message=not_found_error("Prayer"),
+        expected_status=404
+    )
