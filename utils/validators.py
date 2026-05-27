@@ -4,6 +4,7 @@ from .error_messages import (
   string_error,
   non_empty_string_error,
   valid_relationship_error,
+  bool_error,
 )
 
 def parse_bool_default(value, default_bool: bool = False) -> bool:
@@ -37,12 +38,17 @@ def parse_relationship(field, value, errors) -> Relationship | None:
   
   return None
 
+def parse_bool(field, value, errors):
+  if not isinstance(value, bool):
+    errors.append(bool_error(field))
+    
+  return parse_bool_default(value)
 
 validators = {
   "name": parse_str,
   "relationship": parse_relationship,
   "prayer": parse_str,
-  "has_prayed": parse_bool_default
+  "has_prayed": parse_bool,
 }
 
 def validate_fields(data, required_fields=None) -> tuple[list, dict]:

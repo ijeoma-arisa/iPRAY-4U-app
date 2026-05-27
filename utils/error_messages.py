@@ -16,6 +16,9 @@ def _format_error(field, message, as_list=False):
 
     return formatted
 
+def not_found_error(data):
+    return f"{data} not found."
+
 
 def required_error(field, as_list=False):
     return _format_error(field, 'is required.', as_list)
@@ -33,5 +36,5 @@ def valid_relationship_error(field, as_list=False):
     valid_relationships = [r.value for r in Relationship]
     return _format_error(field, f'must be one of {valid_relationships}', as_list)
 
-def not_found_error(data):
-    return f"{data} not found."
+def bool_error(field, as_list=False):
+    return _format_error(field, 'must be a boolean.', as_list)
