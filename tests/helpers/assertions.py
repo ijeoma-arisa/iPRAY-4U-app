@@ -59,3 +59,10 @@ def assert_prayer_data(data: dict, prayer: dict):
   person_id = data.get("person_id")
   assert isinstance(person_id, int)
   
+  
+def assert_prayers_list(data_list: list, prayers_list: list):
+  assert len(data_list) == len(prayers_list)
+  
+  for i in range(len(data_list)):
+    assert_prayer_data(data_list[i], prayers_list[i])
+  

@@ -3,6 +3,7 @@ from helpers.assertions import (
     assert_error_response,
     assert_valid_delete_response,
     assert_prayer_data,
+    assert_prayers_list,
 )
 from helpers.fixtures import  (
     client, 
@@ -177,15 +178,60 @@ def test_update_prayer_valid_has_prayed_only(client, sample_prayer):
     
     assert_prayer_data(prayer_data, sample_prayer)
 
-    
 
 def test_update_prayer_valid_all_fields(client, sample_prayer):
-    pass 
+    person_id = sample_prayer["person_id"]
+    prayer_id = sample_prayer["id"]
+    prayer_url = get_prayers_url(person_id, prayer_id) 
+    
+    updated_prayer_and_has_prayed_fields = {
+        "prayer": "Peace of mind",
+        "has_prayed": True
+    }
+    
+    update_existing_json_fields(updated_prayer_and_has_prayed_fields, sample_prayer)
 
+    response = client.patch(prayer_url, json=updated_prayer_and_has_prayed_fields)
+    
+    prayer_data = assert_success_response(
+        response,
+        expected_message=patch_success("Prayer")
+    )
+    
+    assert_prayer_data(prayer_data, sample_prayer)
 
 def test_update_prayer_missing_all_fields(client, sample_prayer):
-    pass
-
+    person_id = sample_prayer["person_id"]
+    person_prayers_url = get_prayers_url(person_id)
+    
+    get_prayers_response = client.get(person_prayers_url)
+    original_prayers_list = assert_success_response(
+        get_prayers_response,
+        expected_message=get_success("Prayers"),
+        data_type=list
+    )
+    
+    prayer_id = sample_prayer["id"]
+    prayer_url = get_prayers_url(person_id, prayer_id) 
+    
+    response = client.patch(prayer_url, json={})
+    
+    assert_error_response(
+        response,
+        expected_message=VALIDATION_FAILED_ERROR,
+        expected_errors=set(required_error(["prayer", "has_prayed"]))
+    )
+    
+    get_prayers_response = client.get(person_prayers_url)
+    
+    prayers_data_list = assert_success_response(
+        get_prayers_response,
+        expected_message=get_success("Prayers"),
+        data_type=list
+    )
+    
+    assert_prayers_list(prayers_data_list, original_prayers_list)
+    
 
 # DELETE endpoint
 def test_delete_prayer_valid(client, sample_prayer):
