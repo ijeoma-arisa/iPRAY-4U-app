@@ -26,7 +26,9 @@ load_dotenv()
 def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
   
-  app.config["DATABASE_URL"] = os.environ.get("PROD_DATABASE_URL")
+  app.config.from_mapping(
+    DATABASE_URL= os.environ.get("DATABASE_URL")
+  )
   
   if test_config:
     app.config.update(test_config)
