@@ -76,7 +76,7 @@ function initPrayerEventListeners({ onSuccess }) {
       const prayerId = prayerCard.dataset.prayerId;
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
-      const toggledHasPrayed = prayerCard.dataset.hasPrayed === "1" ? 0 : 1;
+      const toggledHasPrayed = prayerCard.dataset.hasPrayed === "true" ? false : true;
 
       const data = {
         ['has_prayed']: toggledHasPrayed,

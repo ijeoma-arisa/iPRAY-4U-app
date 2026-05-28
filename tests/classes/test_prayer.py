@@ -1,6 +1,6 @@
 import unittest
 
-from models import Prayer
+from ipray4u.models import Prayer
 
 class TestPrayer(unittest.TestCase):
   def setUp(self):
@@ -16,7 +16,7 @@ class TestPrayer(unittest.TestCase):
     self.assertEqual(self.pr.get_text(), text)
     
   def test_prayed(self):
-    self.pr.set_prayed(True)
+    self.pr.set_has_prayed(True)
     self.assertTrue(self.pr.has_prayed())
     
     
