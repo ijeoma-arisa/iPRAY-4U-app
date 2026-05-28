@@ -15,7 +15,8 @@ load_dotenv()
 @pytest.fixture
 def client():
   app = create_app({
-    "DATABASE_URL": os.environ["TEST_DATABASE_URL"]
+    "TESTING": True,
+    "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
   })
 
   client = app.test_client()
