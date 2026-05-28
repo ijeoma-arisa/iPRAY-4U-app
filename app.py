@@ -27,7 +27,7 @@ def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
   
   app.config.from_mapping(
-    DATABASE_URL=os.environ.get("DATABASE_URL")
+    DATABASE_URL=os.environ.get("DATABASE_URL"),
   )
   
   if test_config:
@@ -273,8 +273,3 @@ def create_app(test_config=None):
       return success_json(get_success("Relationships"), relationships)
   
   return app
-
-app = create_app()
-
-if __name__ == "__main__":
-  app.run(debug=True)
