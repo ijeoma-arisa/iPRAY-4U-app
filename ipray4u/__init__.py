@@ -2,21 +2,24 @@ import os
 from flask import Flask, g, jsonify, request, render_template
 from dotenv import load_dotenv
 
-from ipray4u.db import init_db, get_db_connection
-from ipray4u.db import schema_postgres
-from ipray4u.models import Relationship
-from ipray4u.utils.validators import (
+from .db import (
+    init_db, 
+    get_db_connection,
+    schema_postgres,
+)
+from .models import Relationship
+from .utils.validators import (
   validate_fields,
   parse_relationship,
   parse_bool_default
 )
 
-from ipray4u.utils.error_messages import (
+from .utils.error_messages import (
   VALIDATION_FAILED_ERROR,
   not_found_error,
 )
 
-from ipray4u.utils.success_messages import (
+from .utils.success_messages import (
   get_success,
   post_success,
   patch_success,

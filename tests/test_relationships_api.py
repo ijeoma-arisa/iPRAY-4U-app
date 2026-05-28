@@ -1,11 +1,11 @@
-from models import Relationship
-from helpers.fixtures import client
-from helpers.assertions import (
+from ipray4u.models import Relationship
+from .helpers.fixtures import client
+from .helpers.assertions import (
   assert_success_response, 
   assert_relationship_data,
 )
-from helpers.urls import RELATIONSHIPS_URL
-from utils.success_messages import get_success
+from .helpers.urls import RELATIONSHIPS_URL
+from ipray4u.utils.success_messages import get_success
 
 def test_get_relationships(client):
   response = client.get(RELATIONSHIPS_URL)

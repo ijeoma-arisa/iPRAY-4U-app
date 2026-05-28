@@ -1,8 +1,8 @@
 import os
 import psycopg
 from flask import g, current_app
-from db import schema_postgres
-from models import Relationship
+from . import schema_postgres
+from ..models import Relationship
 from dotenv import load_dotenv
 
 load_dotenv()

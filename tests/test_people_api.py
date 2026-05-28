@@ -1,19 +1,19 @@
-from models import Relationship
+from ipray4u.models import Relationship
 
-from helpers.assertions import (
+from .helpers.assertions import (
     assert_success_response, 
     assert_error_response,
     assert_valid_delete_response,
     assert_person_data, 
 )
-from helpers.fixtures import client
-from helpers.sample_data import (
+from .helpers.fixtures import client
+from .helpers.sample_data import (
     generate_person_json, 
     update_existing_json_fields  
 )
-from helpers.urls import PEOPLE_URL
+from .helpers.urls import PEOPLE_URL
 
-from utils.error_messages import (
+from ipray4u.utils.error_messages import (
   VALIDATION_FAILED_ERROR,
   required_error,
   string_error,
@@ -21,7 +21,7 @@ from utils.error_messages import (
   not_found_error,
 )
 
-from utils.success_messages import (
+from ipray4u.utils.success_messages import (
   get_success,
   post_success,
   patch_success,

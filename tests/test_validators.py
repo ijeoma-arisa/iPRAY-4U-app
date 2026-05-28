@@ -1,19 +1,19 @@
 import unittest
-from utils.validators import (
+from ipray4u.utils.validators import (
     parse_bool_default,
     parse_relationship,
     parse_str,
     validate_fields
 )
-from utils.error_messages import (
+from ipray4u.utils.error_messages import (
     required_error,
     string_error,
     non_empty_string_error,
     valid_relationship_error,
 )
 
-from models import Relationship
-from helpers.sample_data import generate_person_json
+from ipray4u.models import Relationship
+from .helpers.sample_data import generate_person_json
 
 class TestParseBoolDefault(unittest.TestCase):
     """Test cases for parse_bool_default function."""

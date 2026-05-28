@@ -1,4 +1,4 @@
-from models import Relationship
+from ..models import Relationship
 from .error_messages import (
   required_error,
   string_error,

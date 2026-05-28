@@ -1,6 +1,6 @@
 import unittest
 
-from models import Person, Relationship
+from ipray4u.models import Person, Relationship
 
 class TestPerson(unittest.TestCase):
   def setUp(self):

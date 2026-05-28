@@ -1,6 +1,6 @@
 import unittest
 
-from models import Prayer
+from ipray4u.models import Prayer
 
 class TestPrayer(unittest.TestCase):
   def setUp(self):

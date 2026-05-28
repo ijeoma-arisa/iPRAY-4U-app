@@ -1,24 +1,24 @@
-from helpers.assertions import (
+from .helpers.assertions import (
     assert_success_response, 
     assert_error_response,
     assert_valid_delete_response,
     assert_prayer_data,
     assert_prayers_list,
 )
-from helpers.fixtures import  (
+from .helpers.fixtures import  (
     client, 
     sample_person, 
     sample_prayer,
 )
 
-from helpers.sample_data import (
+from .helpers.sample_data import (
     generate_person_json, 
     generate_prayer_json,
     update_existing_json_fields  
 )
 
-from helpers.urls import get_prayers_url, PRAYERS_URL
-from utils.error_messages import (
+from .helpers.urls import get_prayers_url, PRAYERS_URL
+from ipray4u.utils.error_messages import (
     VALIDATION_FAILED_ERROR,
     required_error,
     string_error,
@@ -26,7 +26,7 @@ from utils.error_messages import (
     not_found_error,
 )
 
-from utils.success_messages import (
+from ipray4u.utils.success_messages import (
     get_success,
     post_success,
     patch_success,

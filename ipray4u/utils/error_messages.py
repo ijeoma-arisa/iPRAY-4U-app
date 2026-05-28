@@ -1,4 +1,4 @@
-from models import Relationship
+from ..models import Relationship
 
 VALIDATION_FAILED_ERROR = "Validation failed."
 

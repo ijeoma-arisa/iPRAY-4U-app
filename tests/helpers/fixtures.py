@@ -5,9 +5,9 @@ from ipray4u.db import cleanup_test_db
 from dotenv import load_dotenv
 
 from ipray4u.models import Relationship 
-from helpers.urls import PEOPLE_URL, get_prayers_url
-from helpers.sample_data import generate_person_json
-from helpers.assertions import assert_success_response
+from .urls import PEOPLE_URL, get_prayers_url
+from .sample_data import generate_person_json
+from .assertions import assert_success_response
 from ipray4u.utils.success_messages import get_success, post_success
 
 load_dotenv()

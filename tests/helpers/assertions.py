@@ -1,4 +1,4 @@
-from models import Relationship
+from ipray4u.models import Relationship
 
 def assert_valid_delete_response(response):
   assert response.status_code == 204
