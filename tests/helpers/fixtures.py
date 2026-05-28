@@ -1,14 +1,14 @@
 import pytest
 import os
-from app import create_app
-from db import cleanup_test_db
+from ipray4u import create_app
+from ipray4u.db import cleanup_test_db
 from dotenv import load_dotenv
 
-from models import Relationship 
+from ipray4u.models import Relationship 
 from helpers.urls import PEOPLE_URL, get_prayers_url
 from helpers.sample_data import generate_person_json
 from helpers.assertions import assert_success_response
-from utils.success_messages import get_success, post_success
+from ipray4u.utils.success_messages import get_success, post_success
 
 load_dotenv()
 
