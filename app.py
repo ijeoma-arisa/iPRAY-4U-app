@@ -26,10 +26,12 @@ load_dotenv()
 def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
   
-  app.config["DATABASE_URL"] = os.environ["PROD_DATABASE_URL"]
+  # app.config["DATABASE_URL"] = os.environ["PROD_DATABASE_URL"]
   
-  if test_config:
-    app.config.update(test_config)
+  # if test_config:
+  #   app.config.update(test_config)
+  
+  app.config["DATABASE_URL"] = test_config or os.environ["PROD_DATABASE_URL"]
   
   with app.app_context():
     init_db()
