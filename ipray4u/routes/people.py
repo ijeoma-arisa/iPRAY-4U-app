@@ -14,7 +14,7 @@ from ipray4u.utils.success_messages import (
 people_blueprint = Blueprint("people", __name__)
 
 # TODO: Add custom 404 Not Found page (or redirect)
-@people_blueprint.route("/api/people", methods=["GET"])
+@people_blueprint.get("/api/people")
 def get_people():
         db = get_db_connection()
 
@@ -26,7 +26,7 @@ def get_people():
 
         return success_json(get_success("People"), people)
 
-@people_blueprint.route("/api/people", methods=["POST"])
+@people_blueprint.post("/api/people")
 # TODO: Resolve duplicate people and relationships
 def add_person():
     data = request.get_json()
@@ -53,7 +53,7 @@ def add_person():
     return success_json(post_success("Person"), person), 201
         
 
-@people_blueprint.route("/api/people/<int:person_id>", methods=["GET"])
+@people_blueprint.get("/api/people/<int:person_id>")
 def get_person(person_id):
     db = get_db_connection()
 
@@ -64,7 +64,7 @@ def get_person(person_id):
 
     return success_json(get_success("Person"), person)
 
-@people_blueprint.route("/api/people/<int:person_id>", methods=["PATCH"])
+@people_blueprint.patch("/api/people/<int:person_id>")
 def update_person(person_id):
     data = request.get_json()
 
@@ -94,7 +94,7 @@ def update_person(person_id):
     db.commit()
     return success_json(patch_success("Person"), updated_person)
 
-@people_blueprint.route("/api/people/<int:person_id>", methods=["DELETE"])
+@people_blueprint.delete("/api/people/<int:person_id>")
 def delete_person(person_id):
     db = get_db_connection()
 

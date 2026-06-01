@@ -6,7 +6,7 @@ from ipray4u.utils.success_messages import get_success
 
 relationships_blueprint = Blueprint("relationships", __name__)
 
-@relationships_blueprint.route("/api/relationships", methods=["GET"])
+@relationships_blueprint.get("/api/relationships")
 def get_relationships():
     db = get_db_connection()
     relationships = db.execute(schema.SELECT_ALL_RELATIONSHIPS_QUERY).fetchall()

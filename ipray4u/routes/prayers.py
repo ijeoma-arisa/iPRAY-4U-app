@@ -12,14 +12,14 @@ from ipray4u.utils.success_messages import (
 
 prayers_blueprint = Blueprint("prayers", __name__)
 
-@prayers_blueprint.route("/api/prayers", methods=["GET"])
+@prayers_blueprint.get("/api/prayers")
 def get_prayers():
     db = get_db_connection()
     prayers = db.execute(schema.SELECT_ALL_PRAYERS_QUERY).fetchall()
     
     return success_json(get_success("Prayers"), prayers)
 
-@prayers_blueprint.route("/api/people/<int:person_id>/prayers", methods=["GET"])
+@prayers_blueprint.get("/api/people/<int:person_id>/prayers")
 def get_prayers_by_person(person_id):
     db = get_db_connection()
     
@@ -34,7 +34,7 @@ def get_prayers_by_person(person_id):
     
     return success_json(success_msg, prayers)
 
-@prayers_blueprint.route("/api/people/<int:person_id>/prayers", methods=["POST"])
+@prayers_blueprint.post("/api/people/<int:person_id>/prayers")
 def add_prayer(person_id):
     db = get_db_connection()
     person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
@@ -58,7 +58,7 @@ def add_prayer(person_id):
     db.commit()
     return success_json(post_success("Prayer"), prayer), 201
         
-@prayers_blueprint.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["PATCH"])
+@prayers_blueprint.patch("/api/people/<int:person_id>/prayers/<int:prayer_id>")
 def update_prayer(person_id, prayer_id):
     data = request.get_json()
     
@@ -87,7 +87,7 @@ def update_prayer(person_id, prayer_id):
     db.commit()
     return success_json(patch_success("Prayer"), updated_prayer)
     
-@prayers_blueprint.route("/api/people/<int:person_id>/prayers/<int:prayer_id>", methods=["DELETE"])
+@prayers_blueprint.delete("/api/people/<int:person_id>/prayers/<int:prayer_id>")
 def delete_prayer(person_id, prayer_id):
     db = get_db_connection()
     person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
