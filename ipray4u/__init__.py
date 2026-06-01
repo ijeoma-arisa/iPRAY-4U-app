@@ -22,9 +22,8 @@ def create_app(test_config=None):
   if not app.config.get("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not configured.")
   
-  # if not app.config.get("SECRET_KEY"):
-    # raise RuntimeError("SECRET_KEY is not configured.")
-  
+  if not app.config.get("SECRET_KEY"):
+    raise RuntimeError("SECRET_KEY is not configured.")
   
   from ipray4u.routes.auth import auth_blueprint
   from ipray4u.routes.pages import pages_blueprint
