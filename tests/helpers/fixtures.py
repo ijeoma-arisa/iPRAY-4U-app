@@ -16,8 +16,7 @@ load_dotenv()
 def client():
   app = create_app({
     "TESTING": True,
-    "DATABASE_URL": os.environ.get("TEST_DATABASE_URL"),
-    "SECRET_KEY": os.environ.get("SECRET_KEY"),
+    "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
   })
 
   client = app.test_client()
