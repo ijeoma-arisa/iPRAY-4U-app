@@ -1,4 +1,10 @@
-from flask import Blueprint, render_template, request, flash
+from flask import (
+    Blueprint, 
+    render_template, 
+    request, 
+    flash,
+    redirect
+)
 from . import success_json, error_json
 from ipray4u.supabase_client import get_supabase
 
@@ -15,12 +21,17 @@ def post_signup():
     email = request.form.get("email")
     password =  request.form.get("password")
     
-    # supabase.auth.sign_up(
-    #     {
-    #     "email": email,
-    #     "password": password,
-    #     }
-    # )
+    supabase.auth.sign_up(
+        {
+        "email": email,
+        "password": password,
+        }
+    )
     
-    # flash('Account created', 'success') 
+    flash(
+        'Account created. Check your email to verify your account.', 
+        'success'
+    )
+    
+    return redirect("verify.html")
         
