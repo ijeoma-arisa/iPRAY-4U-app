@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from . import success_json
+from ipray4u.responses import success_json
 from ipray4u.db import get_db_connection, schema
 from ipray4u.utils.success_messages import get_success
 

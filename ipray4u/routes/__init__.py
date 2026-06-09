@@ -1,27 +1,5 @@
-from flask import jsonify 
-
-def rows_to_dict(rows):
-    return [dict(row) for row in rows]
-
-def success_json(message, data=None):
-    if data is None:
-      data = {}
-    
-    data = dict(data) if not isinstance(data, list) else rows_to_dict(data) 
-    
-    return jsonify({
-      "status": "success", 
-      "message": message, 
-      "data": data
-    })
-
-def error_json(message, errors=None):
-    body = {
-      "status": "error",
-      "message": message
-    }
-    
-    if errors is not None:
-      body["errors"] = errors
-      
-    return jsonify(body)
+from .auth import auth_blueprint
+from .pages import pages_blueprint
+from .people import people_blueprint
+from .prayers import prayers_blueprint
+from .relationships import relationships_blueprint

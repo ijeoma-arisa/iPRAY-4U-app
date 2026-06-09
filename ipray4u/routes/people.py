@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 
-from . import success_json, error_json
+from ipray4u.responses import success_json, error_json
 from ipray4u.db import get_db_connection, schema
 from ipray4u.models import Relationship
 from ipray4u.utils.validators import validate_fields, parse_relationship
@@ -10,11 +10,13 @@ from ipray4u.utils.success_messages import (
     post_success,
     patch_success,
 )
+from ipray4u.decorators import api_login_required
 
 people_blueprint = Blueprint("people", __name__)
 
 # TODO: Add custom 404 Not Found page (or redirect)
 @people_blueprint.get("/api/people")
+@api_login_required
 def get_people():
         db = get_db_connection()
 
@@ -27,6 +29,7 @@ def get_people():
         return success_json(get_success("People"), people)
 
 @people_blueprint.post("/api/people")
+@api_login_required
 # TODO: Resolve duplicate people and relationships
 def add_person():
     data = request.get_json()
@@ -54,6 +57,7 @@ def add_person():
         
 
 @people_blueprint.get("/api/people/<int:person_id>")
+@api_login_required
 def get_person(person_id):
     db = get_db_connection()
 
@@ -65,6 +69,7 @@ def get_person(person_id):
     return success_json(get_success("Person"), person)
 
 @people_blueprint.patch("/api/people/<int:person_id>")
+@api_login_required
 def update_person(person_id):
     data = request.get_json()
 
@@ -95,6 +100,7 @@ def update_person(person_id):
     return success_json(patch_success("Person"), updated_person)
 
 @people_blueprint.delete("/api/people/<int:person_id>")
+@api_login_required
 def delete_person(person_id):
     db = get_db_connection()
 

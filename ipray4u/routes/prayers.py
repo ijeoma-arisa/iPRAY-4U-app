@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 
-from . import success_json, error_json
+from ipray4u.responses import success_json, error_json
 from ipray4u.db import get_db_connection, schema
 from ipray4u.utils.validators import validate_fields, parse_bool_default
 from ipray4u.utils.error_messages import VALIDATION_FAILED_ERROR, not_found_error
@@ -9,10 +9,12 @@ from ipray4u.utils.success_messages import (
     post_success,
     patch_success,
 )
+from ipray4u.decorators import api_login_required
 
 prayers_blueprint = Blueprint("prayers", __name__)
 
 @prayers_blueprint.get("/api/prayers")
+@api_login_required
 def get_prayers():
     db = get_db_connection()
     prayers = db.execute(schema.SELECT_ALL_PRAYERS_QUERY).fetchall()
@@ -20,6 +22,7 @@ def get_prayers():
     return success_json(get_success("Prayers"), prayers)
 
 @prayers_blueprint.get("/api/people/<int:person_id>/prayers")
+@api_login_required
 def get_prayers_by_person(person_id):
     db = get_db_connection()
     
@@ -35,6 +38,7 @@ def get_prayers_by_person(person_id):
     return success_json(success_msg, prayers)
 
 @prayers_blueprint.post("/api/people/<int:person_id>/prayers")
+@api_login_required
 def add_prayer(person_id):
     db = get_db_connection()
     person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
@@ -59,6 +63,7 @@ def add_prayer(person_id):
     return success_json(post_success("Prayer"), prayer), 201
         
 @prayers_blueprint.patch("/api/people/<int:person_id>/prayers/<int:prayer_id>")
+@api_login_required
 def update_prayer(person_id, prayer_id):
     data = request.get_json()
     
@@ -88,6 +93,7 @@ def update_prayer(person_id, prayer_id):
     return success_json(patch_success("Prayer"), updated_prayer)
     
 @prayers_blueprint.delete("/api/people/<int:person_id>/prayers/<int:prayer_id>")
+@api_login_required
 def delete_prayer(person_id, prayer_id):
     db = get_db_connection()
     person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()

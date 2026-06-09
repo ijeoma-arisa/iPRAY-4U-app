@@ -25,11 +25,13 @@ def create_app(test_config=None):
   if not app.config.get("SECRET_KEY"):
     raise RuntimeError("SECRET_KEY is not configured.")
   
-  from ipray4u.routes.auth import auth_blueprint
-  from ipray4u.routes.pages import pages_blueprint
-  from ipray4u.routes.people import people_blueprint
-  from ipray4u.routes.prayers import prayers_blueprint
-  from ipray4u.routes.relationships import relationships_blueprint
+  from ipray4u.routes import (
+    auth_blueprint,
+    pages_blueprint,
+    people_blueprint,
+    prayers_blueprint,
+    relationships_blueprint
+  )
   
   app.register_blueprint(auth_blueprint)
   app.register_blueprint(pages_blueprint)
