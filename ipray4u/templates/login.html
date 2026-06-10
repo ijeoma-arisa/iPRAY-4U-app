@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Log In</title>
-</head>
-<body>
-  <h1>Log In</h1>
+{% extends "base.html" %}
+
+{% block title %}Log In{% endblock %}
+
+{% block content %}
+  <h1>Log In</h1>  
   <form method="POST" action="/login">
     <label for="email">Email</label>
     <input type="email" id="email" name="email" required>
@@ -16,15 +13,4 @@
   
     <button type="submit">Log In</button>
   </form>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-          {% if category == 'error' %}
-            <p class="{{ category }}"> {{ message }}</li>
-          {% endif %}
-        {% endfor %}
-    {% endif %}
-  {% endwith %}
-    
-</body>
-</html>
+{% endblock %}
