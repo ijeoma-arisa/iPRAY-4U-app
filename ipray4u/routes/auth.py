@@ -29,12 +29,12 @@ def signup_user():
     email = request.form.get("email")
     password =  request.form.get("password")
     
-    # supabase.auth.sign_up(
-    #     {
-    #     "email": email,
-    #     "password": password,
-    #     }
-    # )
+    supabase.auth.sign_up(
+        {
+        "email": email,
+        "password": password,
+        }
+    )
     
     flash(
         'Account created. Check your email to verify your account.', 
@@ -55,19 +55,15 @@ def login_user():
     password = request.form.get("password")
     
     try:
-        # response = supabase.auth.sign_in_with_password(
-        #     {
-        #         "email": email,
-        #         "password": password,
-        #     }
-        # )
+        response = supabase.auth.sign_in_with_password(
+            {
+                "email": email,
+                "password": password,
+            }
+        )
         
-        # TODO: Remove mock login after Supabase Auth rate limit clears
-        # session["user_id"] = response.user.id
-        # session["email"] = response.user.email
-        
-        session["user_id"] = "00000000-0000-0000-0000-000000000001"
-        session["email"] = "test@example.com"
+        session["user_id"] = response.user.id
+        session["email"] = response.user.email
         
         flash("Welcome back!", "success")
         return redirect(url_for("pages.prayer_requests_page"))
