@@ -28,9 +28,17 @@ def client():
   cleanup_test_db()
 
 @pytest.fixture
-def sample_person(client):
+def auth_client(client):
+  with client.session_transaction() as session:
+    session["user_id"] = "test-user-id"
+    session["email"] = "test@example.com"
+    
+  return client
+
+@pytest.fixture
+def sample_person(auth_client):
   person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
-  response = client.post(PEOPLE_URL, json=person)
+  response = auth_client.post(PEOPLE_URL, json=person)
   
   data = assert_success_response(
     response,
@@ -41,11 +49,11 @@ def sample_person(client):
   return data
 
 @pytest.fixture
-def sample_prayer(client, sample_person):
+def sample_prayer(auth_client, sample_person):
   person_id = sample_person["id"]
   prayers_url = get_prayers_url(person_id)
   
-  response = client.get(prayers_url)
+  response = auth_client.get(prayers_url)
   
   
   prayers = assert_success_response(

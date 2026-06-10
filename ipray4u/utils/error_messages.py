@@ -1,6 +1,7 @@
 from ..models import Relationship
 
 VALIDATION_FAILED_ERROR = "Validation failed."
+AUTHENTICATION_REQUIRED_ERROR = "Authentication required."
 
 def _format_error(field, message, as_list=False):
     def _format_item(item):
