@@ -55,8 +55,6 @@ def login_user():
     password = request.form.get("password")
     
     try:
-        # TODO: Remove mock login after Supabase Auth rate limit clears
-        
         # response = supabase.auth.sign_in_with_password(
         #     {
         #         "email": email,
@@ -64,13 +62,14 @@ def login_user():
         #     }
         # )
         
+        # TODO: Remove mock login after Supabase Auth rate limit clears
         # session["user_id"] = response.user.id
         # session["email"] = response.user.email
         
         session["user_id"] = "00000000-0000-0000-0000-000000000001"
         session["email"] = "test@example.com"
         
-        flash("Welcome back!")
+        flash("Welcome back!", "success")
         return redirect(url_for("pages.prayer_requests_page"))
         
     except AuthApiError:
@@ -81,5 +80,10 @@ def login_user():
         current_app.logger.exception("Unexpected error during login")
         flash("Something went wrong. Please try again.", "error")
         return redirect(url_for("auth.login_page"))
-        
+
+@auth_blueprint.post("/logout")
+def logout_user():
+    session.clear()
+    flash("You have been logged out.", "success")
+    return redirect(url_for("auth.login_page"))
     
