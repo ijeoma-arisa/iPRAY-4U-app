@@ -55,7 +55,6 @@ def sample_prayer(auth_client, sample_person):
   
   response = auth_client.get(prayers_url)
   
-  
   prayers = assert_success_response(
     response,
     expected_message=get_success("Prayers"),

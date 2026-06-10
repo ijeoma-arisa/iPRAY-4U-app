@@ -11,10 +11,7 @@ from .helpers.fixtures import (
   auth_client,
   sample_person,
 )
-from .helpers.sample_data import (
-    generate_person_json, 
-    update_existing_json_fields  
-)
+from .helpers.sample_data import generate_person_json, update_existing_json_fields
 from .helpers.urls import PEOPLE_URL
 
 from ipray4u.utils.error_messages import (
