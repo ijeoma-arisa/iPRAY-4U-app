@@ -1,6 +1,10 @@
 PEOPLE_URL = '/api/people'
 RELATIONSHIPS_URL = '/api/relationships'
 PRAYERS_URL = '/api/prayers'
+LOGOUT_URL = '/logout'
+
+# HACK: Update naming convention
+PRAYER_REQUESTS_URL = '/prayer-requests'
 
 def get_prayers_url(person_id: int = None, prayer_id: int = None):
     if person_id is None:
