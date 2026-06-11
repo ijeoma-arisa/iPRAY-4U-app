@@ -1,9 +1,12 @@
 import os
 from flask import Flask, g
 from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect
 from .db import init_db
 
 load_dotenv()
+
+csrf = CSRFProtect()
 
 def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
@@ -11,8 +14,8 @@ def create_app(test_config=None):
   app.config.from_mapping(
     DATABASE_URL=os.environ.get("DATABASE_URL"),
     SECRET_KEY=os.environ.get("SECRET_KEY"),
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=False, # True in production later
+    SESSION_COOKIE_HTTPONLY=True, # Review how this protects JS from reading cookies
+    SESSION_COOKIE_SECURE=False, # True in production later - HTTPS traffic only for cookies
     SESSION_COOKIE_SAMESITE="Lax",
   )
   
@@ -24,6 +27,8 @@ def create_app(test_config=None):
   
   if not app.config.get("SECRET_KEY"):
     raise RuntimeError("SECRET_KEY is not configured.")
+  
+  csrf.init_app(app)
   
   from ipray4u.routes import (
     auth_blueprint,
@@ -41,7 +46,7 @@ def create_app(test_config=None):
   
   with app.app_context():
     init_db()
-    
+
   @app.teardown_appcontext
   def close_db_connection(exception):
     db = g.pop("db", None)

@@ -17,6 +17,7 @@ def client():
   app = create_app({
     "TESTING": True,
     "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
+    "WTF_CSRF_ENABLED": False,
   })
 
   client = app.test_client()

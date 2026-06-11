@@ -1,6 +1,7 @@
 PEOPLE_URL = '/api/people'
 RELATIONSHIPS_URL = '/api/relationships'
 PRAYERS_URL = '/api/prayers'
+LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 
 # HACK: Update naming convention
