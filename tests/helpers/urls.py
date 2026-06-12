@@ -1,6 +1,8 @@
 PEOPLE_URL = '/api/people'
 RELATIONSHIPS_URL = '/api/relationships'
 PRAYERS_URL = '/api/prayers'
+SIGNUP_URL = '/signup'
+VERIFY_URL = '/verify'
 LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 

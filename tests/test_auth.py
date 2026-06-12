@@ -1,124 +1,126 @@
 from .helpers.assertions import assert_success_response
 from ipray4u.utils.success_messages import get_success
-from .helpers.fixtures import client, auth_client
+from .helpers.fixtures import (
+    client, 
+    auth_client, 
+    auth_form_data, 
+    mock_supabase, 
+    mock_login_response,
+)
 from .helpers.urls import (
+    SIGNUP_URL,
+    VERIFY_URL,
     LOGIN_URL,
     LOGOUT_URL, 
     PRAYER_REQUESTS_URL,
 )
 # Signup Tests
-# def test_signup_page_loads(client):
-    # Act: GET the signup page
-
-    # Assert: status code is 200
-    # Assert: response contains expected signup page text
-
-
-# def test_signup_with_valid_data_redirects_to_verify_page(client, mocker):
-    # Arrange:
-    # - mock Supabase sign_up response
-    # - prepare valid form data: email, password, maybe display_name
-
-    # Act: POST signup form data to signup route
-
-    # Assert: status code is 302
-    # Assert: redirects to verify page
-    # Assert: Supabase sign_up was called with expected data
-
-
-# def test_signup_with_invalid_data_shows_error(client):
-    # Arrange:
-    # - prepare missing/invalid form data
-
-    # Act: POST signup form
-
-    # Assert: response does not create account
-    # Assert: status code is 200 or 400 depending on your design
-    # Assert: error message appears
-
-
-# def test_signup_when_supabase_returns_error_shows_flash_message(client, mocker):
-    # Arrange:
-    # - mock Supabase sign_up to raise AuthApiError or return failure
-
-    # Act: POST valid-looking signup data
-
-    # Assert: user stays on signup page or is redirected appropriately
-    # Assert: error flash/message appears
+def test_signup_page_loads(client):
+    response = client.get(SIGNUP_URL)
     
-# Verify Tests
-# def test_verify_page_loads(client):
-    # Act: GET verify page
+    assert response.status_code == 200
+    assert b"Sign Up" in response.data
 
-    # Assert: status code is 200
-    # Assert: response contains expected verify-email message
+def test_signup_with_valid_data_redirects_to_verify_page(
+    client, 
+    auth_form_data,
+    mock_supabase,
+    ):
 
+    response = client.post(SIGNUP_URL, data=auth_form_data)
+    
+    assert response.status_code == 302
+    assert response.headers["Location"] == VERIFY_URL
+    
+    mock_supabase.auth.sign_up.assert_called_once_with({
+    "email": auth_form_data["email"],
+    "password": auth_form_data["password"],
+    })
 
-# def test_verify_page_is_reachable_after_signup(client, mocker):
-    # Arrange:
-    # - mock successful signup
-
-    # Act:
-    # - POST signup form
-
-    # Assert:
-    # - response redirects to verify page
+    
+# TODO: Verify Tests
     
 # Login Tests
-# def test_login_page_loads(client):
-    # Act: GET login page
-
-    # Assert: status code is 200
-    # Assert: response contains expected login page text
-
-
-# def test_login_with_valid_credentials_sets_session_and_redirects(client, mocker):
-    # Arrange:
-    # - mock Supabase sign_in_with_password response
-    # - response should include fake user id and email
-    # - prepare valid email/password form data
-
-    # Act: POST login form
-
-    # Assert: status code is 302
-    # Assert: redirects to protected page or intended page
-    # Assert: session contains user_id
-    # Assert: session contains email, if your app stores it
-
-
-# def test_login_with_invalid_credentials_shows_error(client, mocker):
-    # Arrange:
-    # - mock Supabase sign_in_with_password to raise auth error
-
-    # Act: POST login form
-
-    # Assert: status code is 200 or redirect, depending on your design
-    # Assert: session does not contain user_id
-    # Assert: error message appears
-
-
-# def test_login_with_missing_fields_shows_error(client):
-    # Arrange:
-    # - missing email or password
-
-    # Act: POST login form
-
-    # Assert: session does not contain user_id
-    # Assert: error message appears
+def test_login_page_loads(client):
+    response = client.get(LOGIN_URL)
     
+    assert response.status_code == 200
+    assert b"Log In" in response.data
+
+
+def test_login_with_valid_credentials_sets_session_and_redirects(
+    client,
+    mock_login_response,
+    auth_form_data,
+    mock_supabase,
+    ):
+    
+    mock_supabase.auth.sign_in_with_password.return_value = mock_login_response
+    
+    response = client.post(LOGIN_URL, data=auth_form_data)
+    
+    assert response.status_code == 302
+    assert response.headers["Location"] == PRAYER_REQUESTS_URL
+    
+    mock_supabase.auth.sign_in_with_password.assert_called_once_with({
+        "email": auth_form_data["email"],
+        "password": auth_form_data["password"],
+    })
+    
+    with client.session_transaction() as session:
+        assert session["user_id"] == mock_login_response.user.id
+        assert session["email"] == mock_login_response.user.email
+
+
+def test_login_with_invalid_credentials_redirects_to_login_and_does_not_set_session(
+    client, 
+    auth_form_data,
+    mock_supabase,
+    mocker,
+    ):
+    
+    class FakeAuthApiError(Exception):
+        pass
+    
+    mocker.patch("ipray4u.routes.auth.AuthApiError", FakeAuthApiError)
+    
+    mock_supabase.auth.sign_in_with_password.side_effect = FakeAuthApiError()
+    
+    response = client.post(LOGIN_URL, data=auth_form_data)
+    
+    assert response.status_code == 302
+    assert response.headers["Location"] == LOGIN_URL
+    
+    with client.session_transaction() as session:
+        assert "user_id" not in session
+        assert "email" not in session
+
+def test_login_with_unexpected_error_redirects_to_login_and_does_not_set_session(
+    client,
+    auth_form_data,
+    mock_supabase,
+):
+    mock_supabase.auth.sign_in_with_password.side_effect = Exception("Network error")
+    
+    response = client.post(LOGIN_URL, data=auth_form_data)
+    
+    assert response.status_code == 302
+    assert response.headers["Location"] == LOGIN_URL
+    
+    with client.session_transaction() as session:
+        assert "user_id" not in session
+        assert "email" not in session
+
 # Logout Tests
-def test_logout_clears_session_and__redirects_to_login(auth_client):
-    auth_client.post(LOGOUT_URL)
+def test_logout_clears_session_and_redirects_to_login(auth_client):
+    response = auth_client.post(LOGOUT_URL)
+    assert response.status_code == 302
+    assert response.headers["Location"] == LOGIN_URL
     
     with auth_client.session_transaction() as session:
         assert "user_id" not in session
         assert "email" not in session
         
-    response = auth_client.get(PRAYER_REQUESTS_URL)
-
-    assert response.status_code == 302
-    assert response.headers["Location"] == LOGIN_URL
-
 
 def test_logout_makes_protected_page_inaccessible(auth_client):
     response = auth_client.get(PRAYER_REQUESTS_URL)
@@ -138,30 +140,4 @@ def test_logout_get_method_not_allowed(auth_client):
     
     assert response.status_code == 405
     
-# CSRF Tests
-# def test_logout_without_csrf_token_is_rejected(client_with_csrf_enabled):
-    # Arrange:
-    # - place user_id in session
-
-    # Act:
-    # - POST logout route without csrf_token
-
-    # Assert:
-    # - status code is 400
-    # - session still contains user_id
-
-
-# def test_login_without_csrf_token_is_rejected(client_with_csrf_enabled):
-    # Act:
-    # - POST login form data without csrf_token
-
-    # Assert:
-    # - status code is 400
-
-
-# def test_signup_without_csrf_token_is_rejected(client_with_csrf_enabled):
-    # Act:
-    # - POST signup form data without csrf_token
-
-    # Assert:
-    # - status code is 400
+# TODO: CSRF Tests

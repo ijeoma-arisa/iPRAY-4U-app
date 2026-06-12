@@ -1,5 +1,7 @@
 import pytest
 import os
+from types import SimpleNamespace
+
 from ipray4u import create_app
 from ipray4u.db import cleanup_test_db
 from dotenv import load_dotenv
@@ -66,3 +68,31 @@ def sample_prayer(auth_client, sample_person):
   assert len(prayers) == 1
   
   return prayers[0]
+
+@pytest.fixture
+def auth_form_data():
+  return {
+    "email": "test@example.com",
+    "password": "test-password",
+  }
+  
+@pytest.fixture
+def mock_supabase(mocker):
+  fake_supabase = mocker.Mock()
+  
+  mocker.patch(
+    "ipray4u.routes.auth.get_supabase",
+    return_value=fake_supabase
+  )
+  
+  return fake_supabase
+
+@pytest.fixture
+def mock_login_response():
+    return SimpleNamespace(
+        user=SimpleNamespace(
+            id="test-user-id",
+            email="test@example.com",
+        )
+  )  
+  
