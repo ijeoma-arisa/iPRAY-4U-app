@@ -58,8 +58,8 @@ def test_user(app):
       INSERT INTO profiles (id, display_name)
       VALUES (%s, %s)
       ON CONFLICT (id) DO NOTHING
-      """
-      (user["id"], user["display_name"])
+      """,
+      (user["id"], user["display_name"],)
     )
     
     db.commit()

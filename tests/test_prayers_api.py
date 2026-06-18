@@ -6,6 +6,8 @@ from .helpers.assertions import (
     assert_prayers_list,
 )
 from .helpers.fixtures import  (
+    app,
+    test_user,
     client, 
     auth_client,
     sample_person, 

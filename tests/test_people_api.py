@@ -7,7 +7,9 @@ from .helpers.assertions import (
     assert_person_data, 
 )
 from .helpers.fixtures import (
+  app,
   client, 
+  test_user,
   auth_client,
   sample_person,
 )
