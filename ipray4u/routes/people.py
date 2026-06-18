@@ -26,7 +26,7 @@ def get_people():
 
         people = (db.execute(schema.SELECT_RELATIONSHIP_PEOPLE_QUERY, (user_id, relationship.value,)).fetchall()
                     if isinstance(relationship, Relationship)
-                    else db.execute(schema.SELECT_ALL_PEOPLE_QUERY).fetchall())
+                    else db.execute(schema.SELECT_ALL_PEOPLE_QUERY, (user_id,)).fetchall())
 
         return success_json(get_success("People"), people)
 
@@ -51,10 +51,10 @@ def add_person():
     db = get_db_connection()
 
     relationship_row = db.execute(schema.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()   
-    person_id = db.execute(schema.INSERT_PERSON_QUERY, (name, relationship_row["id"])).fetchone()["id"]
+    person_id = db.execute(schema.INSERT_PERSON_QUERY, (name, relationship_row["id"], user_id,)).fetchone()["id"]
 
-    db.execute(schema.INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer)) 
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    db.execute(schema.INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer,)) 
+    person = db.execute(schema.SELECT_PERSON_QUERY, (user_id, person_id,)).fetchone()
 
     db.commit()
     return success_json(post_success("Person"), person), 201
@@ -63,9 +63,11 @@ def add_person():
 @people_blueprint.get("/api/people/<int:person_id>")
 @api_login_required
 def get_person(person_id):
+    user_id = session["user_id"]
+    
     db = get_db_connection()
 
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema.SELECT_PERSON_QUERY, (user_id, person_id,)).fetchone()
 
     if person is None:
         return error_json(not_found_error("Person")), 404
@@ -75,6 +77,8 @@ def get_person(person_id):
 @people_blueprint.patch("/api/people/<int:person_id>")
 @api_login_required
 def update_person(person_id):
+    user_id = session["user_id"]
+    
     data = request.get_json()
 
     valid_fields = ["name", "relationship"]
@@ -91,11 +95,11 @@ def update_person(person_id):
     relationship_id = db.execute(schema.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"] if relationship is not None else None
 
     if name is not None and relationship is not None:
-        updated_person = db.execute(schema.UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY, (name, relationship_id, person_id)).fetchone()
+        updated_person = db.execute(schema.UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY, (name, relationship_id, user_id, person_id,)).fetchone()
     elif name is not None:
-        updated_person = db.execute(schema.UPDATE_PERSON_NAME_QUERY, (name, person_id)).fetchone()
+        updated_person = db.execute(schema.UPDATE_PERSON_NAME_QUERY, (name, user_id, person_id,)).fetchone()
     else:
-        updated_person = db.execute(schema.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, person_id)).fetchone()
+        updated_person = db.execute(schema.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, user_id, person_id,)).fetchone()
 
     if updated_person is None:
         return error_json(not_found_error("Person")), 404
@@ -106,9 +110,11 @@ def update_person(person_id):
 @people_blueprint.delete("/api/people/<int:person_id>")
 @api_login_required
 def delete_person(person_id):
+    user_id = session["user_id"]
+    
     db = get_db_connection()
 
-    deleted_person = db.execute(schema.DELETE_PERSON_QUERY, (person_id,)).fetchone()
+    deleted_person = db.execute(schema.DELETE_PERSON_QUERY, (user_id, person_id,)).fetchone()
 
     if deleted_person is None:
         return error_json(not_found_error("Person")), 404

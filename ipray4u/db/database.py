@@ -25,6 +25,7 @@ def init_db():
       cursor.execute(schema.CREATE_PRAYERS_TABLE)
       
       # Create indexes
+      cursor.execute(schema.CREATE_INDEX_ON_PEOPLE_USER_ID)
       cursor.execute(schema.CREATE_INDEX_ON_PEOPLE_RELATIONSHIP)
       cursor.execute(schema.CREATE_INDEX_ON_PRAYERS_PERSON)
       

@@ -3,7 +3,7 @@ import os
 from types import SimpleNamespace
 
 from ipray4u import create_app
-from ipray4u.db import cleanup_test_db
+from ipray4u.db import get_db_connection, cleanup_test_db
 from dotenv import load_dotenv
 
 from ipray4u.models import Relationship 
@@ -31,9 +31,16 @@ def client():
   cleanup_test_db()
 
 @pytest.fixture
+def test_user():
+  db = get_db_connection()
+  
+  test_user_id = "00000000-0000-0000-0000-000000000001"
+  
+  
+@pytest.fixture
 def auth_client(client):
   with client.session_transaction() as session:
-    session["user_id"] = "test-user-id"
+    session["user_id"] = "00000000-0000-0000-0000-000000000001"
     session["email"] = "test@example.com"
     
   return client
@@ -91,7 +98,7 @@ def mock_supabase(mocker):
 def mock_login_response():
     return SimpleNamespace(
         user=SimpleNamespace(
-            id="test-user-id",
+            id="00000000-0000-0000-0000-000000000001",
             email="test@example.com",
         )
   )  

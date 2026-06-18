@@ -45,12 +45,19 @@ CREATE TABLE IF NOT EXISTS prayers (
   );"""
 
 # INDEXES
+CREATE_INDEX_ON_PEOPLE_USER_ID = """
+CREATE INDEX IF NOT EXISTS idx_people_user_id 
+ON people(user_id);
+"""
+
 CREATE_INDEX_ON_PEOPLE_RELATIONSHIP = """
-CREATE INDEX IF NOT EXISTS idx_people_relationship ON people(relationship_id);
+CREATE INDEX IF NOT EXISTS idx_people_relationship 
+ON people(relationship_id);
 """
 
 CREATE_INDEX_ON_PRAYERS_PERSON = """
-CREATE INDEX IF NOT EXISTS idx_prayers_person ON prayers(person_id);
+CREATE INDEX IF NOT EXISTS idx_prayers_person 
+ON prayers(person_id);
 """
 
 # SELECT QUERIES
