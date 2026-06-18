@@ -16,6 +16,11 @@ def init_db():
     with conn.cursor() as cursor:
       # Create tables
       cursor.execute(schema.CREATE_RELATIONSHIPS_TABLE)
+      
+      if current_app.config["TESTING"]:
+        cursor.execute(schema.CREATE_AUTH_SCHEMA_FOR_TESTS)
+      
+      cursor.execute(schema.CREATE_PROFILES_TABLE)
       cursor.execute(schema.CREATE_PEOPLE_TABLE)
       cursor.execute(schema.CREATE_PRAYERS_TABLE)
       

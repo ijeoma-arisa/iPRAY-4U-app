@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, session
 
 from ipray4u.responses import success_json, error_json
 from ipray4u.db import get_db_connection, schema
@@ -18,11 +18,13 @@ people_blueprint = Blueprint("people", __name__)
 @people_blueprint.get("/api/people")
 @api_login_required
 def get_people():
+        user_id = session["user_id"]
+        
         db = get_db_connection()
 
         relationship = parse_relationship("rel", request.args.get("rel"), [])
 
-        people = (db.execute(schema.SELECT_RELATIONSHIP_PEOPLE_QUERY, (relationship.value,)).fetchall()
+        people = (db.execute(schema.SELECT_RELATIONSHIP_PEOPLE_QUERY, (user_id, relationship.value,)).fetchall()
                     if isinstance(relationship, Relationship)
                     else db.execute(schema.SELECT_ALL_PEOPLE_QUERY).fetchall())
 
@@ -32,6 +34,8 @@ def get_people():
 @api_login_required
 # TODO: Resolve duplicate people and relationships
 def add_person():
+    user_id = session["user_id"]
+    
     data = request.get_json()
 
     required_fields = ["name", "relationship", "prayer"]
