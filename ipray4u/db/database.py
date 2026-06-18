@@ -42,12 +42,20 @@ def get_db_connection():
   return g.db
  
 def cleanup_test_db():
-  with psycopg.connect(
-    os.environ["TEST_DATABASE_URL"]
-  ) as conn:
-    
+  test_db = os.environ["TEST_DATABASE_URL"]
+  prod_db = os.environ.get("DATABASE_URL")
+  
+  assert test_db != prod_db, (
+    "TEST_DATABASE_URL must not point to the same database as DATABASE_URL."
+  )
+
+  with psycopg.connect(test_db) as conn:
     with conn.cursor() as cursor:
       cursor.execute("""
-        TRUNCATE TABLE prayers, people
+        TRUNCATE TABLE 
+          prayers, 
+          people, 
+          profiles,
+          auth.users
         RESTART IDENTITY CASCADE;
-        """)
+      """)

@@ -18,17 +18,17 @@ people_blueprint = Blueprint("people", __name__)
 @people_blueprint.get("/api/people")
 @api_login_required
 def get_people():
-        user_id = session["user_id"]
-        
-        db = get_db_connection()
+    user_id = session["user_id"]
+    
+    db = get_db_connection()
 
-        relationship = parse_relationship("rel", request.args.get("rel"), [])
+    relationship = parse_relationship("rel", request.args.get("rel"), [])
 
-        people = (db.execute(schema.SELECT_RELATIONSHIP_PEOPLE_QUERY, (user_id, relationship.value,)).fetchall()
-                    if isinstance(relationship, Relationship)
-                    else db.execute(schema.SELECT_ALL_PEOPLE_QUERY, (user_id,)).fetchall())
+    people = (db.execute(schema.SELECT_RELATIONSHIP_PEOPLE_QUERY, (user_id, relationship.value,)).fetchall()
+                if isinstance(relationship, Relationship)
+                else db.execute(schema.SELECT_ALL_PEOPLE_QUERY, (user_id,)).fetchall())
 
-        return success_json(get_success("People"), people)
+    return success_json(get_success("People"), people)
 
 @people_blueprint.post("/api/people")
 @api_login_required

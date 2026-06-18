@@ -15,33 +15,65 @@ from ipray4u.utils.success_messages import get_success, post_success
 load_dotenv()
 
 @pytest.fixture
-def client():
+def app():
   app = create_app({
     "TESTING": True,
     "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
     "WTF_CSRF_ENABLED": False,
   })
-
-  client = app.test_client()
   
   cleanup_test_db()
 
-  yield client
+  yield app
   
   cleanup_test_db()
 
+
 @pytest.fixture
-def test_user():
-  db = get_db_connection()
+def client(app):
+  return app.test_client()
+
+@pytest.fixture
+def test_user(app):
+  user = {
+    "id": "00000000-0000-0000-0000-000000000001",
+    "email": "test@example.com",
+    "display_name": "Test User",
+  }
   
-  test_user_id = "00000000-0000-0000-0000-000000000001"
+  with app.app_context():
+    db = get_db_connection()
+  
+    db.execute(
+      """
+      INSERT INTO auth.users (id)
+      VALUES (%s)
+      ON CONFLICT (id) DO NOTHING
+      """,
+      (user["id"],)
+    )
+    
+    db.execute(
+      """
+      INSERT INTO profiles (id, display_name)
+      VALUES (%s, %s)
+      ON CONFLICT (id) DO NOTHING
+      """
+      (user["id"], user["display_name"])
+    )
+    
+    db.commit()
+    db.close()
+  
+ 
+  return user
   
   
 @pytest.fixture
-def auth_client(client):
+def auth_client(client, test_user):
   with client.session_transaction() as session:
-    session["user_id"] = "00000000-0000-0000-0000-000000000001"
-    session["email"] = "test@example.com"
+    session["user_id"] = test_user["id"] 
+    session["email"] = test_user["email"]
     
   return client
 

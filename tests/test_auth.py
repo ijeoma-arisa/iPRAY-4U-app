@@ -1,7 +1,9 @@
 from .helpers.assertions import assert_success_response
 from ipray4u.utils.success_messages import get_success
 from .helpers.fixtures import (
-    client, 
+    app,
+    client,
+    test_user, 
     auth_client, 
     auth_form_data, 
     mock_supabase, 

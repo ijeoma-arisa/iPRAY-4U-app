@@ -123,6 +123,7 @@ FROM relationships
 WHERE relationship = %s    
 """
 
+
 # INSERT QUERIES
 INSERT_RELATIONSHIP_ROWS = """
 INSERT INTO relationships (relationship) 
@@ -147,6 +148,7 @@ INSERT INTO prayers (person_id, prayer, has_prayed)
 VALUES (%s, %s, %s)
 RETURNING *
 """
+
 
 # UPDATE Queries
 UPDATE_PERSON_NAME_QUERY = """
