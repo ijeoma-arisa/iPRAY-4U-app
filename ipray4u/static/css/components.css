@@ -310,3 +310,42 @@ label {
 .confirm-delete-button:hover {
   background-color: var(--darker-red);
 }
+
+.flash-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.flash-message {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  border: 1px solid;
+}
+
+.flash-success {
+  background: #ecfdf3;
+  border-color: #abefc6;
+  color: #067647;
+}
+
+.flash-error {
+  background: #fef3f2;
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.flash-info {
+  background: var(--primary-soft);
+  border-color: var(--primary-border);
+  color: var(--darker-purple);
+}
+
+.flash-warning {
+  background: #fffaeb;
+  border-color: #fedf89;
+  color: #93370d;
+}

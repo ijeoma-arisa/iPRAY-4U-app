@@ -36,10 +36,7 @@ def signup_user():
         }
     )
     
-    flash(
-        'Account created. Check your email to verify your account.', 
-        'success'
-    )
+    flash("Account created. Check your email to verify your account.", "info")
     
     return redirect(url_for("auth.verify_page"))
         

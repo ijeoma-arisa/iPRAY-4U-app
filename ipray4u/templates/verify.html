@@ -1,3 +1,20 @@
 {% extends "base.html" %}
 
 {% block title %}Verify Account{% endblock %}
+
+{% block content %}
+<main class="auth-page">
+  <section class="auth-card">
+    <div class="form-title">
+      <h1>Verify Your Account</h1>
+      <p class="page-subtitle">
+        Check your email for a verification link before logging in.
+      </p>
+    </div>
+
+    <a class="btn save-button" href="{{ url_for('auth.login_page') }}">
+      Back to Log In
+    </a>
+  </section>
+</main>
+{% endblock %}

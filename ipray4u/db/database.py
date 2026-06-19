@@ -13,6 +13,8 @@ def init_db():
     row_factory=psycopg.rows.dict_row
   ) as conn:
     
+    
+    
     with conn.cursor() as cursor:
       # Create tables
       cursor.execute(schema.CREATE_RELATIONSHIPS_TABLE)
@@ -32,6 +34,7 @@ def init_db():
       # Insert relationship values
       relationship_values = [(r.value,) for r in Relationship]
       cursor.executemany(schema.INSERT_RELATIONSHIP_ROWS, relationship_values)
+      
     
 def get_db_connection():
   if "db" not in g:
