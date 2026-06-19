@@ -68,6 +68,7 @@ def test_login_with_valid_credentials_sets_session_and_redirects(
 def test_login_with_invalid_credentials_redirects_to_login_and_does_not_set_session(
     client, 
     auth_form_data,
+    test_user,
     mock_supabase,
     mocker,
     ):

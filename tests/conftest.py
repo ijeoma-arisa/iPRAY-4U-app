@@ -114,9 +114,9 @@ def sample_prayer(auth_client, sample_person):
   return prayers[0]
 
 @pytest.fixture
-def auth_form_data():
+def auth_form_data(test_user):
   return {
-    "email": "test@example.com",
+    "email": test_user["email"],
     "password": "test-password",
   }
   

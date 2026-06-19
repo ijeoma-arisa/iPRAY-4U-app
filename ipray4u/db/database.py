@@ -13,8 +13,6 @@ def init_db():
     row_factory=psycopg.rows.dict_row
   ) as conn:
     
-    
-    
     with conn.cursor() as cursor:
       # Create tables
       cursor.execute(schema.CREATE_RELATIONSHIPS_TABLE)

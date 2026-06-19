@@ -10,6 +10,7 @@ from flask import (
 )
 from supabase_auth.errors import AuthApiError
 from ipray4u.supabase_client import get_supabase
+from ipray4u.db.profiles import ensure_profile_exists
 
 
 auth_blueprint = Blueprint("auth", __name__)
@@ -48,19 +49,21 @@ def login_page():
 def login_user():
     supabase = get_supabase()
     
-    email = request.form.get("email")
-    password = request.form.get("password")
-    
     try:
         response = supabase.auth.sign_in_with_password(
             {
-                "email": email,
-                "password": password,
+                "email": request.form.get("email"),
+                "password": request.form.get("password"),
             }
         )
         
-        session["user_id"] = response.user.id
-        session["email"] = response.user.email
+        user_id = response.user.id
+        email = response.user.email
+        
+        ensure_profile_exists(user_id)
+        
+        session["user_id"] = user_id
+        session["email"] = email
         
         flash("Welcome back!", "success")
         return redirect(url_for("pages.prayer_requests_page"))
