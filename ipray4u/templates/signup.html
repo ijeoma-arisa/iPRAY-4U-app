@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<main class="auth-page">
+  <section class="auth-card">
+    <form method="POST" action="{{ url_for('auth.signup_user') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-title">
+        <h1>Sign Up</h1>
+        <p class="page-subtitle">Create an account to save your prayer requests</p>
+      </div>
+      
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <p class="flash-message flash-{{ category }}">
+                {{ message }}
+              </p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
+      <div class="form-data">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+
+      <button type="submit" class="btn save-button">Sign Up</button>
+
+      <p class="auth-footer">
+        Already have an account?
+        <a href="{{ url_for('auth.login_page') }}">Log in</a>
+      </p>
+    </form>
+  </section>
+</main>
+{% endblock %}

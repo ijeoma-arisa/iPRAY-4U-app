@@ -3,6 +3,7 @@ import { renderPersonCards } from './person-cards.js';
 import { renderRelationshipButtons, initRelationshipButtonsRowListener } from './relationships.js';
 import { GET_PEOPLE_URL } from './api/endpoints.js';
 import { buildPeopleApiUrl } from './utils.js';
+import { fetchWithCsrf } from './api/client.js';
 
 
 function displayTime(){
@@ -88,7 +89,7 @@ function initPrayerEventListeners({ onSuccess }) {
         body: JSON.stringify(data)
       };
       
-      const response = await fetch(prayerRoute, options);
+      const response = await fetchWithCsrf(prayerRoute, options);
       const { status, message } = await response.json();
       if (status === 'success') {
         const url = `${GET_PEOPLE_URL}${window.location.search}`;

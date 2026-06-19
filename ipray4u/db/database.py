@@ -1,7 +1,7 @@
 import os
 import psycopg
 from flask import g, current_app
-from . import schema_postgres
+from . import schema
 from ..models import Relationship
 from dotenv import load_dotenv
 
@@ -15,17 +15,24 @@ def init_db():
     
     with conn.cursor() as cursor:
       # Create tables
-      cursor.execute(schema_postgres.CREATE_RELATIONSHIPS_TABLE)
-      cursor.execute(schema_postgres.CREATE_PEOPLE_TABLE)
-      cursor.execute(schema_postgres.CREATE_PRAYERS_TABLE)
+      cursor.execute(schema.CREATE_RELATIONSHIPS_TABLE)
+      
+      if current_app.config["TESTING"]:
+        cursor.execute(schema.CREATE_AUTH_SCHEMA_FOR_TESTS)
+      
+      cursor.execute(schema.CREATE_PROFILES_TABLE)
+      cursor.execute(schema.CREATE_PEOPLE_TABLE)
+      cursor.execute(schema.CREATE_PRAYERS_TABLE)
       
       # Create indexes
-      cursor.execute(schema_postgres.CREATE_INDEX_ON_PEOPLE_RELATIONSHIP)
-      cursor.execute(schema_postgres.CREATE_INDEX_ON_PRAYERS_PERSON)
+      cursor.execute(schema.CREATE_INDEX_ON_PEOPLE_USER_ID)
+      cursor.execute(schema.CREATE_INDEX_ON_PEOPLE_RELATIONSHIP)
+      cursor.execute(schema.CREATE_INDEX_ON_PRAYERS_PERSON)
       
       # Insert relationship values
       relationship_values = [(r.value,) for r in Relationship]
-      cursor.executemany(schema_postgres.INSERT_RELATIONSHIP_ROWS, relationship_values)
+      cursor.executemany(schema.INSERT_RELATIONSHIP_ROWS, relationship_values)
+      
     
 def get_db_connection():
   if "db" not in g:
@@ -36,12 +43,20 @@ def get_db_connection():
   return g.db
  
 def cleanup_test_db():
-  with psycopg.connect(
-    os.environ["TEST_DATABASE_URL"]
-  ) as conn:
-    
+  test_db = os.environ["TEST_DATABASE_URL"]
+  prod_db = os.environ.get("DATABASE_URL")
+  
+  assert test_db != prod_db, (
+    "TEST_DATABASE_URL must not point to the same database as DATABASE_URL."
+  )
+
+  with psycopg.connect(test_db) as conn:
     with conn.cursor() as cursor:
       cursor.execute("""
-        TRUNCATE TABLE prayers, people
+        TRUNCATE TABLE 
+          prayers, 
+          people, 
+          profiles,
+          auth.users
         RESTART IDENTITY CASCADE;
-        """)
+      """)

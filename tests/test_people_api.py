@@ -6,15 +6,12 @@ from .helpers.assertions import (
     assert_valid_delete_response,
     assert_person_data, 
 )
-from .helpers.fixtures import client
-from .helpers.sample_data import (
-    generate_person_json, 
-    update_existing_json_fields  
-)
+from .helpers.sample_data import generate_person_json, update_existing_json_fields
 from .helpers.urls import PEOPLE_URL
 
 from ipray4u.utils.error_messages import (
   VALIDATION_FAILED_ERROR,
+  AUTHENTICATION_REQUIRED_ERROR,
   required_error,
   string_error,
   valid_relationship_error,
@@ -28,7 +25,18 @@ from ipray4u.utils.success_messages import (
 )
 
 # POST endpoint
-def test_add_person_valid(client):
+def test_add_person_requires_auth(client):
+  person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+  
+  response = client.post(PEOPLE_URL, json=person)
+  
+  assert_error_response(
+    response,
+    expected_message=AUTHENTICATION_REQUIRED_ERROR,
+    expected_status=401
+  )
+
+def test_add_person_valid(auth_client):
   people = [
     generate_person_json("Bob", Relationship.FRIENDS.value, "Strength"),
     generate_person_json("Sarah",  Relationship.FAMILY.value, "Peace"),
@@ -36,7 +44,7 @@ def test_add_person_valid(client):
   ]
     
   for person in people:
-    response = client.post(PEOPLE_URL, json=person)
+    response = auth_client.post(PEOPLE_URL, json=person)
     
     person_data = assert_success_response(
       response, 
@@ -46,14 +54,14 @@ def test_add_person_valid(client):
     
     assert_person_data(person_data, person)
    
-def test_add_person_missing_name(client):
+def test_add_person_missing_name(auth_client):
   person = generate_person_json(
     name=None, 
     relationship=Relationship.FRIENDS.value, 
     prayer="Forgiveness"
   )
 
-  response = client.post(PEOPLE_URL, json=person)
+  response = auth_client.post(PEOPLE_URL, json=person)
   
   assert_error_response(
     response,
@@ -61,14 +69,14 @@ def test_add_person_missing_name(client):
     expected_errors={required_error("name")}
   )
   
-def test_add_person_missing_relationship(client):
+def test_add_person_missing_relationship(auth_client):
   person = generate_person_json(
     name="Bob", 
     relationship=None, 
     prayer="Forgiveness"
   )
 
-  response = client.post(PEOPLE_URL, json=person)
+  response = auth_client.post(PEOPLE_URL, json=person)
   
   assert_error_response(
     response,
@@ -76,14 +84,14 @@ def test_add_person_missing_relationship(client):
     expected_errors={required_error("relationship")}
   )
   
-def test_add_person_missing_prayer(client):
+def test_add_person_missing_prayer(auth_client):
   person = generate_person_json(
     name="Bob", 
     relationship=Relationship.FRIENDS.value, 
     prayer=None
   )
 
-  response = client.post(PEOPLE_URL, json=person)
+  response = auth_client.post(PEOPLE_URL, json=person)
   
   assert_error_response(
     response,
@@ -91,14 +99,14 @@ def test_add_person_missing_prayer(client):
     expected_errors={required_error("prayer")}
   )
 
-def test_add_person_missing_all_fields(client):
+def test_add_person_missing_all_fields(auth_client):
   person = generate_person_json(
     name=None,
     relationship=None,
     prayer=None
   )
   
-  response = client.post(PEOPLE_URL, json=person)
+  response = auth_client.post(PEOPLE_URL, json=person)
   
   required_field_errors = required_error(["name", "relationship", "prayer"])
     
@@ -108,14 +116,14 @@ def test_add_person_missing_all_fields(client):
     expected_errors=set(required_field_errors),
   )
 
-def test_add_person_invalid_name(client):
+def test_add_person_invalid_name(auth_client):
   person = generate_person_json(
     name=123,
     relationship=Relationship.FRIENDS.value,
     prayer="Forgiveness"
   )
 
-  response = client.post(PEOPLE_URL, json=person)
+  response = auth_client.post(PEOPLE_URL, json=person)
 
   assert_error_response(
     response,
@@ -123,14 +131,14 @@ def test_add_person_invalid_name(client):
     expected_errors={string_error("name")}
   )
 
-def test_add_person_invalid_prayer(client):
+def test_add_person_invalid_prayer(auth_client):
   person = generate_person_json(
     name="Bob",
     relationship=Relationship.FRIENDS.value,
     prayer=123
   )
 
-  response = client.post(PEOPLE_URL, json=person)
+  response = auth_client.post(PEOPLE_URL, json=person)
 
   assert_error_response(
     response,
@@ -138,14 +146,14 @@ def test_add_person_invalid_prayer(client):
     expected_errors={string_error("prayer")}
   )
 
-def test_add_person_invablid_relationship(client):
+def test_add_person_invablid_relationship(auth_client):
   person = generate_person_json(
     name="Bob",
     relationship="Stranger",
     prayer="Forgiveness"
   )
 
-  response = client.post(PEOPLE_URL, json=person)
+  response = auth_client.post(PEOPLE_URL, json=person)
 
   assert_error_response(
     response,
@@ -154,7 +162,16 @@ def test_add_person_invablid_relationship(client):
   )
 
 # GET endpoint
-def test_get_people_no_filter(client):
+def test_get_people_requires_auth(client):
+  response = client.get(PEOPLE_URL)
+  
+  assert_error_response(
+    response,
+    expected_message=AUTHENTICATION_REQUIRED_ERROR,
+    expected_status=401
+  )
+  
+def test_get_people_no_filter(auth_client):
   people = [
     generate_person_json("Bob", Relationship.FRIENDS.value, "Strength"),
     generate_person_json("Sarah",  Relationship.FAMILY.value, "Peace"),
@@ -162,9 +179,9 @@ def test_get_people_no_filter(client):
   ]
     
   for person in people:
-    client.post(PEOPLE_URL, json=person)
+    auth_client.post(PEOPLE_URL, json=person)
  
-  response = client.get(PEOPLE_URL)
+  response = auth_client.get(PEOPLE_URL)
   
   data = assert_success_response(
     response, 
@@ -175,7 +192,7 @@ def test_get_people_no_filter(client):
   assert isinstance(data, list)
   assert len(data) == 3
   
-def test_get_people_with_relationship_filter(client):
+def test_get_people_with_relationship_filter(auth_client):
   people = [
     generate_person_json("Bob", Relationship.FRIENDS.value, "Strength"),
     generate_person_json("Sarah",  Relationship.FAMILY.value, "Peace"),
@@ -183,10 +200,10 @@ def test_get_people_with_relationship_filter(client):
   ]
 
   for person in people:
-    client.post(PEOPLE_URL, json=person)
+    auth_client.post(PEOPLE_URL, json=person)
     
     relationship_url = f"{PEOPLE_URL}?rel={person["relationship"]}"
-    response = client.get(relationship_url)    
+    response = auth_client.get(relationship_url)    
     
     data = assert_success_response(
       response, 
@@ -197,13 +214,13 @@ def test_get_people_with_relationship_filter(client):
     assert isinstance(data, list)
     assert len(data) == 1
     
-def test_get_person_valid(client):
+def test_get_person_valid(auth_client):
   person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
 
-  client.post(PEOPLE_URL, json=person)
+  auth_client.post(PEOPLE_URL, json=person)
     
   person_url = f"{PEOPLE_URL}/1"
-  response = client.get(person_url) 
+  response = auth_client.get(person_url) 
   
   person_data = assert_success_response(
     response, 
@@ -212,9 +229,9 @@ def test_get_person_valid(client):
   
   assert_person_data(person_data, person)
   
-def test_get_person_invalid(client):
+def test_get_person_invalid(auth_client):
   invalid_person_url = f"{PEOPLE_URL}/2"
-  response = client.get(invalid_person_url)
+  response = auth_client.get(invalid_person_url)
   
   assert_error_response(
     response,
@@ -223,9 +240,9 @@ def test_get_person_invalid(client):
   )
   
   person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
-  client.post(PEOPLE_URL, json=person)
+  auth_client.post(PEOPLE_URL, json=person)
     
-  response = client.get(invalid_person_url)
+  response = auth_client.get(invalid_person_url)
   assert_error_response(
     response,
     expected_message=not_found_error("Person"),
@@ -233,14 +250,31 @@ def test_get_person_invalid(client):
   )
   
 # PATCH endpoint
-def test_update_person_valid_name_only(client):
+def test_update_person_requires_auth(client, sample_person):
+  person_id = sample_person["id"]
+  person_url = f"{PEOPLE_URL}/{person_id}"
+  
+  with client.session_transaction() as session:
+    session.clear()
+  
+  updated_name_json = {"name": "Sarah"}
+  update_existing_json_fields(updated_name_json, sample_person)
+  response = client.patch(person_url, json=updated_name_json)
+    
+  assert_error_response(
+    response,
+    expected_message=AUTHENTICATION_REQUIRED_ERROR,
+    expected_status=401
+  )
+  
+def test_update_person_valid_name_only(auth_client):
   person = generate_person_json("Sarah", Relationship.FAMILY.value, "Peace")
-  client.post(PEOPLE_URL, json=person)
+  auth_client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"
   
   updated_name_json = update_existing_json_fields({"name": "Julia"}, person)
-  response = client.patch(person_url, json=updated_name_json)
+  response = auth_client.patch(person_url, json=updated_name_json)
   
   person_data = assert_success_response(
     response, 
@@ -249,9 +283,9 @@ def test_update_person_valid_name_only(client):
   
   assert_person_data(person_data, person)
 
-def test_update_person_valid_relationship_only(client):
+def test_update_person_valid_relationship_only(auth_client):
   person = generate_person_json("Sarah", Relationship.FAMILY.value, "Peace")
-  client.post(PEOPLE_URL, json=person)
+  auth_client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"
   
@@ -260,7 +294,7 @@ def test_update_person_valid_relationship_only(client):
     person
   )
   
-  response = client.patch(person_url, json=updated_relationship_json)
+  response = auth_client.patch(person_url, json=updated_relationship_json)
   
   person_data = assert_success_response(
     response, 
@@ -269,9 +303,9 @@ def test_update_person_valid_relationship_only(client):
   
   assert_person_data(person_data, person)
 
-def test_update_person_valid_all_fields(client):
+def test_update_person_valid_all_fields(auth_client):
   person = generate_person_json("Sarah", Relationship.FAMILY.value, "Peace")
-  client.post(PEOPLE_URL, json=person)
+  auth_client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"
   
@@ -279,7 +313,7 @@ def test_update_person_valid_all_fields(client):
     {"name": "Mary", "relationship": Relationship.KNOWN.value},
     person
   )
-  response = client.patch(person_url, json=updated_name_and_relationship_json)
+  response = auth_client.patch(person_url, json=updated_name_and_relationship_json)
 
   person_data = assert_success_response(
     response, 
@@ -288,13 +322,13 @@ def test_update_person_valid_all_fields(client):
   
   assert_person_data(person_data, person)
 
-def test_update_person_missing_all_fields(client):
+def test_update_person_missing_all_fields(auth_client):
   person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
-  client.post(PEOPLE_URL, json=person)
+  auth_client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"
   
-  response = client.patch(person_url, json={})
+  response = auth_client.patch(person_url, json={})
   
   assert_error_response(
     response,
@@ -302,7 +336,7 @@ def test_update_person_missing_all_fields(client):
     expected_errors=set(required_error(["name", "relationship"]))
   )
   
-  get_response = client.get(person_url)
+  get_response = auth_client.get(person_url)
   person_data = assert_success_response(
     get_response,
     expected_message=get_success("Person")
@@ -312,18 +346,33 @@ def test_update_person_missing_all_fields(client):
   
 
 # DELETE endpoint
-def test_delete_person_valid(client):
+def test_delete_person_requires_auth(client, sample_person):
+  person_id = sample_person["id"]
+  person_url = f"{PEOPLE_URL}/{person_id}"
+  
+  with client.session_transaction() as session:
+    session.clear()
+  
+  response = client.delete(person_url)
+  
+  assert_error_response(
+    response,
+    expected_message=AUTHENTICATION_REQUIRED_ERROR,
+    expected_status=401
+  )
+  
+def test_delete_person_valid(auth_client):
   person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
-  client.post(PEOPLE_URL, json=person)
+  auth_client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"
-  response = client.delete(person_url)
+  response = auth_client.delete(person_url)
 
   assert_valid_delete_response(response)
   
-def test_delete_person_nonexistent_id(client):
+def test_delete_person_nonexistent_id(auth_client):
   person_url = f"{PEOPLE_URL}/1"
-  response = client.delete(person_url)
+  response = auth_client.delete(person_url)
   
   assert_error_response(
     response,
@@ -331,14 +380,14 @@ def test_delete_person_nonexistent_id(client):
     expected_status=404
   )
   
-def test_delete_person_duplicate_request(client):
+def test_delete_person_duplicate_request(auth_client):
   person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
-  client.post(PEOPLE_URL, json=person)
+  auth_client.post(PEOPLE_URL, json=person)
   
   person_url = f"{PEOPLE_URL}/1"
-  client.delete(person_url)
+  auth_client.delete(person_url)
 
-  response = client.delete(person_url)
+  response = auth_client.delete(person_url)
   
   assert_error_response(
     response,

@@ -1,98 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prayer Requests</title>
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+{% extends "base.html" %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/2917e784fa.js" crossorigin="anonymous"></script>
+{% block title %}Prayer Requests{% endblock %}
 
-  </head>
+{% block head %}
+  <script src="https://kit.fontawesome.com/2917e784fa.js" crossorigin="anonymous"></script>
+{% endblock %}
 
-  <body>
-    <div class="prayer-requests-page">
-      <nav class="nav-bar" aria-label="Main navigation">
-        <a class="temp-logo" href="{{ url_for('homepage') }}">
-          <div class="nav-logo">
-              <img src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}">
-              <h3>iPray 4U</h3>
-          </div>
-        </a>
-    
-        <ul class="nav-links">
-          <li class="current-date-js"></li>
-        </ul>
-      </nav>
+{% block content %}
+<div class="prayer-requests-page">
+  <nav class="nav-bar" aria-label="Main navigation">
+    <a class="temp-logo" href="{{ url_for('pages.homepage') }}">
+      <div class="nav-logo">
+          <img src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}">
+          <h3>iPRAY 4U</h3>
+      </div>
+    </a>
 
-      <main>
-        <section class="prayer-requests-panel">
-          <div class="prayer-requests-banner">
-            <div class="prayer-requests-title">
-              <h1>Prayer Requests</h1>
-              <p class="page-subtitle">Keep track of who you're praying for </p>
-            </div>
-          </div>
-          
-          <div class="prayer-requests-controls">
-            <button class="btn add-prayer-button add-prayer-button-js">Add New Prayer Request</button>
-            <div class="relationship-buttons-row relationship-buttons-row-js"></div>
-          </div>
+    <ul class="nav-links">
+      <li class="current-date current-date-js"></li>
 
-          <div class="person-cards person-cards-js"></div>
-        </section>
-      </main>
+      <li class="logout">
+        <form action="{{ url_for('auth.logout_user') }}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn logout-button">Log out</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
 
-      <dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
-      <dialog class="modal modal-js delete-item-modal-js">
-        <button class="close-button close-modal-js" aria-label="Close">&times;</button>
-        <h2 class="form-title delete-title-js"></h2>
-        <div>Are you sure you want to delete this <span class="item-to-delete-type"></span>?</div>
-        <div class="item-to-delete"></div>
-        <div>
-          <button class="btn confirm-delete-button confirm-delete-button-js">Delete</button>
-          <button class="btn close-modal-js deny-delete-button deny-delete-button-js">Cancel</button>
+  <main>
+    <section class="prayer-requests-panel">
+      <div class="prayer-requests-banner">
+        <div class="prayer-requests-title">
+          <h1>Prayer Requests</h1>
+          <p class="page-subtitle">Keep track of who you're praying for </p>
         </div>
-      </dialog>
-      <dialog class="modal modal-js edit-prayer-modal edit-prayer-modal-js">
-        <button class="close-button close-modal-js" aria-label="Close">&times;</button>
-        <form class="edit-prayer-form modal-form-js edit-prayer-form-js" method="POST">
-          <h2 class="form-title">Edit Prayer</h2>
-          <div class="form-data">
-            <label for="prayer">Prayer Request</label>
-            <textarea id="prayer" name="prayer" placeholder="Enter prayer here" rows="5" cols="20" required></textarea>
+      </div>
+      
+      <div class="prayer-requests-controls">
+        <button class="btn add-prayer-button add-prayer-button-js">Add New Prayer Request</button>
+        <div class="relationship-buttons-row relationship-buttons-row-js"></div>
+      </div>
 
-            <div class="checkbox-row">
-              <input id="has-prayed" name="has-prayed" type="checkbox" value="Prayed" />
-              <label for="has-prayed">Prayed</label>
-            </div>
-          </div>
-          <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
-        </form>
-      </dialog>
-      <dialog class="modal modal-js edit-person-modal edit-person-modal-js">
-        <button class="close-button close-modal-js" aria-label="Close">&times;</button>
-        <form class="edit-person-form modal-form-js edit-person-form-js" method="POST">
-          <h2 class="form-title">Edit Person</h2>
-          <div class="form-data">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" placeholder="Name" required/>
-          </div>
-          <div class="form-data">
-            <label for="relationship">Relationship</label> 
-            <select id="relationship" name="relationship" class="relationship-dropdown-js" required>
-            </select>
-          </div>
-          <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
-        </form>
-      </dialog>
+      <div class="person-cards person-cards-js"></div>
+    </section>
+  </main>
+
+  <dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
+  <dialog class="modal modal-js delete-item-modal-js">
+    <button class="close-button close-modal-js" aria-label="Close">&times;</button>
+    <h2 class="form-title delete-title-js"></h2>
+    <div>Are you sure you want to delete this <span class="item-to-delete-type"></span>?</div>
+    <div class="item-to-delete"></div>
+    <div>
+      <button class="btn confirm-delete-button confirm-delete-button-js">Delete</button>
+      <button class="btn close-modal-js deny-delete-button deny-delete-button-js">Cancel</button>
     </div>
-    <script type="module" src="{{ url_for('static', filename='js/prayer-requests.js') }}"></script>
-  </body>
-</html>
+  </dialog>
+  <dialog class="modal modal-js edit-prayer-modal edit-prayer-modal-js">
+    <button class="close-button close-modal-js" aria-label="Close">&times;</button>
+    <form class="edit-prayer-form modal-form-js edit-prayer-form-js" method="POST">
+      <h2 class="form-title">Edit Prayer</h2>
+      <div class="form-data">
+        <label for="prayer">Prayer Request</label>
+        <textarea id="prayer" name="prayer" placeholder="Enter prayer here" rows="5" cols="20" required></textarea>
+
+        <div class="checkbox-row">
+          <input id="has-prayed" name="has-prayed" type="checkbox" value="Prayed" />
+          <label for="has-prayed">Prayed</label>
+        </div>
+      </div>
+      <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
+    </form>
+  </dialog>
+  <dialog class="modal modal-js edit-person-modal edit-person-modal-js">
+    <button class="close-button close-modal-js" aria-label="Close">&times;</button>
+    <form class="edit-person-form modal-form-js edit-person-form-js" method="POST">
+      <h2 class="form-title">Edit Person</h2>
+      <div class="form-data">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Name" required/>
+      </div>
+      <div class="form-data">
+        <label for="relationship">Relationship</label> 
+        <select id="relationship" name="relationship" class="relationship-dropdown-js" required>
+        </select>
+      </div>
+      <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
+    </form>
+  </dialog>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script type="module" src="{{ url_for('static', filename='js/prayer-requests.js') }}"></script>
+{% endblock %}

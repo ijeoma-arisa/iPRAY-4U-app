@@ -44,6 +44,7 @@ jobs:
       - name: Run tests
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/prayer_test
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: pytest
 
 

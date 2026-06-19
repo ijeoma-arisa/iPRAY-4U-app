@@ -4,7 +4,7 @@
   cursor: pointer;
   padding: 0.7rem; 
   border-radius: 6px;
-  border: none;
+  border: 1px solid transparent;
   font-weight: bold;
   transition: all 0.3s ease;
   color: white;
@@ -14,6 +14,27 @@
 .btn:hover {
   transform: scale(1.05);
 }
+
+.btn-outline {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+  box-shadow: 0 2px 6px rgba(69, 43, 111, 0.08);
+
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.btn-outline:hover {
+  background: #f3ecfb;
+  color: var(--darker-purple);
+  border-color: var(--primary);
+}
+
 .add-prayer-button, .save-button {
   background-color: var(--primary);
 }
@@ -64,6 +85,12 @@
   color:red;
 }
 
+
+.launch-actions .btn {
+  width: 100%;
+  padding: 0.9rem;
+  font-size: 1.05rem;
+}
 
 form {
   display: flex;
@@ -170,6 +197,14 @@ label {
   align-items: center;
   color: var(--text-main);
   background-color: var(--surface);
+  transition: transform 180ms ease,
+              box-shadow 180ms ease;
+}
+
+.temp-logo:hover .nav-logo {
+  transform: translateY(-2px);
+
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
 }
 
 .nav-logo img {
@@ -182,9 +217,33 @@ label {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   margin: 0;
   padding: 0;
+}
+
+.current-date {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.logout form {
+  margin: 0;
+}
+
+.logout-button {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .relationship-buttons-row {
@@ -309,4 +368,43 @@ label {
 .delete-prayer-button:hover,
 .confirm-delete-button:hover {
   background-color: var(--darker-red);
+}
+
+.flash-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.flash-message {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  border: 1px solid;
+}
+
+.flash-success {
+  background: #ecfdf3;
+  border-color: #abefc6;
+  color: #067647;
+}
+
+.flash-error {
+  background: #fef3f2;
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.flash-info {
+  background: var(--primary-soft);
+  border-color: var(--primary-border);
+  color: var(--darker-purple);
+}
+
+.flash-warning {
+  background: #fffaeb;
+  border-color: #fedf89;
+  color: #93370d;
 }

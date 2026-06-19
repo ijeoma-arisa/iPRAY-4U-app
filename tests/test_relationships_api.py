@@ -1,5 +1,4 @@
 from ipray4u.models import Relationship
-from .helpers.fixtures import client
 from .helpers.assertions import (
   assert_success_response, 
   assert_relationship_data,
