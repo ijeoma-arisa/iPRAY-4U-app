@@ -1,5 +1,6 @@
 import { GET_PEOPLE_URL } from './api/endpoints.js';
 import { renderRelationshipDropdown } from './relationships.js';
+import { fetchWithCsrf } from './api/client.js';
 
 function renderPrayerRequestModal() {
   document.querySelector('.add-prayer-request-modal-js').innerHTML = 
@@ -78,7 +79,7 @@ async function handlePrayerRequestInput({ onSuccess }){
         `${GET_PEOPLE_URL}/${prayerRequestForm.dataset.personId}/prayers`:
         GET_PEOPLE_URL
         
-    const response = await fetch(prayerRoute, options);
+    const response = await fetchWithCsrf(prayerRoute, options);
     const { status, message } = await response.json();
 
     if (status === 'success') {
@@ -110,7 +111,7 @@ function initDeleteModalListeners({ onSuccess }){
       const itemId = deleteItemModal.dataset.itemId;
       const item = document.getElementById(itemId);
       
-      await fetch(route, {method: "DELETE"});
+      await fetchWithCsrf(route, {method: "DELETE"});
       item?.remove();
 
       const url = `${GET_PEOPLE_URL}${window.location.search}`;
@@ -174,7 +175,7 @@ async function handleEditPrayerInput({ onSuccess }){
     const prayerId = editPrayerForm.dataset.prayerId;
     const prayerRoute = `${GET_PEOPLE_URL}/${personId}/prayers/${prayerId}`;
 
-    const response = await fetch(prayerRoute, options);
+    const response = await fetchWithCsrf(prayerRoute, options);
     const { status, message } = await response.json();
 
     if (status === 'success') {
@@ -241,7 +242,7 @@ async function handleEditPersonInput({ onSuccess }){
 
     const personRoute = `${GET_PEOPLE_URL}/${personId}`;
 
-    const response = await fetch(personRoute, options);
+    const response = await fetchWithCsrf(personRoute, options);
     const { status, message } = await response.json();
 
     if (status === 'success') {
