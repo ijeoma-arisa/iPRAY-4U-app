@@ -1,61 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iPray 4U | Home</title>
-  
+{% extends "base.html" %}
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+{% block title %}Home{% endblock %}
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+{% block content %}
+<main class="homepage">
+  <section class="homepage-phone-card">
+    
+    <div class="homepage-content">
+      <div class="homepage-title-banner">
+        <h1>iPRAY 4U</h1>
+        
+        <p class="homepage-subtitle">
+          Keep track of prayer requests and who you're praying for
+        </p>
+      </div>
 
-</head>
-<body>
-  <main class="homepage">
-    <section class="homepage-phone-card">
-      
-      <div class="homepage-content">
-        <div class="homepage-title-banner">
-          <h1>iPray 4U</h1>
-          
-          <p class="homepage-subtitle">
-            Keep track of prayer requests and who you're praying for
-          </p>
-        </div>
+      <div class="homepage-image-card">
+        <img 
+          src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}" 
+          alt="Phone with a heart on the screen and text messages alongside it"
+          class="homepage-image"
+        >
 
-        <div class="homepage-image-card">
-          <img 
-            src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}" 
-            alt="Phone with a heart on the screen and text messages alongside it"
-            class="homepage-image"
-          >
-
-          <div class="homepage-image-caption">
-            <a href="http://www.freepik.com">Designed by studiogstock / Freepik</a>
-          </div>
-        </div>
-
-        <div class="homepage-buttons-banner">
-          <button class="btn add-prayer-button add-prayer-button-js">
-            Add Prayer Request
-          </button>
-
-          <a class="btn view-button" href="{{ url_for('pages.prayer_requests_page') }}">
-            View Prayer Requests
-          </a>
+        <div class="homepage-image-caption">
+          <a href="http://www.freepik.com">Designed by studiogstock / Freepik</a>
         </div>
       </div>
 
-    </section>
-  </main>
-  <dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
+      <div class="homepage-buttons-banner">
+        <button class="btn add-prayer-button add-prayer-button-js">
+          Add Prayer Request
+        </button>
+
+        <a class="btn view-button" href="{{ url_for('pages.prayer_requests_page') }}">
+          View Prayer Requests
+        </a>
+      </div>
+    </div>
+
+  </section>
+</main>
+<dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
+{% endblock %}
+
+{% block scripts %}
   <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
-</body>
-</html>
-
-
+{% endblock %}

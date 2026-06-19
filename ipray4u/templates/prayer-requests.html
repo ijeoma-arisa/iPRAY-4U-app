@@ -12,13 +12,13 @@
     <a class="temp-logo" href="{{ url_for('pages.homepage') }}">
       <div class="nav-logo">
           <img src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}">
-          <h3>iPray 4U</h3>
+          <h3>iPRAY 4U</h3>
       </div>
     </a>
 
     <ul class="nav-links">
       <li class="current-date current-date-js"></li>
-      
+
       <li class="logout">
         <form action="{{ url_for('auth.logout_user') }}" method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
