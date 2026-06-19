@@ -6,78 +6,81 @@ main {
 /* Homepage */
 
 .homepage {
+  min-height: 100vh;
   display: flex;
-  color: black;
-  height: 100vh;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: var(--primary);
+
+  padding: 2rem 1rem;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 42%),
+    linear-gradient(180deg, var(--primary), var(--primary-hover));
+
+  color: var(--text-main);
 }
 
-.homepage-content {
+.launch-card {
+  width: min(100%, 430px);
   display: flex;
-  background-color: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-}
+  gap: 1.75rem;
 
-.homepage-phone-card {
-  display: flex;
-  background-color: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-  margin: 0 auto;
-}
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 28px;
+  padding: 2rem 1.5rem;
 
-.homepage-title-banner {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
   text-align: center;
-  gap: 1px;
+  box-shadow: 0 18px 45px rgba(69, 43, 111, 0.28);
 }
 
-.homepage-image-card {
+.launch-logo-placeholder {
+  width: 104px;
+  height: 104px;
+  display: grid;
+  place-items: center;
+
+  background: var(--primary-soft);
+  border: 1px solid var(--primary-border);
+  border-radius: 28px;
+
+  font-size: 3rem;
+}
+
+.launch-copy {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  gap: 0.5rem;
+}
+
+.launch-copy h1 {
+  margin: 0;
+  font-size: 2.6rem;
+  color: var(--text-main);
+}
+
+.launch-tagline {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--darker-purple);
+}
+
+.launch-description {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.launch-actions {
   width: 100%;
-  background-color: rgb(57, 186, 189);
-  margin-bottom: 1rem;
-  border-radius: 0.8rem;
-  gap: 1rem;
-}
-
-.homepage-image {
-  width: 200px;
-}
-
-.homepage-image-caption {
-  color: white;
-  padding: 0.8rem;
-}
-
-.homepage-buttons-banner {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 10px;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+  gap: 0.75rem;
 }
 
-/* Auth Pages */
+
 /* Auth Pages */
 
 .auth-page {

@@ -4,43 +4,36 @@
 
 {% block content %}
 <main class="homepage">
-  <section class="homepage-phone-card">
-    
-    <div class="homepage-content">
-      <div class="homepage-title-banner">
-        <h1>iPRAY 4U</h1>
-        
-        <p class="homepage-subtitle">
-          Keep track of prayer requests and who you're praying for
-        </p>
-      </div>
-
-      <div class="homepage-image-card">
-        <img 
-          src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}" 
-          alt="Phone with a heart on the screen and text messages alongside it"
-          class="homepage-image"
-        >
-
-        <div class="homepage-image-caption">
-          <a href="http://www.freepik.com">Designed by studiogstock / Freepik</a>
-        </div>
-      </div>
-
-      <div class="homepage-buttons-banner">
-        <button class="btn add-prayer-button add-prayer-button-js">
-          Add Prayer Request
-        </button>
-
-        <a class="btn view-button" href="{{ url_for('pages.prayer_requests_page') }}">
-          View Prayer Requests
-        </a>
-      </div>
+  <section class="launch-card">
+    <div class="launch-logo-placeholder" aria-hidden="true">
+      <span>🙏</span>
     </div>
 
+    <div class="launch-copy">
+      <h1>iPRAY 4U</h1>
+
+      <p class="launch-tagline">
+        Prayer requests, organized.
+      </p>
+
+      <p class="launch-description">
+        Keep every request in one place for the people you care about.
+      </p>
+    </div>
+
+    <div class="launch-actions">
+      <button class="btn add-prayer-button add-prayer-button-js">
+        Add Prayer Request
+      </button>
+
+      <a class="btn btn-outline" href="{{ url_for('pages.prayer_requests_page') }}">
+        View Prayer Requests
+      </a>
+    </div>
   </section>
 </main>
-<dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
+
+<dialog class="modal modal-jsd add-prayer-request-modal-js"></dialog>
 {% endblock %}
 
 {% block scripts %}
