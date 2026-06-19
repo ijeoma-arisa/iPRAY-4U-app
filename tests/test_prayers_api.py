@@ -5,15 +5,6 @@ from .helpers.assertions import (
     assert_prayer_data,
     assert_prayers_list,
 )
-from .helpers.fixtures import  (
-    app,
-    client, 
-    test_user,
-    auth_client,
-    sample_person, 
-    sample_prayer,
-)
-
 from .helpers.sample_data import generate_prayer_json, update_existing_json_fields
 from .helpers.urls import get_prayers_url, PRAYERS_URL
 from ipray4u.utils.error_messages import (

@@ -1,74 +1,79 @@
-import pytest
 import os
+import pytest
 from types import SimpleNamespace
+from dotenv import load_dotenv
 
 from ipray4u import create_app
 from ipray4u.db import get_db_connection, cleanup_test_db
-from dotenv import load_dotenv
-
 from ipray4u.models import Relationship 
-from .urls import PEOPLE_URL, get_prayers_url
-from .sample_data import generate_person_json
-from .assertions import assert_success_response
 from ipray4u.utils.success_messages import get_success, post_success
+
+from .helpers.urls import PEOPLE_URL, get_prayers_url
+from .helpers.sample_data import generate_person_json
+from .helpers.assertions import assert_success_response
+
+
+TEST_USER_ID = "00000000-0000-0000-0000-000000000001"
+TEST_USER_EMAIL = "test@example.com"
+TEST_USER_DISPLAY_NAME = "Test User"
 
 load_dotenv()
 
 @pytest.fixture
 def app():
-  app = create_app({
-    "TESTING": True,
-    "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
-    "WTF_CSRF_ENABLED": False,
-  })
-  
-  cleanup_test_db()
+    app = create_app({
+        "TESTING": True,
+        "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
+        "WTF_CSRF_ENABLED": False,
+    })
 
-  yield app
-  
-  cleanup_test_db()
+    cleanup_test_db()
+
+    yield app
+
+    cleanup_test_db()
 
 
 @pytest.fixture
 def client(app):
-  return app.test_client()
+    return app.test_client()
+
 
 @pytest.fixture
 def test_user(app):
-  user = {
-    "id": "00000000-0000-0000-0000-000000000001",
-    "email": "test@example.com",
-    "display_name": "Test User",
-  }
-  
-  with app.app_context():
-    db = get_db_connection()
-  
-    db.execute(
-      """
-      INSERT INTO auth.users (id)
-      VALUES (%s)
-      ON CONFLICT (id) DO NOTHING
-      """,
-      (user["id"],)
-    )
+    user = {
+        "id": TEST_USER_ID,
+        "email": TEST_USER_EMAIL,
+        "display_name": TEST_USER_DISPLAY_NAME,
+    }
+
+    with app.app_context():
+        db = get_db_connection()
+
+        db.execute(
+            """
+            INSERT INTO auth.users (id)
+            VALUES (%s)
+            ON CONFLICT (id) DO NOTHING
+            """,
+        (user["id"],)
+        )
+
+        db.execute(
+            """
+            INSERT INTO profiles (id, display_name)
+            VALUES (%s, %s)
+            ON CONFLICT (id) DO NOTHING
+            """,
+            (user["id"], user["display_name"],)
+        )
     
-    db.execute(
-      """
-      INSERT INTO profiles (id, display_name)
-      VALUES (%s, %s)
-      ON CONFLICT (id) DO NOTHING
-      """,
-      (user["id"], user["display_name"],)
-    )
-    
-    db.commit()
-    db.close()
-  
- 
-  return user
-  
-  
+        db.commit()
+        db.close()
+
+    return user
+
+
 @pytest.fixture
 def auth_client(client, test_user):
   with client.session_transaction() as session:

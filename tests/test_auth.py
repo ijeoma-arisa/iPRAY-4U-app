@@ -1,14 +1,5 @@
 from .helpers.assertions import assert_success_response
 from ipray4u.utils.success_messages import get_success
-from .helpers.fixtures import (
-    app,
-    client,
-    test_user, 
-    auth_client, 
-    auth_form_data, 
-    mock_supabase, 
-    mock_login_response,
-)
 from .helpers.urls import (
     SIGNUP_URL,
     VERIFY_URL,

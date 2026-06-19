@@ -6,13 +6,6 @@ from .helpers.assertions import (
     assert_valid_delete_response,
     assert_person_data, 
 )
-from .helpers.fixtures import (
-  app,
-  client, 
-  test_user,
-  auth_client,
-  sample_person,
-)
 from .helpers.sample_data import generate_person_json, update_existing_json_fields
 from .helpers.urls import PEOPLE_URL
 
