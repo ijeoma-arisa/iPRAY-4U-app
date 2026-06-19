@@ -7,8 +7,8 @@ from .helpers.assertions import (
 )
 from .helpers.fixtures import  (
     app,
-    test_user,
     client, 
+    test_user,
     auth_client,
     sample_person, 
     sample_prayer,

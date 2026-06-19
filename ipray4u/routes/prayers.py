@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, session
 
 from ipray4u.responses import success_json, error_json
 from ipray4u.db import get_db_connection, schema
@@ -24,9 +24,11 @@ def get_prayers():
 @prayers_blueprint.get("/api/people/<int:person_id>/prayers")
 @api_login_required
 def get_prayers_by_person(person_id):
+    user_id = session["user_id"]
+    
     db = get_db_connection()
     
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema.SELECT_PERSON_QUERY, (user_id, person_id,)).fetchone()
     
     if person is None:
       return error_json(not_found_error("Person")), 404
@@ -40,8 +42,10 @@ def get_prayers_by_person(person_id):
 @prayers_blueprint.post("/api/people/<int:person_id>/prayers")
 @api_login_required
 def add_prayer(person_id):
+    user_id = session["user_id"]
+
     db = get_db_connection()
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema.SELECT_PERSON_QUERY, (user_id, person_id,)).fetchone()
     
     if person is None:
       return error_json(not_found_error("Person")), 404
@@ -95,8 +99,10 @@ def update_prayer(person_id, prayer_id):
 @prayers_blueprint.delete("/api/people/<int:person_id>/prayers/<int:prayer_id>")
 @api_login_required
 def delete_prayer(person_id, prayer_id):
+    user_id = session["user_id"]
+
     db = get_db_connection()
-    person = db.execute(schema.SELECT_PERSON_QUERY, (person_id,)).fetchone()
+    person = db.execute(schema.SELECT_PERSON_QUERY, (user_id, person_id,)).fetchone()
     
     if not person:
       return error_json(not_found_error("Person")), 404 
