@@ -12,7 +12,19 @@
         <h1>Sign Up</h1>
         <p class="page-subtitle">Create an account to save your prayer requests</p>
       </div>
-
+      
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <p class="flash-message flash-{{ category }}">
+                {{ message }}
+              </p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
       <div class="form-data">
         <label for="email">Email</label>
         <input type="email" id="email" name="email" required>

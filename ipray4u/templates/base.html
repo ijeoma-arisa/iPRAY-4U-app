@@ -12,18 +12,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  {% block head %}{% endblock %}
+
 </head>
 <body>
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div class="flash-messages">
-        {% for message in messages %}
-          <p>{{ message }}</p>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
   {% block content %}{% endblock %}
+
+  {% block scripts %}{% endblock %}
 </body>
 </html>
