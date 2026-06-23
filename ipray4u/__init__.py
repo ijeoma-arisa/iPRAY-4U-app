@@ -3,6 +3,14 @@ from flask import Flask, g
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from .db import init_db
+from .utils.environment import validate_required_env_vars
+
+REQUIRED_ENV_VARS = [
+  "DATABASE_URL",
+  "SUPABASE_URL",
+  "SUPABASE_PUBLISHABLE_KEY",
+  "SECRET_KEY",
+]
 
 load_dotenv()
 
@@ -10,6 +18,8 @@ csrf = CSRFProtect()
 
 def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
+  
+  validate_required_env_vars(REQUIRED_ENV_VARS)
   
   app.config.from_mapping(
     DATABASE_URL=os.environ.get("DATABASE_URL"),
