@@ -3,14 +3,11 @@ from flask import Flask, g
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from .db import init_db
-from .utils.environment import validate_required_env_vars
-
-REQUIRED_ENV_VARS = [
-  "DATABASE_URL",
-  "SUPABASE_URL",
-  "SUPABASE_PUBLISHABLE_KEY",
-  "SECRET_KEY",
-]
+from .utils.environment import (
+  TEST_REQUIRED_ENV_VARS,
+  PROD_REQUIRED_ENV_VARS,
+  validate_required_env_vars,
+)
 
 load_dotenv()
 
@@ -19,13 +16,14 @@ csrf = CSRFProtect()
 def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
   
-  validate_required_env_vars(REQUIRED_ENV_VARS)
+  required_env_vars = TEST_REQUIRED_ENV_VARS if test_config else PROD_REQUIRED_ENV_VARS
+  validate_required_env_vars(required_env_vars)
   
   app.config.from_mapping(
     DATABASE_URL=os.environ.get("DATABASE_URL"),
     SECRET_KEY=os.environ.get("SECRET_KEY"),
-    SESSION_COOKIE_HTTPONLY=True, # Review how this protects JS from reading cookies
-    SESSION_COOKIE_SECURE=False, # True in production later - HTTPS traffic only for cookies
+    SESSION_COOKIE_HTTPONLY=True, #TODO: Review how this protects JS from reading cookies
+    SESSION_COOKIE_SECURE=False, #TODO: True in production later - HTTPS traffic only for cookies
     SESSION_COOKIE_SAMESITE="Lax",
   )
   
