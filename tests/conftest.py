@@ -118,6 +118,7 @@ def auth_form_data(test_user):
   return {
     "email": test_user["email"],
     "password": "test-password",
+    "confirm-password": "test-password",
   }
   
 @pytest.fixture

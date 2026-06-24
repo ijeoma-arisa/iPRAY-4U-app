@@ -12,6 +12,7 @@ from supabase_auth.errors import AuthApiError
 from ipray4u.supabase_client import get_supabase
 from ipray4u.db.profiles import ensure_profile_exists
 
+MIN_PASSWORD_LENGTH = 8
 
 auth_blueprint = Blueprint("auth", __name__)
 
@@ -27,13 +28,22 @@ def signup_page():
 def signup_user():   
     supabase = get_supabase()
      
-    email = request.form.get("email")
-    password =  request.form.get("password")
+    email = request.form.get("email", "").strip()
+    password = request.form.get("password", "")
+    confirm_password = request.form.get("confirm-password", "")
+    
+    if not password or len(password) < MIN_PASSWORD_LENGTH:
+        flash(f"Password must be at least {MIN_PASSWORD_LENGTH} characters.", "error")
+        return render_template("signup.html", email=email), 400
+    
+    if password != confirm_password:
+        flash("Passwords do not match.", "error")
+        return render_template("signup.html", email=email), 400
     
     supabase.auth.sign_up(
         {
-        "email": email,
-        "password": password,
+            "email": email,
+            "password": password,
         }
     )
     

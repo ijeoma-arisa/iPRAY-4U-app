@@ -26,8 +26,8 @@ def test_signup_with_valid_data_redirects_to_verify_page(
     assert response.headers["Location"] == VERIFY_URL
     
     mock_supabase.auth.sign_up.assert_called_once_with({
-    "email": auth_form_data["email"],
-    "password": auth_form_data["password"],
+        "email": auth_form_data["email"],
+        "password": auth_form_data["password"],
     })
 
     
