@@ -1,62 +1,116 @@
 # iPRAY 4U
-<img width="400" height="600" alt="image" src="https://github.com/user-attachments/assets/dce996cd-693c-468d-ac3c-09503b86c183" />
 
+**Prayer requests, organized.**
+
+🌐 Live App: Coming Soon
+
+<!-- TODO: Replace with updated screenshot before launch post -->
 
 ## About
 *"Can you pray for me?"*
 
-No need to write someone's prayers in your Notes app when you can just use **iPRAY 4U!**
+**iPRAY 4U** helps you keep track of the prayer requests shared by the people in your life. Instead of keeping requests scattered across your Notes app, text messages, or memory, iPRAY 4U keeps every request for the people you care about in one place.
 
-This web app  makes it easy to manage the prayers that others share with you. 
-
-This is an ongoing project, so stay tuned for new features that will be released periodically!
+Organize prayer requests by person, group people by relationship, and stay intentional about praying for family, friends, and more. iPRAY 4U was built to make it easier to faithfully remember and follow through on the prayer requests entrusted to you.
 
 ## Features
-📆 Dec 7, 2025: Add new prayer requests
+- Organize prayer requests by person and relationship
+- Manage people and their prayer requests
+- Track which prayer requests you've already prayed for
+- Access your prayer requests from your own secure account
+
+## Tech Stack
+
+**Frontend:** HTML, CSS, JavaScript
+
+**Backend:** Python, Flask
+
+**Database:** PostgreSQL
+
+**Authentication:** Supabase Auth
+
+**Deployment:** Render
+
+**Testing & CI/CD:** pytest, GitHub Actions
+
+## Screenshots
+
+### Homepage
+<!-- Add screenshot -->
+
+### Prayer Requests Page
+<!--  Add screenshot -->
 
 ## Prerequisites
-* Python 3.9 or later (includes pip)
-* Recommended: Virtual environment (venv is built-in)
+* Python 3.12
+* Recommended: virtual environment
 
 ## Installation
 
-### Clone repository
-```
+### Clone the repository
+
+```bash
 git clone <repository-url>
 
 cd <project-folder>
 ```
 
-### Create virtual environment
-```
+### Create and activate virtual environment
+
+```bash
 python -m venv venv
 ```
 
-### Activate virtual environment
-Windows
-```
+Windows:
+
+```bash
 venv\Scripts\activate
 ```
 
-Mac / OS
-```
-source myvenv/bin/activate
+macOS/Linux:
+
+```bash
+source venv/bin/activate
 ```
 
 ### Install dependencies
-```
+
+```bash
 pip install -r requirements.txt
 ```
 
-## Run the app
+## Environment Variables
+Create a `.env` file in the project root and configure the following variables:
 
-**NOTE: This app currently runs with Flask's development server using** `debug=True`. 
-
-**Do not use it in a production deployment.**
+```env
+DATABASE_URL=
+SECRET_KEY=
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
 ```
-python app.py
+
+## Run Locally
+Start the Flask development server:
+
+```bash
+flask run
 ```
 
+If Flask does not detect the app automatically, run:
 
+```bash
+flask --app wsgi run
+```
 
+The production deployment uses:
 
+```bash
+gunicorn wsgi:app
+```
+
+## Testing
+Run the test suite:
+
+```bash
+pytest
+```
