@@ -7,7 +7,13 @@ from .helpers.urls import (
     LOGOUT_URL, 
     PRAYER_REQUESTS_URL,
 )
+
 # Signup Tests
+# TODO: Add signup validation tests:
+# - password mismatch
+# - password too short
+# - verify sign_up is not called on validation failure
+    
 def test_signup_page_loads(client):
     response = client.get(SIGNUP_URL)
     
@@ -29,9 +35,9 @@ def test_signup_with_valid_data_redirects_to_verify_page(
         "email": auth_form_data["email"],
         "password": auth_form_data["password"],
     })
-
     
-# TODO: Verify Tests
+
+# TODO: Add tests for verify.html / email verification flow
     
 # Login Tests
 def test_login_page_loads(client):
@@ -68,7 +74,6 @@ def test_login_with_valid_credentials_sets_session_and_redirects(
 def test_login_with_invalid_credentials_redirects_to_login_and_does_not_set_session(
     client, 
     auth_form_data,
-    test_user,
     mock_supabase,
     mocker,
     ):
@@ -93,7 +98,7 @@ def test_login_with_unexpected_error_redirects_to_login_and_does_not_set_session
     client,
     auth_form_data,
     mock_supabase,
-):
+    ):
     mock_supabase.auth.sign_in_with_password.side_effect = Exception("Network error")
     
     response = client.post(LOGIN_URL, data=auth_form_data)
@@ -134,4 +139,4 @@ def test_logout_get_method_not_allowed(auth_client):
     
     assert response.status_code == 405
     
-# TODO: CSRF Tests
+# TODO: Add CSRF Tests
