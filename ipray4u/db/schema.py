@@ -87,14 +87,18 @@ WHERE p.user_id = %s AND
 
 # Prayers
 SELECT_ALL_PRAYERS_QUERY = """
-SELECT * 
-FROM prayers
+SELECT pr.*
+FROM prayers AS pr
+JOIN people as p ON pr.person_id = p.id
+WHERE p.user_id = %s
 """
 
 SELECT_ALL_PRAYERS_BY_PERSON_QUERY = """
-SELECT * 
-FROM prayers 
-WHERE person_id = %s
+SELECT pr.* 
+FROM prayers AS pr
+JOIN people as p ON pr.person_id = p.id 
+WHERE p.user_id = %s AND
+      pr.person_id = %s
 """
 
 SELECT_PRAYER_QUERY = """
@@ -177,37 +181,53 @@ RETURNING *
 """
 
 UPDATE_PRAYER_TEXT_QUERY = """
-UPDATE prayers
+UPDATE prayers AS pr
 SET prayer = %s
-WHERE id = %s
-RETURNING *
+FROM people AS p
+WHERE pr.person_id = p.id AND
+      p.user_id = %s AND
+      pr.person_id = %s AND
+      pr.id = %s
+RETURNING pr.*
 """
 
 UPDATE_PRAYER_HAS_PRAYED_QUERY = """
-UPDATE prayers
+UPDATE prayers AS pr
 SET has_prayed = %s
-WHERE id = %s
-RETURNING *
+FROM people AS p
+WHERE pr.person_id = p.id AND
+      p.user_id = %s AND
+      pr.person_id = %s AND
+      pr.id = %s
+RETURNING pr.*
 """
 
 UPDATE_PRAYER_TEXT_AND_HAS_PRAYED_QUERY = """
-UPDATE prayers
+UPDATE prayers AS pr
 SET prayer = %s,
     has_prayed = %s
-WHERE id = %s
-RETURNING *
+FROM people AS p
+WHERE pr.person_id = p.id AND
+      p.user_id = %s AND
+      pr.person_id = %s AND
+      pr.id = %s
+RETURNING pr.*
 """
 
 # DELETE Queries
 DELETE_PERSON_QUERY = """
-DELETE FROM people 
+DELETE FROM people
 WHERE user_id = %s AND
       id = %s
 RETURNING *
 """
 
 DELETE_PRAYER_QUERY = """
-DELETE FROM prayers 
-WHERE id = %s
-RETURNING *
+DELETE FROM prayers AS pr 
+USING people AS p
+WHERE pr.person_id = p.id AND
+      p.user_id = %s AND
+      pr.person_id = %s AND
+      pr.id = %s
+RETURNING pr.*
 """
