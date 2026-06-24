@@ -16,8 +16,10 @@ prayers_blueprint = Blueprint("prayers", __name__)
 @prayers_blueprint.get("/api/prayers")
 @api_login_required
 def get_prayers():
+    user_id = session["user_id"]
+
     db = get_db_connection()
-    prayers = db.execute(schema.SELECT_ALL_PRAYERS_QUERY).fetchall()
+    prayers = db.execute(schema.SELECT_ALL_PRAYERS_QUERY, (user_id,)).fetchall()
     
     return success_json(get_success("Prayers"), prayers)
 
@@ -33,7 +35,10 @@ def get_prayers_by_person(person_id):
     if person is None:
       return error_json(not_found_error("Person")), 404
     
-    prayers = db.execute(schema.SELECT_ALL_PRAYERS_BY_PERSON_QUERY, (person_id,)).fetchall()
+    prayers = db.execute(
+      schema.SELECT_ALL_PRAYERS_BY_PERSON_QUERY,
+      (user_id, person_id,)
+    ).fetchall()
     
     success_msg = "No prayers found" if not prayers else get_success("Prayers")
     
@@ -61,7 +66,10 @@ def add_prayer(person_id):
     prayer_text = parsed["prayer"]
     has_prayed = parse_bool_default(data.get("has_prayed"))
     
-    prayer = db.execute(schema.INSERT_PRAYER_QUERY, (person_id, prayer_text, has_prayed)).fetchone()   
+    prayer = db.execute(
+      schema.INSERT_PRAYER_QUERY, 
+      (person_id, prayer_text, has_prayed)
+    ).fetchone()   
       
     db.commit()
     return success_json(post_success("Prayer"), prayer), 201
@@ -69,6 +77,7 @@ def add_prayer(person_id):
 @prayers_blueprint.patch("/api/people/<int:person_id>/prayers/<int:prayer_id>")
 @api_login_required
 def update_prayer(person_id, prayer_id):
+    
     data = request.get_json()
     
     valid_fields = ["prayer", "has_prayed"]
@@ -80,15 +89,24 @@ def update_prayer(person_id, prayer_id):
     if not parsed or (prayer is None and has_prayed is None):
       return error_json(VALIDATION_FAILED_ERROR, errors), 400
     
-    
+    user_id = session["user_id"]
     db = get_db_connection()
 
     if prayer is not None and has_prayed is not None:
-      updated_prayer = db.execute(schema.UPDATE_PRAYER_TEXT_AND_HAS_PRAYED_QUERY, (prayer, has_prayed, prayer_id)).fetchone()
+      updated_prayer = db.execute(
+        schema.UPDATE_PRAYER_TEXT_AND_HAS_PRAYED_QUERY, 
+        (prayer, has_prayed, user_id, person_id, prayer_id)
+      ).fetchone()
     elif prayer is not None:
-      updated_prayer = db.execute(schema.UPDATE_PRAYER_TEXT_QUERY, (prayer, prayer_id)).fetchone()
+      updated_prayer = db.execute(
+        schema.UPDATE_PRAYER_TEXT_QUERY, 
+        (prayer, user_id, person_id, prayer_id)
+      ).fetchone()
     else:
-      updated_prayer = db.execute(schema.UPDATE_PRAYER_HAS_PRAYED_QUERY, (has_prayed, prayer_id)).fetchone()
+      updated_prayer = db.execute(
+        schema.UPDATE_PRAYER_HAS_PRAYED_QUERY, 
+        (has_prayed, user_id, person_id, prayer_id)
+      ).fetchone()
  
     if updated_prayer is None:
         return error_json(not_found_error("Prayer")), 404
@@ -107,7 +125,10 @@ def delete_prayer(person_id, prayer_id):
     if not person:
       return error_json(not_found_error("Person")), 404 
     
-    deleted_prayer = db.execute(schema.DELETE_PRAYER_QUERY, (prayer_id,)).fetchone()
+    deleted_prayer = db.execute(
+      schema.DELETE_PRAYER_QUERY, 
+      (user_id, person_id, prayer_id)
+    ).fetchone()
     
     if deleted_prayer is None:
       return error_json(not_found_error("Prayer")), 404 
