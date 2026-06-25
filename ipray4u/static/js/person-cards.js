@@ -60,19 +60,27 @@ export async function renderPersonCards(url) {
           data-person-relationship="${person.relationship}"
       >
         <div class="person-info-section">
-          <h3>${person.name}</h3>
-          <p>${person.relationship}</p>
-          <div class="person-buttons">
-            <button class="btn edit-person-button edit-person-button-js">
-              <i class="fa-solid fa-pencil" aria-hidden="true"></i> 
-              Edit
-            </button>
-            <button class="btn delete-person-button delete-person-button-js"><i class="fa-solid fa-trash" aria-hidden="true"></i> Delete</button>
+          <div class="person-header">
+            <div class="person-title">
+              <h3>${person.name}</h3>
+              <p>${person.relationship}</p>
+            </div>
+          
+            <div class="person-buttons">
+              <button class="btn edit-person-button edit-person-button-js" aria-label="Edit ${person.name}">
+                <i class="fa-solid fa-pencil" aria-hidden="true"></i> 
+              </button>
+              <button class="btn delete-person-button delete-person-button-js" aria-label="Delete ${person.name}">
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
         </div>
+
         <div class="prayer-cards-section">
           ${prayersHTML}
         </div>
+
         <button id=${person.id} 
           class="btn add-prayer-button add-prayer-button-js" 
           data-person-id=${person.id} 

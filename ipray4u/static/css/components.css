@@ -11,8 +11,10 @@
   text-align: center;
 }
 
-.btn:hover {
-  transform: scale(1.05);
+@media (hover: hover) {
+  .btn:hover {
+    transform: scale(1.05);
+  }
 }
 
 .btn-outline {
@@ -178,7 +180,7 @@ label {
   justify-content: space-between;
   align-items: center;
 
-  background-color: #7c6aa6;
+  background-color: var(--primary-hover);
   color: white;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
 
@@ -233,18 +235,38 @@ label {
 }
 
 .logout-button {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* .logout-button {
   padding: 0.45rem 0.9rem;
   font-size: 0.9rem;
-  background: transparent;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: white;
+  color: var(--primary);
+  border: none;
   border-radius: 6px;
 }
 
 .logout-button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #f4f1fa;
   border-color: rgba(255, 255, 255, 0.5);
-}
+} */
 
 .relationship-buttons-row {
   display: flex;
@@ -264,7 +286,7 @@ label {
 .person-card {
   width: 100%;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 1rem;
   padding: 1rem;
   align-items: center;
@@ -280,19 +302,56 @@ label {
   box-shadow: 0px 12px 8px rgba(0, 0, 0, 0.12);
 }
 
-.person-buttons {
-  display:flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
 .person-info-section {
   display: flex;
   flex-direction: column;
+  width: 200px;
+  flex-shrink: 0;
   align-items: center;
   padding: 0.5rem;
-  min-width: 140px;
+  gap: 1.25rem;
+}
+
+.person-header {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
   gap: 0.5rem;
+}
+
+.person-title {
+  text-align: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.person-title h3,
+.person-title p {
+  margin: 0;
+}
+
+.person-title h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.person-title p {
+  margin-top: 0.2rem;
+  color: var(--text-muted);
+}
+
+.person-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.4rem;
+}
+
+.person-buttons .btn {
+  width: auto;
+  height: auto;
+  padding: 0.5rem 0.7rem;
 }
 
 .prayer-cards-section {
@@ -407,4 +466,99 @@ label {
   background: #fffaeb;
   border-color: #fedf89;
   color: #93370d;
+}
+
+@media (max-width: 767px) {
+  .nav-bar {
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .nav-logo {
+    padding: 0 0.6rem;
+  }
+
+  .nav-logo h3 {
+    font-size: 1rem;
+  }
+
+  .current-date {
+    display: none;
+  }
+
+  .relationship-buttons-row {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .relationship-button {
+    flex: 0 0 auto;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .person-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .person-title {
+    text-align: left;
+  }
+
+  .person-buttons {
+    flex-shrink: 0;
+    gap: 0.4rem;
+  }
+
+  .person-buttons .btn,
+  .update-prayer-buttons .btn {
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+  }
+
+  .person-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.85rem;
+  }
+
+  .person-info-section {
+    flex: none;
+    width: 100%;
+    padding: 0;
+  }
+
+  .prayer-cards-section {
+    min-width: 0;
+    height: auto;
+    max-height: 260px;
+    padding: 0.5rem;
+  }
+
+  .prayer-card {
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.65rem;
+  }
+
+  .update-prayer-buttons {
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+  }
+
+  .person-card > .add-prayer-button {
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
 }

@@ -22,7 +22,10 @@
       <li class="logout">
         <form action="{{ url_for('auth.logout_user') }}" method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn logout-button">Log out</button>
+          <button type="submit" class="btn logout-button">
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+            Log out
+          </button>
         </form>
       </li>
     </ul>

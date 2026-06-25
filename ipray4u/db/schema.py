@@ -68,6 +68,7 @@ SELECT p.id, p.name, r.relationship
 FROM people AS p
 JOIN relationships AS r ON p.relationship_id = r.id
 WHERE p.user_id = %s
+ORDER BY p.id ASC;
 """
 
 SELECT_RELATIONSHIP_PEOPLE_QUERY = """
@@ -91,14 +92,16 @@ SELECT pr.*
 FROM prayers AS pr
 JOIN people as p ON pr.person_id = p.id
 WHERE p.user_id = %s
+ORDER BY pr.id ASC;
 """
 
 SELECT_ALL_PRAYERS_BY_PERSON_QUERY = """
 SELECT pr.* 
 FROM prayers AS pr
-JOIN people as p ON pr.person_id = p.id 
+JOIN people AS p ON pr.person_id = p.id 
 WHERE p.user_id = %s AND
       pr.person_id = %s
+ORDER BY pr.id ASC;
 """
 
 SELECT_PRAYER_QUERY = """
