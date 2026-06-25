@@ -64,14 +64,14 @@ export function initRelationshipButtonsRowListener(){
       if (relationshipButton === allButton) return;
 
       selectRelationshipButton(allButton);
-      renderPersonCards(GET_PEOPLE_URL);
+      renderPersonCards(GET_PEOPLE_URL, true);
       window.history.pushState({}, '', window.location.pathname);
       return;
     }
     
     if (relationshipButton === allButton){
       selectRelationshipButton(allButton);
-      renderPersonCards(GET_PEOPLE_URL);
+      renderPersonCards(GET_PEOPLE_URL, true);
       window.history.pushState({}, '', window.location.pathname);
     }
 
@@ -84,7 +84,7 @@ export function initRelationshipButtonsRowListener(){
     const relationshipURL = `${GET_PEOPLE_URL}?${params}`;
 
     selectRelationshipButton(relationshipButton);
-    renderPersonCards(relationshipURL);
+    renderPersonCards(relationshipURL, true);
   })
 
 }

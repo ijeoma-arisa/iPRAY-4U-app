@@ -22,12 +22,12 @@ function initPageLoadListeners(){
     const relationship = params.get('rel');
 
     if (relationship){
-      renderPersonCards(`${GET_PEOPLE_URL}?${params}`);
+      renderPersonCards(`${GET_PEOPLE_URL}?${params}`, true);
       renderRelationshipButtons(relationship);
       return;
     }
 
-    renderPersonCards(GET_PEOPLE_URL);
+    renderPersonCards(GET_PEOPLE_URL, true);
     renderRelationshipButtons(null);
   });
 }

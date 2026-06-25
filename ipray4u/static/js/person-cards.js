@@ -42,7 +42,13 @@ async function loadPrayers(person_id) {
   return prayersHTML;
 }
 
-export async function renderPersonCards(url) {
+export async function renderPersonCards(url, showSpinner = false) {
+  const personCards = document.querySelector('.person-cards-js'); 
+  
+  if (showSpinner) {
+    personCards.innerHTML = '<div class="loading-spinner"></div>';
+  }
+
   const response = await fetch(url);
   const {status, data: persons} = await response.json();
   
@@ -92,7 +98,6 @@ export async function renderPersonCards(url) {
       </div>`;
   }
   
-  document.querySelector('.person-cards-js')
-    .innerHTML = personCardsHTML || 'No people found.';
+  personCards.innerHTML = personCardsHTML || 'No people found.';
 }
 
