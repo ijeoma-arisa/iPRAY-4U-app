@@ -18,7 +18,7 @@ async function loadPrayers(person_id) {
       >
         <div class="prayer-text">
           ${prayer.prayer}
-          ${prayer['has_prayed'] ? "Prayed!" : ""}
+          ${prayer['has_prayed'] ? '<span class="prayed-badge">Prayed!</span>' : ""}
         </div>
         <div class="update-prayer-buttons">
           <button 

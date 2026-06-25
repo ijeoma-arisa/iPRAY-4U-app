@@ -371,6 +371,9 @@ label {
 
 .prayer-text {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
 }
 
 .update-prayer-buttons {
@@ -460,6 +463,20 @@ label {
   background: #fffaeb;
   border-color: #fedf89;
   color: #93370d;
+}
+
+.prayed-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 0.4rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #ecfdf3;
+  color: #067647;
+  border: 1px solid #abefc6;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 @media (max-width: 767px) {
