@@ -9,11 +9,12 @@
 {% block content %}
 <div class="prayer-requests-page">
   <nav class="nav-bar" aria-label="Main navigation">
-    <a class="temp-logo" href="{{ url_for('pages.homepage') }}">
-      <div class="nav-logo">
-          <img src="{{ url_for('static', filename='images/phone-with-heart-texts.jpg') }}">
-          <h3>iPRAY 4U</h3>
-      </div>
+    <a class="nav-logo" href="{{ url_for('pages.homepage') }}">
+      <img 
+        src="{{ url_for('static', filename='images/branding/logo-horizontal.png') }}"
+        alt="iPRAY 4U"
+        class="nav-logo-img"
+      >
     </a>
 
     <ul class="nav-links">

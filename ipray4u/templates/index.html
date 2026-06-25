@@ -5,10 +5,11 @@
 {% block content %}
 <main class="homepage">
   <section class="launch-card">
-    <div class="launch-logo-placeholder" aria-hidden="true">
-      <span>🙏</span>
-    </div>
-
+      <img
+        src="{{ url_for('static', filename='images/branding/logo-icon.png') }}"
+        alt="iPRAY 4U"
+        class="launch-logo"
+      >
     <div class="launch-copy">
       <h1>iPRAY 4U</h1>
 
@@ -34,7 +35,7 @@
   </section>
 </main>
 
-<dialog class="modal modal-jsd add-prayer-request-modal-js"></dialog>
+<dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
 {% endblock %}
 
 {% block scripts %}

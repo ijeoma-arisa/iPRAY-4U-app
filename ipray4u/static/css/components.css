@@ -193,8 +193,8 @@ label {
 .nav-logo {
   display: flex;
   background: transparent;
-  padding: 0 1rem;
-  border-radius: 6px;
+  padding: 0.35rem 0.8rem;
+  border-radius: 12px;
   gap: 0.5rem;
   align-items: center;
   color: var(--text-main);
@@ -203,16 +203,25 @@ label {
               box-shadow 180ms ease;
 }
 
-.temp-logo:hover .nav-logo {
-  transform: translateY(-2px);
-
-  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+.launch-logo {
+  width: 200px;
+  height: auto;
+  display: block;
 }
 
-.nav-logo img {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
+.nav-logo-img {
+  height: 64px;
+  width: auto;
+  display: block;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  padding: 0.4rem 0.9rem;
+  border-radius: 12px;
+  flex-shrink: 0;
 }
 
 .nav-links {
@@ -498,17 +507,27 @@ label {
 }
 
 @media (max-width: 767px) {
+  .launch-logo {
+    width: 132px;
+  }
+
   .nav-bar {
     gap: 0.75rem;
     padding: 0.5rem 0.75rem;
   }
 
   .nav-logo {
-    padding: 0 0.6rem;
+    padding: 0.3rem 0.6rem;
   }
-
+  
   .nav-logo h3 {
     font-size: 1rem;
+  }
+
+  .nav-logo-img {
+    height: 48px;
+    width: auto;
+    display: block;
   }
 
   .current-date {
