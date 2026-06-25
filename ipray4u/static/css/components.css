@@ -254,20 +254,6 @@ label {
   border-color: rgba(255, 255, 255, 0.45);
 }
 
-/* .logout-button {
-  padding: 0.45rem 0.9rem;
-  font-size: 0.9rem;
-  background: white;
-  color: var(--primary);
-  border: none;
-  border-radius: 6px;
-}
-
-.logout-button:hover {
-  background: #f4f1fa;
-  border-color: rgba(255, 255, 255, 0.5);
-} */
-
 .relationship-buttons-row {
   display: flex;
   flex-wrap: wrap;
@@ -297,9 +283,11 @@ label {
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
-.person-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0px 12px 8px rgba(0, 0, 0, 0.12);
+@media (hover: hover) {
+  .person-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 12px 8px rgba(0, 0, 0, 0.12);
+  }
 }
 
 .person-info-section {
@@ -401,7 +389,13 @@ label {
   background-color: var(--main-green);
 }
 
-.mark-prayed-button:hover  {
+@media (hover: hover) {
+  .mark-prayed-button:hover {
+    background-color: var(--darker-green);
+  }
+}
+
+.mark-prayed-button:active {
   background-color: var(--darker-green);
 }
 
