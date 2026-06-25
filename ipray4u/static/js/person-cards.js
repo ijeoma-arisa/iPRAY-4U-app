@@ -1,7 +1,12 @@
-import { GET_PEOPLE_URL } from './api/endpoints.js';
+import { GET_PEOPLE_URL, LOGIN_URL } from './api/endpoints.js';
 
 async function loadPrayers(person_id) {
   const response = await fetch(`${GET_PEOPLE_URL}/${person_id}/prayers`);
+  if (response.status === 401) {
+    window.location.href = LOGIN_URL;
+    return;
+  }
+
   const {status, data: prayers} = await response.json();
 
   let prayersHTML = '';
@@ -50,6 +55,11 @@ export async function renderPersonCards(url, showSpinner = false) {
   }
 
   const response = await fetch(url);
+  if (response.status === 401) {
+    window.location.href = LOGIN_URL;
+    return;
+  }
+  
   const {status, data: persons} = await response.json();
   
   let personCardsHTML = '';

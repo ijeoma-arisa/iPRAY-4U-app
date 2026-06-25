@@ -37,14 +37,18 @@
   border-color: var(--primary);
 }
 
-.add-prayer-button, .save-button {
+.add-prayer-button, 
+.save-button,
+.create-account-button {
   background-color: var(--primary);
 }
 
 .save-button {
   margin-top: 0.5rem;
 }
-.add-prayer-button:hover, .save-button:hover {
+.add-prayer-button:hover, 
+.save-button:hover,
+.create-account-button:hover {
   background: var(--primary-hover);
 }
 

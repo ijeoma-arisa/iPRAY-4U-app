@@ -1,5 +1,9 @@
 import os
-from flask import Flask, g
+from flask import (
+  Flask,
+  g,
+  render_template,
+)
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from .db import init_db
@@ -52,6 +56,10 @@ def create_app(test_config=None):
   app.register_blueprint(prayers_blueprint)
   app.register_blueprint(relationships_blueprint)
   
+  @app.errorhandler(500)
+  def internal_server_error(error):
+    return render_template("500.html"), 500
+    
   with app.app_context():
     init_db()
 

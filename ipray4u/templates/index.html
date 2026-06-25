@@ -23,13 +23,25 @@
     </div>
 
     <div class="launch-actions">
-      <button class="btn add-prayer-button add-prayer-button-js">
-        Add Prayer Request
-      </button>
+      {% if session.get("user_id") %}
+        <button class="btn add-prayer-button add-prayer-button-js">
+          Add Prayer Request
+        </button>
 
-      <a class="btn btn-outline" href="{{ url_for('pages.prayer_requests_page') }}">
-        View Prayer Requests
-      </a>
+        <a class="btn btn-outline" href="{{ url_for('pages.prayer_requests_page') }}">
+          View Prayer Requests
+        </a>
+        
+      {% else %}
+        <a class="btn create-account-button" href="{{ url_for('auth.signup_user') }}">
+          Create Account
+        </a>
+
+        <a class="btn btn-outline" href="{{ url_for('auth.login_user') }}">
+          Log In
+        </a>
+      {% endif %}
+
     </div>
   </section>
 </main>

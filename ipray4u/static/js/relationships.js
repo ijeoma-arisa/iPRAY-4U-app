@@ -1,8 +1,16 @@
-import { GET_PEOPLE_URL, GET_RELATIONSHIPS_URL } from './api/endpoints.js';
+import { 
+  GET_PEOPLE_URL, 
+  GET_RELATIONSHIPS_URL,
+  LOGIN_URL, 
+} from './api/endpoints.js';
 import { renderPersonCards } from './person-cards.js';
 
 export async function renderRelationshipDropdown(modal) {
   const response = await fetch(GET_RELATIONSHIPS_URL);
+  if (response.status === 401) {
+    window.location.href = LOGIN_URL;
+    return;
+  }
   const {status, data: relationships} = await response.json();
   
   let relationshipsHTML = '<option value="" disabled selected hidden>Select</option>';
@@ -16,6 +24,10 @@ export async function renderRelationshipDropdown(modal) {
 
 export async function renderRelationshipButtons(selectedRelationship) {
   const response = await fetch(GET_RELATIONSHIPS_URL);
+  if (response.status === 401) {
+    window.location.href = LOGIN_URL;
+    return;
+  }
   const { status, data: relationships } = await response.json();
 
   let relationshipsHTML = '<button class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js">All</button>';
@@ -37,7 +49,9 @@ export async function renderRelationshipButtons(selectedRelationship) {
     ? relationshipButtonsRow.querySelector(`[data-rel="${selectedRelationship.toLowerCase()}"]`)
     : relationshipButtonsRow.querySelector('.relationship-button-all-js');
 
-  selectedButton.classList.add('is-selected');
+  if (selectedButton){
+    selectedButton.classList.add('is-selected');
+  }
 }
 
 export function selectRelationshipButton(relationshipButton){

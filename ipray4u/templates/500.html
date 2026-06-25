@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<main>
+  <h1>Oops!</h1>
+  <p> Something went wrong.</p>
+  <p> Please try again.</p>
+<a href="{{ url_for('pages.homepage') }}">
+   Return to Home
+</a>
+</main>
+{% endblock %}
