@@ -41,14 +41,6 @@ Organize prayer requests by person, group people by relationship, and stay inten
 
 **Testing & CI/CD:** pytest, GitHub Actions
 
-## Screenshots
-
-### Homepage
-<!-- Add screenshot -->
-
-### Prayer Requests Page
-<!--  Add screenshot -->
-
 ## Prerequisites
 * Python 3.12
 * Recommended: virtual environment
