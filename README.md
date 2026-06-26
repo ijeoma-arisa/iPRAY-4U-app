@@ -20,11 +20,11 @@ Organize prayer requests by person, group people by relationship, and stay inten
 ## Screenshots
 
 <p align="center">
-  <img src="images/homepage-logged-out.png" alt="Homepage" width="85%">
+  <img src="images/hompage-1.png" alt="Homepage" width="85%">
 </p>
 
 <p align="center">
-  <img src="images/prayer-requests-dashboard.png" alt="Prayer Requests Dashboard" width="85%">
+  <img src="images/dashboard.png" alt="Prayer Requests Dashboard" width="85%">
 </p>
 
 ## Tech Stack
