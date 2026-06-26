@@ -41,14 +41,18 @@ function initPrayerEventListeners({ onSuccess }) {
 
   personCards.addEventListener('click', async (event) => {
     const personCard = event.target.closest('.person-card-js');
+    if (!personCard) return;
+
     const prayerCard = event.target.closest('.prayer-card-js');
 
-    if (!personCard && !prayerCard) return;
+    const deletePersonButton = event.target.closest('.delete-person-button-js');
+    const deletePrayerButton = event.target.closest('.delete-prayer-button-js');
+    const markPrayedButton = event.target.closest('.mark-prayed-button-js');
     
     const personId = personCard.dataset.personId;
     const personRoute = `${GET_PEOPLE_URL}/${personId}`;
     
-    if (event.target.classList.contains('delete-person-button-js')){
+    if (deletePersonButton){
       deleteTitle.innerHTML = 'Delete Person';
       itemToDeleteType.innerHTML = 'person';
       itemToDelete.innerHTML = personCard.dataset.personName;
@@ -59,7 +63,7 @@ function initPrayerEventListeners({ onSuccess }) {
       deleteItemModal.showModal();
     }
     
-    if (event.target.classList.contains('delete-prayer-button-js')){
+    if (deletePrayerButton && prayerCard){
       const prayerId = prayerCard.dataset.prayerId;
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
@@ -73,7 +77,7 @@ function initPrayerEventListeners({ onSuccess }) {
       deleteItemModal.showModal();
     }
     
-    if (event.target.classList.contains('mark-prayed-button-js')){
+    if (markPrayedButton && prayerCard){
       const prayerId = prayerCard.dataset.prayerId;
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 

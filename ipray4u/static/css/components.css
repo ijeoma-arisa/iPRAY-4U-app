@@ -387,10 +387,12 @@ label {
   display: flex;
   flex-direction: column;
   overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 .update-prayer-buttons {
   display: flex;
+  flex-shrink: 0;
   gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: flex-end;

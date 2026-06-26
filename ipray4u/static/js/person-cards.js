@@ -26,17 +26,22 @@ async function loadPrayers(person_id) {
           ${prayer['has_prayed'] ? '<span class="prayed-badge">Prayed!</span>' : ""}
         </div>
         <div class="update-prayer-buttons">
-          <button 
+          <button
+            type="button" 
             class="btn mark-prayed-button mark-prayed-button-js"
           >
             <i class="fa-solid fa-hands-praying" aria-hidden="true"></i>
           </button>
 
-          <button class="btn edit-prayer-button edit-prayer-button-js">
+          <button
+            type="button"  
+            class="btn edit-prayer-button edit-prayer-button-js"
+          >
             <i class="fa-solid fa-pencil" aria-hidden="true"></i>
           </button>
 
           <button 
+            type="button" 
             class="btn delete-prayer-button delete-prayer-button-js"
           >
             <i class="fa-solid fa-trash" aria-hidden="true"></i>
