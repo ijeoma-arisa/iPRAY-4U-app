@@ -2,9 +2,7 @@
 
 **Prayer requests, organized.**
 
-🌐 Live App: Coming Soon
-
-<!-- TODO: Replace with updated screenshot before launch post -->
+🌐 **Live App:** [Try iPRAY 4U](https://ipray4u.app)
 
 ## About
 *"Can you pray for me?"*
@@ -19,6 +17,16 @@ Organize prayer requests by person, group people by relationship, and stay inten
 - Track which prayer requests you've already prayed for
 - Access your prayer requests from your own secure account
 
+## Screenshots
+
+<p align="center">
+  <img src="images/homepage-1.png" alt="Homepage" width="85%">
+</p>
+
+<p align="center">
+  <img src="images/dashboard.png" alt="Prayer Requests Dashboard" width="85%">
+</p>
+
 ## Tech Stack
 
 **Frontend:** HTML, CSS, JavaScript
@@ -32,14 +40,6 @@ Organize prayer requests by person, group people by relationship, and stay inten
 **Deployment:** Render
 
 **Testing & CI/CD:** pytest, GitHub Actions
-
-## Screenshots
-
-### Homepage
-<!-- Add screenshot -->
-
-### Prayer Requests Page
-<!--  Add screenshot -->
 
 ## Prerequisites
 * Python 3.12
