@@ -26,8 +26,10 @@ def create_app(test_config=None):
   app.config.from_mapping(
     DATABASE_URL=os.environ.get("DATABASE_URL"),
     SECRET_KEY=os.environ.get("SECRET_KEY"),
-    SESSION_COOKIE_HTTPONLY=True, #TODO: Review how this protects JS from reading cookies
-    SESSION_COOKIE_SECURE=False, #TODO: True in production later - HTTPS traffic only for cookies
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=(
+      os.environ["SESSION_COOKIE_SECURE"].lower() == "true"
+    ),
     SESSION_COOKIE_SAMESITE="Lax",
   )
   

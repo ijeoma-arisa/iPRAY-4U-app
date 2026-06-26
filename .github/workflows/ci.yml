@@ -45,6 +45,7 @@ jobs:
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/prayer_test
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          SESSION_COOKIE_SECURE: "False"
         run: pytest
 
 

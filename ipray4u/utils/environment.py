@@ -3,6 +3,7 @@ import os
 TEST_REQUIRED_ENV_VARS = [
   "TEST_DATABASE_URL",
   "SECRET_KEY",
+  "SESSION_COOKIE_SECURE",
 ]
 
 PROD_REQUIRED_ENV_VARS = [
@@ -10,6 +11,7 @@ PROD_REQUIRED_ENV_VARS = [
   "SUPABASE_URL",
   "SUPABASE_PUBLISHABLE_KEY",
   "SECRET_KEY",
+  "SESSION_COOKIE_SECURE",
 ]
 
 def validate_required_env_vars(required_vars):
