@@ -2,7 +2,7 @@
 
 **Prayer requests, organized.**
 
-🌐 Live App: Coming Soon
+🌐 **Live App:** [Launch iPRAY 4U](https://ipray4u.app)
 
 ## About
 *"Can you pray for me?"*
