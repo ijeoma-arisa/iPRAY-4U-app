@@ -88,10 +88,16 @@ export async function renderPersonCards(url, showSpinner = false) {
             </div>
           
             <div class="person-buttons">
-              <button class="btn edit-person-button edit-person-button-js" aria-label="Edit ${person.name}">
+              <button 
+                type="button"
+                class="btn edit-person-button edit-person-button-js" aria-label="Edit ${person.name}"
+              >
                 <i class="fa-solid fa-pencil" aria-hidden="true"></i> 
               </button>
-              <button class="btn delete-person-button delete-person-button-js" aria-label="Delete ${person.name}">
+              <button 
+                type="button"
+                class="btn delete-person-button delete-person-button-js" aria-label="Delete ${person.name}"
+              >
                 <i class="fa-solid fa-trash" aria-hidden="true"></i>
               </button>
             </div>
@@ -102,7 +108,9 @@ export async function renderPersonCards(url, showSpinner = false) {
           ${prayersHTML}
         </div>
 
-        <button id=${person.id} 
+        <button 
+          id=${person.id}
+          type="button" 
           class="btn add-prayer-button add-prayer-button-js" 
           data-person-id=${person.id} 
           data-person-name="${person.name}" 

@@ -31,10 +31,12 @@
     box-shadow 180ms ease;
 }
 
-.btn-outline:hover {
-  background: #f3ecfb;
-  color: var(--darker-purple);
-  border-color: var(--primary);
+@media (hover: hover) {
+  .btn-outline:hover {
+    background: #f3ecfb;
+    color: var(--darker-purple);
+    border-color: var(--primary);
+  }
 }
 
 .add-prayer-button, 
@@ -46,11 +48,15 @@
 .save-button {
   margin-top: 0.5rem;
 }
-.add-prayer-button:hover, 
-.save-button:hover,
-.create-account-button:hover {
-  background: var(--primary-hover);
+
+@media (hover: hover) {
+  .add-prayer-button:hover, 
+  .save-button:hover,
+  .create-account-button:hover {
+    background: var(--primary-hover);
+  }
 }
+
 
 .relationship-button {
   border: 1px solid #d8c8ee;
@@ -59,11 +65,18 @@
   box-shadow: none;
 }
 
-.relationship-button:hover,
 .relationship-button.is-selected {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
+}
+
+@media (hover: hover){
+  .relationship-button:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
 }
 
 .view-button {
@@ -71,8 +84,10 @@
   width: 50%;
 }
 
-.view-button:hover {
-  background: var(--darker-blue);
+@media (hover: hover){
+  .view-button:hover {
+    background: var(--darker-blue);
+  }
 }
 
 .close-button {
@@ -87,10 +102,11 @@
   cursor: pointer;
 }
 
-.close-button:hover {
-  color:red;
+@media (hover: hover){
+  .close-button:hover {
+    color:red;
+  }
 }
-
 
 .launch-actions .btn {
   width: 100%;
@@ -262,9 +278,11 @@ label {
     transform 180ms ease;
 }
 
-.logout-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.45);
+@media (hover: hover){
+  .logout-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.45);
+  }
 }
 
 .relationship-buttons-row {
@@ -423,10 +441,12 @@ label {
   background-color: var(--gray);
 }
 
-.edit-person-button:hover,
-.edit-prayer-button:hover,
-.deny-delete-button:hover {
-  background-color: var(--darker-gray);
+@media (hover: hover){
+  .edit-person-button:hover,
+  .edit-prayer-button:hover,
+  .deny-delete-button:hover {
+    background-color: var(--darker-gray);
+  }
 }
 
 .delete-person-button, 
@@ -435,10 +455,12 @@ label {
   background-color: var(--main-red);
 }
 
-.delete-person-button:hover, 
-.delete-prayer-button:hover,
-.confirm-delete-button:hover {
-  background-color: var(--darker-red);
+@media (hover: hover){
+  .delete-person-button:hover, 
+  .delete-prayer-button:hover,
+  .confirm-delete-button:hover {
+    background-color: var(--darker-red);
+  }
 }
 
 .flash-messages {

@@ -30,11 +30,12 @@ export async function renderRelationshipButtons(selectedRelationship) {
   }
   const { status, data: relationships } = await response.json();
 
-  let relationshipsHTML = '<button class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js">All</button>';
+  let relationshipsHTML = '<button type="button" class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js">All</button>';
 
   relationships.forEach(relationship => {
     relationshipsHTML += 
-    `<button 
+    `<button
+      type="button" 
       class="btn relationship-button relationship-button-js relationship-button-${relationship.id}" 
       data-rel="${relationship.relationship.toLowerCase()}"
     >

@@ -4,7 +4,7 @@ import { fetchWithCsrf } from './api/client.js';
 
 function renderPrayerRequestModal() {
   document.querySelector('.add-prayer-request-modal-js').innerHTML = 
-    `<button class="close-button close-modal-js" aria-label="Close">&times;</button>
+    `<button type="button" class="close-button close-modal-js" aria-label="Close">&times;</button>
     <form class="prayer-request-form modal-form-js prayer-request-form-js" method="POST">
       <h2 class="form-title">New Prayer Request</h2>
       <div class="form-data">

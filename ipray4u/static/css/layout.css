@@ -127,8 +127,10 @@ main {
   font-weight: bold;
 }
 
-.auth-footer a:hover {
-  color: var(--primary-hover);
+@media (hover: hover){
+  .auth-footer a:hover {
+    color: var(--primary-hover);
+  }
 }
 
 /* Prayer Requests Page */
