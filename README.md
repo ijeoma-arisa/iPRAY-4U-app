@@ -4,7 +4,29 @@
 
 🌐 Live App: Coming Soon
 
-<!-- TODO: Replace with updated screenshot before launch post -->
+## Screenshots
+
+### Homepage
+
+<p align="center">
+  <img src="images/homepage-logged-in.png" alt="Homepage" width="85%">
+</p>
+
+### Prayer Requests Dashboard
+
+<p align="center">
+  <img src="images/prayer-requests-dashboard.png" alt="Prayer Requests Dashboard" width="85%">
+</p>
+<p align="center">
+  <img src="images/add-prayer-from-homepage.png" alt="Add Prayer Request Modal" width="85%">
+</p>
+
+### Authentication & Mobile
+
+<p align="center">
+  <img src="images/login-page.png" alt="Log In" width="48%">
+  <img src="images/mobile-view.jpg" alt="Mobile View" width="48%">
+</p>
 
 ## About
 *"Can you pray for me?"*
