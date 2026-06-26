@@ -106,19 +106,21 @@ function initDeleteModalListeners({ onSuccess }){
   const deleteItemModal = document.querySelector('.delete-item-modal-js');
 
   deleteItemModal.addEventListener('click', async (event) => {
-    if (event.target.classList.contains('confirm-delete-button-js')){
-      const route = deleteItemModal.dataset.route;
-      const itemId = deleteItemModal.dataset.itemId;
-      const item = document.getElementById(itemId);
-      
-      await fetchWithCsrf(route, {method: "DELETE"});
-      item?.remove();
+    const confirmDeleteButton = event.target.closest('.confirm-delete-button-js');
+    if (!confirmDeleteButton) return;
 
-      const url = `${GET_PEOPLE_URL}${window.location.search}`;
-      onSuccess();
+    const route = deleteItemModal.dataset.route;
+    const itemId = deleteItemModal.dataset.itemId;
+    const item = document.getElementById(itemId);
+    
+    await fetchWithCsrf(route, {method: "DELETE"});
+    item?.remove();
 
-      deleteItemModal.close();
-    }
+    const url = `${GET_PEOPLE_URL}${window.location.search}`;
+    onSuccess();
+
+    deleteItemModal.close();
+  
   });
 }
 
@@ -199,25 +201,27 @@ function initEditPersonModalListeners(){
   const editPersonModal = document.querySelector('.edit-person-modal-js');
 
   document.addEventListener('click', (event) => {
-    if (event.target.classList.contains('edit-person-button-js')) {
-      const personCard = event.target.closest('.person-card-js');
+    const editPersonButton = event.target.closest('.edit-person-button-js');
+    if (!editPersonButton) return;
+    
+    const personCard = event.target.closest('.person-card-js');
+    if (!personCard) return;
 
-      const personId = personCard.dataset.personId;
-      const personName = personCard.dataset.personName;
-      const personRelationship = personCard.dataset.personRelationship;
+    const personId = personCard.dataset.personId;
+    const personName = personCard.dataset.personName;
+    const personRelationship = personCard.dataset.personRelationship;
 
-      if (personId && personName && personRelationship){
-        const editPersonForm = document.querySelector('.edit-person-form-js');
-        editPersonForm.dataset.personId = personId;
-        editPersonForm.dataset.personName = personName;
-        editPersonForm.dataset.personRelationship = personRelationship;
+    if (personId && personName && personRelationship){
+      const editPersonForm = document.querySelector('.edit-person-form-js');
+      editPersonForm.dataset.personId = personId;
+      editPersonForm.dataset.personName = personName;
+      editPersonForm.dataset.personRelationship = personRelationship;
 
-        editPersonForm.elements.name.value = personName;
-        editPersonForm.elements.relationship.value = personRelationship;
-      }
-
-      editPersonModal.showModal();
+      editPersonForm.elements.name.value = personName;
+      editPersonForm.elements.relationship.value = personRelationship;
     }
+
+    editPersonModal.showModal();
   });
 }
 
