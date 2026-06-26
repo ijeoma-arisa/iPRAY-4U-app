@@ -569,12 +569,15 @@ label {
 
   .person-buttons .btn,
   .update-prayer-buttons .btn {
-    width: 2.2rem;
-    height: 2.2rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
     padding: 0;
     display: grid;
     place-items: center;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    touch-action: manipulation;
   }
 
   .person-card {
