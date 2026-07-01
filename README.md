@@ -112,5 +112,5 @@ gunicorn wsgi:app
 Run the test suite:
 
 ```bash
-pytest
+pytest tests
 ```
