@@ -5,7 +5,7 @@ Before applying RLS changes to production:
 2. Run: 
 
 ```bash
-python scripts/test_rls.py
+python scripts/verify_rls.py
 ```
 
 The script signs into the staging Supabase project using two test accounts and verifies the RLS policies.
