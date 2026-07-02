@@ -1,4 +1,5 @@
 from ipray4u.models import Relationship
+from ipray4u.db import get_db_connection
 
 from .helpers.assertions import (
     assert_success_response, 
@@ -10,6 +11,7 @@ from .helpers.sample_data import generate_person_json, update_existing_json_fiel
 from .helpers.urls import PEOPLE_URL
 
 from ipray4u.utils.error_messages import (
+  DUPLICATE_PERSON_ERROR,
   VALIDATION_FAILED_ERROR,
   AUTHENTICATION_REQUIRED_ERROR,
   required_error,
@@ -53,6 +55,61 @@ def test_add_person_valid(auth_client):
     )
     
     assert_person_data(person_data, person)
+
+def test_add_person_rejects_duplicate_normalized_name(auth_client):
+  person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+  response = auth_client.post(PEOPLE_URL, json=person)
+
+  assert_success_response(
+    response,
+    expected_message=post_success("Person"),
+    expected_status=201,
+  )
+
+  for duplicate_name in ["Bob", "  bOB  "]:
+    duplicate = generate_person_json(
+      duplicate_name,
+      Relationship.FAMILY.value,
+      "Peace"
+    )
+    response = auth_client.post(PEOPLE_URL, json=duplicate)
+
+    assert_error_response(
+      response,
+      expected_message=DUPLICATE_PERSON_ERROR,
+      expected_status=409,
+    )
+
+def test_add_person_allows_same_name_for_different_users(auth_client, app):
+  person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+  response = auth_client.post(PEOPLE_URL, json=person)
+
+  assert_success_response(
+    response,
+    expected_message=post_success("Person"),
+    expected_status=201,
+  )
+
+  second_user_id = "00000000-0000-0000-0000-000000000002"
+  with app.app_context():
+    db = get_db_connection()
+    db.execute("INSERT INTO auth.users (id) VALUES (%s)", (second_user_id,))
+    db.execute(
+      "INSERT INTO profiles (id, display_name) VALUES (%s, %s)",
+      (second_user_id, "Second User")
+    )
+    db.commit()
+
+  with auth_client.session_transaction() as session:
+    session["user_id"] = second_user_id
+
+  response = auth_client.post(PEOPLE_URL, json=person)
+
+  assert_success_response(
+    response,
+    expected_message=post_success("Person"),
+    expected_status=201,
+  )
    
 def test_add_person_missing_name(auth_client):
   person = generate_person_json(
@@ -321,6 +378,32 @@ def test_update_person_valid_all_fields(auth_client):
   )
   
   assert_person_data(person_data, person)
+
+def test_update_person_rejects_duplicate_normalized_name(auth_client):
+  bob = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
+  sarah = generate_person_json("Sarah", Relationship.FAMILY.value, "Peace")
+
+  for person in [bob, sarah]:
+    response = auth_client.post(PEOPLE_URL, json=person)
+    assert_success_response(
+      response,
+      expected_message=post_success("Person"),
+      expected_status=201,
+    )
+
+  response = auth_client.patch(f"{PEOPLE_URL}/2", json={"name": "  bOB  "})
+
+  assert_error_response(
+    response,
+    expected_message=DUPLICATE_PERSON_ERROR,
+    expected_status=409,
+  )
+
+  unchanged_person = assert_success_response(
+    auth_client.get(f"{PEOPLE_URL}/2"),
+    expected_message=get_success("Person"),
+  )
+  assert unchanged_person["name"] == "Sarah"
 
 def test_update_person_missing_all_fields(auth_client):
   person = generate_person_json("Bob", Relationship.FRIENDS.value, "Strength")
