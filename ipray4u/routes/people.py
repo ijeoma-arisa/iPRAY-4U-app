@@ -1,10 +1,15 @@
 from flask import Blueprint, request, session
+from psycopg.errors import UniqueViolation
 
 from ipray4u.responses import success_json, error_json
 from ipray4u.db import get_db_connection, schema
 from ipray4u.models import Relationship
 from ipray4u.utils.validators import validate_fields, parse_relationship
-from ipray4u.utils.error_messages import VALIDATION_FAILED_ERROR, not_found_error
+from ipray4u.utils.error_messages import (
+    DUPLICATE_PERSON_ERROR,
+    VALIDATION_FAILED_ERROR,
+    not_found_error,
+)
 from ipray4u.utils.success_messages import (
     get_success,
     post_success,
@@ -50,13 +55,20 @@ def add_person():
 
     db = get_db_connection()
 
-    relationship_row = db.execute(schema.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()   
-    person_id = db.execute(schema.INSERT_PERSON_QUERY, (name, relationship_row["id"], user_id,)).fetchone()["id"]
+    try:
+        relationship_row = db.execute(schema.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()
+        person_id = db.execute(schema.INSERT_PERSON_QUERY, (name, relationship_row["id"], user_id,)).fetchone()["id"]
 
-    db.execute(schema.INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer,)) 
-    person = db.execute(schema.SELECT_PERSON_QUERY, (user_id, person_id,)).fetchone()
+        db.execute(schema.INSERT_DEFAULT_PRAYER_QUERY, (person_id, prayer,))
+        person = db.execute(schema.SELECT_PERSON_QUERY, (user_id, person_id,)).fetchone()
 
-    db.commit()
+        db.commit()
+    except UniqueViolation as error:
+        db.rollback()
+        if error.diag.constraint_name == schema.PEOPLE_USER_NORMALIZED_NAME_UNIQUE_INDEX:
+            return error_json(DUPLICATE_PERSON_ERROR), 409
+        raise
+
     return success_json(post_success("Person"), person), 201
         
 
@@ -94,12 +106,18 @@ def update_person(person_id):
 
     relationship_id = db.execute(schema.SELECT_RELATIONSHIP_QUERY, (relationship.value,)).fetchone()["id"] if relationship is not None else None
 
-    if name is not None and relationship is not None:
-        updated_person = db.execute(schema.UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY, (name, relationship_id, user_id, person_id,)).fetchone()
-    elif name is not None:
-        updated_person = db.execute(schema.UPDATE_PERSON_NAME_QUERY, (name, user_id, person_id,)).fetchone()
-    else:
-        updated_person = db.execute(schema.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, user_id, person_id,)).fetchone()
+    try:
+        if name is not None and relationship is not None:
+            updated_person = db.execute(schema.UPDATE_PERSON_NAME_AND_RELATIONSHIP_QUERY, (name, relationship_id, user_id, person_id,)).fetchone()
+        elif name is not None:
+            updated_person = db.execute(schema.UPDATE_PERSON_NAME_QUERY, (name, user_id, person_id,)).fetchone()
+        else:
+            updated_person = db.execute(schema.UPDATE_PERSON_RELATIONSHIP_QUERY, (relationship_id, user_id, person_id,)).fetchone()
+    except UniqueViolation as error:
+        db.rollback()
+        if error.diag.constraint_name == schema.PEOPLE_USER_NORMALIZED_NAME_UNIQUE_INDEX:
+            return error_json(DUPLICATE_PERSON_ERROR), 409
+        raise
 
     if updated_person is None:
         return error_json(not_found_error("Person")), 404

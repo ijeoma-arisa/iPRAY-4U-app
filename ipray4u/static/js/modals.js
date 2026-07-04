@@ -20,6 +20,7 @@ function renderPrayerRequestModal() {
         <label for="prayer">Prayer Request</label>
         <textarea id="prayer" name="prayer" placeholder="Enter prayer here" rows="5" cols="20" required></textarea>
       </div>
+      <p class="prayer-request-error-js" role="alert" hidden></p>
       <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
     </form>`;
 }
@@ -34,6 +35,10 @@ function initPrayerRequestModalListeners(){
       
       const personCard = event.target.closest('.person-card-js');
       const prayerRequestForm = document.querySelector('.prayer-request-form-js');
+      const errorMessage = prayerRequestForm.querySelector('.prayer-request-error-js');
+
+      errorMessage.hidden = true;
+      errorMessage.textContent = '';
       
       if (personCard){
         
@@ -60,6 +65,16 @@ async function handlePrayerRequestInput({ onSuccess }){
 
   prayerRequestForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+
+    if (prayerRequestForm.dataset.submitting === 'true') return;
+
+    const saveButton = prayerRequestForm.querySelector('.save-button-js');
+    const errorMessage = prayerRequestForm.querySelector('.prayer-request-error-js');
+
+    prayerRequestForm.dataset.submitting = 'true';
+    saveButton.disabled = true;
+    errorMessage.hidden = true;
+    errorMessage.textContent = '';
     
     const formData = {
       name: prayerRequestForm.elements.name.value,
@@ -79,15 +94,26 @@ async function handlePrayerRequestInput({ onSuccess }){
         `${GET_PEOPLE_URL}/${prayerRequestForm.dataset.personId}/prayers`:
         GET_PEOPLE_URL
         
-    const response = await fetchWithCsrf(prayerRoute, options);
-    const { status, message } = await response.json();
+    try {
+      const response = await fetchWithCsrf(prayerRoute, options);
+      const { status, message } = await response.json();
 
-    if (status === 'success') {
-      const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
-      addPrayerRequestModal.close();
+      if (status === 'success') {
+        const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+        addPrayerRequestModal.close();
 
-      const url = `${GET_PEOPLE_URL}${window.location.search}`;
-      onSuccess();
+        const url = `${GET_PEOPLE_URL}${window.location.search}`;
+        onSuccess();
+      } else {
+        errorMessage.textContent = message || 'Unable to save. Please try again.';
+        errorMessage.hidden = false;
+      }
+    } catch (error) {
+      errorMessage.textContent = 'Unable to save. Please try again.';
+      errorMessage.hidden = false;
+    } finally {
+      delete prayerRequestForm.dataset.submitting;
+      saveButton.disabled = false;
     }
   });
 

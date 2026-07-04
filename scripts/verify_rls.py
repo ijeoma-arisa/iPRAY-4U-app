@@ -1,6 +1,6 @@
 """Integration test for the staging Supabase Row-Level Security policies.
 
-This script loads .env.staging directly, then verifies the loaded Supabase URL
+This script loads .env directly, then verifies the loaded Supabase URL
 matches the known staging project before creating any fixtures.
 """
 
@@ -12,7 +12,7 @@ from postgrest.exceptions import APIError
 from supabase import Client, create_client
 from dotenv import load_dotenv
 
-load_dotenv(".env.staging", override=True)
+load_dotenv()
 
 STAGING_SUPABASE_URL = "https://mrawhknpzsnapjjyiwpf.supabase.co"
 REQUIRED_ENV_VARS = (

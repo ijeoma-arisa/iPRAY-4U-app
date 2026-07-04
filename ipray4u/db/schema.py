@@ -55,6 +55,13 @@ CREATE INDEX IF NOT EXISTS idx_people_relationship
 ON people(relationship_id);
 """
 
+PEOPLE_USER_NORMALIZED_NAME_UNIQUE_INDEX = "uq_people_user_normalized_name"
+
+CREATE_UNIQUE_INDEX_ON_PEOPLE_USER_NORMALIZED_NAME = f"""
+CREATE UNIQUE INDEX IF NOT EXISTS {PEOPLE_USER_NORMALIZED_NAME_UNIQUE_INDEX}
+ON people (user_id, lower(btrim(name)));
+"""
+
 CREATE_INDEX_ON_PRAYERS_PERSON = """
 CREATE INDEX IF NOT EXISTS idx_prayers_person 
 ON prayers(person_id);
