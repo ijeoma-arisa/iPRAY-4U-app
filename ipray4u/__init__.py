@@ -6,6 +6,8 @@ from flask import (
 )
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from .db import init_db
 from .utils.environment import (
   TEST_REQUIRED_ENV_VARS,
@@ -16,6 +18,7 @@ from .utils.environment import (
 load_dotenv()
 
 csrf = CSRFProtect()
+limiter = Limiter(key_func=get_remote_address)
 
 def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
@@ -24,7 +27,9 @@ def create_app(test_config=None):
   validate_required_env_vars(required_env_vars)
   
   app.config.from_mapping(
+    APP_BASE_URL=os.environ["APP_BASE_URL"],
     DATABASE_URL=os.environ.get("DATABASE_URL"),
+    RATELIMIT_STORAGE_URI=os.environ.get("RATELIMIT_STORAGE_URI", "memory://"),
     SECRET_KEY=os.environ.get("SECRET_KEY"),
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=(
@@ -43,6 +48,7 @@ def create_app(test_config=None):
     raise RuntimeError("SECRET_KEY is not configured.")
   
   csrf.init_app(app)
+  limiter.init_app(app)
   
   from ipray4u.routes import (
     auth_blueprint,

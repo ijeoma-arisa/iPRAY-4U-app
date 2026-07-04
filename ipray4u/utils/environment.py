@@ -1,12 +1,14 @@
 import os 
 
 TEST_REQUIRED_ENV_VARS = [
+  "APP_BASE_URL",
   "TEST_DATABASE_URL",
   "SECRET_KEY",
   "SESSION_COOKIE_SECURE",
 ]
 
 PROD_REQUIRED_ENV_VARS = [
+  "APP_BASE_URL",
   "DATABASE_URL",
   "SUPABASE_URL",
   "SUPABASE_PUBLISHABLE_KEY",
@@ -21,4 +23,3 @@ def validate_required_env_vars(required_vars):
     raise RuntimeError(
       f"Missing required environment variables: {', '.join(missing_vars)}"
     )
-    

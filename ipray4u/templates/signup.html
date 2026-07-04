@@ -38,28 +38,34 @@
         >
 
         <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password"
-          autocomplete="new-password" 
-          minlength="8"
-          required
-        >
+        <div class="password-field">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          >
+          <button type="button" class="password-toggle" data-password-toggle="password" aria-controls="password" aria-label="Show password" aria-pressed="false">Show</button>
+        </div>
 
         <p class="form-help">
           Password must be at least 8 characters.
         </p>
 
         <label for="confirm-password">Confirm Password</label>
-        <input 
-          type="password" 
-          id="confirm-password" 
-          name="confirm-password"
-          autocomplete="new-password"
-          minlength="8" 
-          required
-        >
+        <div class="password-field">
+          <input
+            type="password"
+            id="confirm-password"
+            name="confirm-password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          >
+          <button type="button" class="password-toggle" data-password-toggle="confirm-password" aria-controls="confirm-password" aria-label="Show confirm password" aria-pressed="false">Show</button>
+        </div>
       </div>
 
       <button type="submit" class="btn save-button">Sign Up</button>
@@ -71,4 +77,8 @@
     </form>
   </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/password-toggle.js') }}" defer></script>
 {% endblock %}

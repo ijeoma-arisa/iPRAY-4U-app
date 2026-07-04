@@ -9,10 +9,18 @@ from flask import (
     session,
 )
 from supabase_auth.errors import AuthApiError
+from ipray4u import limiter
 from ipray4u.supabase_client import get_supabase
 from ipray4u.db.profiles import ensure_profile_exists
 
 MIN_PASSWORD_LENGTH = 8
+PASSWORD_RESET_SENT_MESSAGE = (
+    "If an account exists for that email, a password reset link has been sent."
+)
+PASSWORD_RESET_ERROR_MESSAGE = (
+    "Unable to reset your password. Please request a new reset link."
+)
+PASSWORD_RESET_TOKEN_HASH_KEY = "password_reset_token_hash"
 
 auth_blueprint = Blueprint("auth", __name__)
 
@@ -55,6 +63,92 @@ def signup_user():
 def login_page():
     return render_template("login.html")
 
+@auth_blueprint.get("/forgot-password")
+def forgot_password_page():
+    return render_template("forgot-password.html")
+
+@auth_blueprint.post("/forgot-password")
+@limiter.limit("5 per hour")
+def forgot_password():
+    email = request.form.get("email", "").strip()
+    reset_url = (
+        f"{current_app.config['APP_BASE_URL'].rstrip('/')}"
+        f"{url_for('auth.reset_password_page')}"
+    )
+
+    try:
+        get_supabase().auth.reset_password_for_email(
+            email,
+            {"redirect_to": reset_url},
+        )
+    except Exception:
+        # The response must remain identical so it cannot reveal account existence.
+        current_app.logger.exception("Unable to send password reset email")
+
+    flash(PASSWORD_RESET_SENT_MESSAGE, "success")
+    return redirect(url_for("auth.forgot_password_page"))
+
+@auth_blueprint.get("/reset-password")
+def reset_password_page():
+    token_hash = request.args.get("token_hash", "").strip()
+    recovery_type = request.args.get("type", "").strip()
+
+    if token_hash or recovery_type:
+        if not token_hash or recovery_type != "recovery":
+            session.pop(PASSWORD_RESET_TOKEN_HASH_KEY, None)
+            flash(PASSWORD_RESET_ERROR_MESSAGE, "error")
+            return redirect(url_for("auth.forgot_password_page"))
+
+        session[PASSWORD_RESET_TOKEN_HASH_KEY] = token_hash
+        return redirect(url_for("auth.reset_password_page"))
+
+    return render_template("reset-password.html")
+
+@auth_blueprint.post("/reset-password")
+def reset_password():
+    password = request.form.get("password", "")
+    confirm_password = request.form.get("confirm-password", "")
+    token_hash = session.get(PASSWORD_RESET_TOKEN_HASH_KEY)
+
+    if not password or len(password) < MIN_PASSWORD_LENGTH:
+        flash(f"Password must be at least {MIN_PASSWORD_LENGTH} characters.", "error")
+        return render_template("reset-password.html"), 400
+
+    if password != confirm_password:
+        flash("Passwords do not match.", "error")
+        return render_template("reset-password.html"), 400
+
+    if not token_hash:
+        flash("This reset link is invalid or expired. Please request a new one.", "error")
+        return render_template("reset-password.html"), 400
+
+    try:
+        supabase = get_supabase()
+        response = supabase.auth.verify_otp(
+            {
+                "token_hash": token_hash,
+                "type": "recovery",
+            }
+        )
+        if not response.session:
+            raise RuntimeError("Password recovery session was not returned")
+
+        supabase.auth.update_user({"password": password})
+    except Exception:
+        current_app.logger.exception("Unable to reset password")
+        session.pop(PASSWORD_RESET_TOKEN_HASH_KEY, None)
+        flash(PASSWORD_RESET_ERROR_MESSAGE, "error")
+        return render_template("reset-password.html"), 400
+
+    session.pop(PASSWORD_RESET_TOKEN_HASH_KEY, None)
+    try:
+        supabase.auth.sign_out({"scope": "local"})
+    except Exception:
+        current_app.logger.exception("Unable to clear password recovery session")
+
+    flash("Password updated. You can now log in.", "success")
+    return redirect(url_for("auth.login_page"))
+
 @auth_blueprint.post("/login")
 def login_user():
     supabase = get_supabase()
@@ -92,4 +186,3 @@ def logout_user():
     session.clear()
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.login_page"))
-    

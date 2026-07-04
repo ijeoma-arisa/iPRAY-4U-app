@@ -43,6 +43,7 @@ jobs:
 
       - name: Run tests
         env:
+          APP_BASE_URL: https://test.ipray4u.example
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/prayer_test
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           SESSION_COOKIE_SECURE: "False"

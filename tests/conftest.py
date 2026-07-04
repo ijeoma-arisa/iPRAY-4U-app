@@ -22,6 +22,7 @@ load_dotenv()
 @pytest.fixture
 def app():
     app = create_app({
+        "APP_BASE_URL": "https://test.ipray4u.example",
         "TESTING": True,
         "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
         "WTF_CSRF_ENABLED": False,
@@ -92,7 +93,7 @@ def sample_person(auth_client):
     expected_message=post_success("Person"),
     expected_status=201    
   )
-  
+
   return data
 
 @pytest.fixture
@@ -139,5 +140,4 @@ def mock_login_response():
             id="00000000-0000-0000-0000-000000000001",
             email="test@example.com",
         )
-  )  
-  
+  )

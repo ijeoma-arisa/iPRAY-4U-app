@@ -1,10 +1,14 @@
 from .helpers.assertions import assert_success_response
+from ipray4u import limiter
 from ipray4u.utils.success_messages import get_success
+from ipray4u.routes.auth import PASSWORD_RESET_TOKEN_HASH_KEY
 from .helpers.urls import (
     SIGNUP_URL,
     VERIFY_URL,
     LOGIN_URL,
     LOGOUT_URL, 
+    FORGOT_PASSWORD_URL,
+    RESET_PASSWORD_URL,
     PRAYER_REQUESTS_URL,
 )
 
@@ -109,6 +113,230 @@ def test_login_with_unexpected_error_redirects_to_login_and_does_not_set_session
     with client.session_transaction() as session:
         assert "user_id" not in session
         assert "email" not in session
+
+
+# Password Reset Tests
+def test_forgot_password_page_loads(client):
+    response = client.get(FORGOT_PASSWORD_URL)
+
+    assert response.status_code == 200
+    assert b"Forgot Password" in response.data
+
+
+def test_reset_password_page_loads(client):
+    response = client.get(RESET_PASSWORD_URL)
+
+    assert response.status_code == 200
+    assert b"Reset Password" in response.data
+
+
+def test_forgot_password_sends_reset_email(client, mock_supabase):
+    response = client.post(
+        FORGOT_PASSWORD_URL,
+        data={"email": "  person@example.com  "},
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == FORGOT_PASSWORD_URL
+    mock_supabase.auth.reset_password_for_email.assert_called_once_with(
+        "person@example.com",
+        {"redirect_to": "https://test.ipray4u.example/reset-password"},
+    )
+
+
+def test_forgot_password_does_not_reveal_account_existence(
+    client,
+    mock_supabase,
+):
+    successful_response = client.post(
+        FORGOT_PASSWORD_URL,
+        data={"email": "person@example.com"},
+        follow_redirects=True,
+    )
+
+    mock_supabase.auth.reset_password_for_email.side_effect = Exception(
+        "User not found"
+    )
+
+    missing_account_response = client.post(
+        FORGOT_PASSWORD_URL,
+        data={"email": "missing@example.com"},
+        follow_redirects=True,
+    )
+
+    assert missing_account_response.status_code == 200
+    assert missing_account_response.data == successful_response.data
+    assert b"If an account exists for that email" in missing_account_response.data
+    assert b"missing@example.com" not in missing_account_response.data
+    assert b"User not found" not in missing_account_response.data
+
+
+def test_forgot_password_is_rate_limited(client, mock_supabase):
+    limiter.reset()
+
+    try:
+        responses = [
+            client.post(
+                FORGOT_PASSWORD_URL,
+                data={"email": "person@example.com"},
+            )
+            for _ in range(6)
+        ]
+    finally:
+        limiter.reset()
+
+    assert all(response.status_code == 302 for response in responses[:5])
+    assert responses[5].status_code == 429
+
+
+def test_reset_password_stores_recovery_token_hash(client, mock_supabase):
+    response = client.get(
+        f"{RESET_PASSWORD_URL}?token_hash=recovery-token&type=recovery"
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == RESET_PASSWORD_URL
+
+    with client.session_transaction() as flask_session:
+        assert flask_session[PASSWORD_RESET_TOKEN_HASH_KEY] == "recovery-token"
+
+    mock_supabase.auth.verify_otp.assert_not_called()
+
+
+def test_reset_password_rejects_invalid_recovery_type(client):
+    response = client.get(
+        f"{RESET_PASSWORD_URL}?token_hash=recovery-token&type=invite",
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert b"Unable to reset your password" in response.data
+
+
+def test_reset_password_missing_recovery_session_does_not_update_user(
+    client,
+    mock_supabase,
+):
+    response = client.post(
+        RESET_PASSWORD_URL,
+        data={
+            "password": "new-password",
+            "confirm-password": "new-password",
+        },
+    )
+
+    assert response.status_code == 400
+    assert b"reset link is invalid or expired" in response.data
+    mock_supabase.auth.verify_otp.assert_not_called()
+    mock_supabase.auth.update_user.assert_not_called()
+
+
+def test_reset_password_too_short_does_not_update_user(client, mock_supabase):
+    response = client.post(
+        RESET_PASSWORD_URL,
+        data={"password": "short", "confirm-password": "short"},
+    )
+
+    assert response.status_code == 400
+    assert b"Password must be at least 8 characters" in response.data
+    mock_supabase.auth.verify_otp.assert_not_called()
+    mock_supabase.auth.update_user.assert_not_called()
+
+
+def test_reset_password_mismatch_does_not_update_user(client, mock_supabase):
+    response = client.post(
+        RESET_PASSWORD_URL,
+        data={
+            "password": "new-password",
+            "confirm-password": "different-password",
+        },
+    )
+
+    assert response.status_code == 400
+    assert b"Passwords do not match" in response.data
+    mock_supabase.auth.verify_otp.assert_not_called()
+    mock_supabase.auth.update_user.assert_not_called()
+
+
+def test_reset_password_updates_user_and_redirects_to_login(client, mock_supabase):
+    with client.session_transaction() as flask_session:
+        flask_session[PASSWORD_RESET_TOKEN_HASH_KEY] = "recovery-token"
+
+    mock_supabase.auth.verify_otp.return_value.session = object()
+
+    response = client.post(
+        RESET_PASSWORD_URL,
+        data={
+            "password": "new-password",
+            "confirm-password": "new-password",
+        },
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == LOGIN_URL
+    mock_supabase.auth.verify_otp.assert_called_once_with(
+        {
+            "token_hash": "recovery-token",
+            "type": "recovery",
+        }
+    )
+    mock_supabase.auth.update_user.assert_called_once_with(
+        {"password": "new-password"}
+    )
+    mock_supabase.auth.sign_out.assert_called_once_with({"scope": "local"})
+
+    with client.session_transaction() as flask_session:
+        assert PASSWORD_RESET_TOKEN_HASH_KEY not in flask_session
+
+
+def test_reset_password_update_failure_is_safe(client, mock_supabase):
+    with client.session_transaction() as flask_session:
+        flask_session[PASSWORD_RESET_TOKEN_HASH_KEY] = "recovery-token"
+
+    mock_supabase.auth.verify_otp.return_value.session = object()
+    mock_supabase.auth.update_user.side_effect = Exception(
+        "Sensitive Supabase update error"
+    )
+
+    response = client.post(
+        RESET_PASSWORD_URL,
+        data={
+            "password": "new-password",
+            "confirm-password": "new-password",
+        },
+    )
+
+    assert response.status_code == 400
+    assert b"Unable to reset your password" in response.data
+    assert b"Sensitive Supabase update error" not in response.data
+
+    with client.session_transaction() as flask_session:
+        assert PASSWORD_RESET_TOKEN_HASH_KEY not in flask_session
+
+
+def test_reset_password_verification_failure_is_safe(client, mock_supabase):
+    with client.session_transaction() as flask_session:
+        flask_session[PASSWORD_RESET_TOKEN_HASH_KEY] = "recovery-token"
+
+    mock_supabase.auth.verify_otp.side_effect = Exception(
+        "Sensitive Supabase verification error"
+    )
+
+    response = client.post(
+        RESET_PASSWORD_URL,
+        data={
+            "password": "new-password",
+            "confirm-password": "new-password",
+        },
+    )
+
+    assert response.status_code == 400
+    assert b"Unable to reset your password" in response.data
+    assert b"Sensitive Supabase verification error" not in response.data
+    mock_supabase.auth.update_user.assert_not_called()
+
+    with client.session_transaction() as flask_session:
+        assert PASSWORD_RESET_TOKEN_HASH_KEY not in flask_session
 
 # Logout Tests
 def test_logout_clears_session_and_redirects_to_login(auth_client):
