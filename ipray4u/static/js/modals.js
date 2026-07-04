@@ -35,6 +35,10 @@ function initPrayerRequestModalListeners(){
       
       const personCard = event.target.closest('.person-card-js');
       const prayerRequestForm = document.querySelector('.prayer-request-form-js');
+      const errorMessage = prayerRequestForm.querySelector('.prayer-request-error-js');
+
+      errorMessage.hidden = true;
+      errorMessage.textContent = '';
       
       if (personCard){
         
