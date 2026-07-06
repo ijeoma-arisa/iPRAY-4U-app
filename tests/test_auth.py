@@ -23,6 +23,10 @@ def test_signup_page_loads(client):
     
     assert response.status_code == 200
     assert b"Sign Up" in response.data
+    assert response.data.count(
+        b'data-password-toggle="password confirm-password"'
+    ) == 2
+    assert b">Show<" not in response.data
 
 def test_signup_with_valid_data_redirects_to_verify_page(
     client, 
@@ -49,6 +53,8 @@ def test_login_page_loads(client):
     
     assert response.status_code == 200
     assert b"Log In" in response.data
+    assert b'data-password-toggle="password"' in response.data
+    assert b">Show<" not in response.data
 
 
 def test_login_with_valid_credentials_sets_session_and_redirects(
@@ -128,6 +134,10 @@ def test_reset_password_page_loads(client):
 
     assert response.status_code == 200
     assert b"Reset Password" in response.data
+    assert response.data.count(
+        b'data-password-toggle="password confirm-password"'
+    ) == 2
+    assert b">Show<" not in response.data
 
 
 def test_forgot_password_sends_reset_email(client, mock_supabase):
