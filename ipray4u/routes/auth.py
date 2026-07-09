@@ -12,6 +12,7 @@ from supabase_auth.errors import AuthApiError
 from ipray4u import limiter
 from ipray4u.supabase_client import get_supabase
 from ipray4u.db.profiles import ensure_profile_exists
+from flask_limiter.util import get_remote_address
 
 MIN_PASSWORD_LENGTH = 8
 PASSWORD_RESET_SENT_MESSAGE = (
@@ -73,6 +74,17 @@ def forgot_password_page():
 @auth_blueprint.post("/forgot-password")
 @limiter.limit("5 per hour")
 def forgot_password():
+    current_app.logger.info(
+    "remote_addr=%s x_forwarded_for=%s",
+    request.remote_addr,
+    request.headers.get("X-Forwarded-For"),
+    )
+    
+    current_app.logger.info(
+    "limiter_key=%s",
+    get_remote_address(),
+    )
+    
     email = request.form.get("email", "").strip()
     reset_url = (
         f"{current_app.config['APP_BASE_URL'].rstrip('/')}"
