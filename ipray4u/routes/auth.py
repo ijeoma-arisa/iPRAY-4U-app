@@ -74,13 +74,13 @@ def forgot_password_page():
 @auth_blueprint.post("/forgot-password")
 @limiter.limit("5 per hour")
 def forgot_password():
-    current_app.logger.info(
+    current_app.logger.warning(
     "remote_addr=%s x_forwarded_for=%s",
     request.remote_addr,
     request.headers.get("X-Forwarded-For"),
     )
     
-    current_app.logger.info(
+    current_app.logger.warning(
     "limiter_key=%s",
     get_remote_address(),
     )
