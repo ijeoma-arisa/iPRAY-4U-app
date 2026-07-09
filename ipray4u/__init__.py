@@ -77,6 +77,13 @@ def create_app(test_config=None):
   csrf.init_app(app)
   limiter.init_app(app)
   
+  #TODO: Remove during production
+  app.logger.info(
+    "Rate limit config: enabled=%s storage=%s",
+    app.config.get("RATELIMIT_ENABLED", True),
+    app.config.get("RATELIMIT_STORAGE_URI"),
+  )
+  
   from ipray4u.routes import (
     auth_blueprint,
     pages_blueprint,
