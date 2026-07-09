@@ -3,7 +3,10 @@ import os
 from .helpers.assertions import assert_success_response
 from ipray4u import create_app, limiter
 from ipray4u.utils.success_messages import get_success
-from ipray4u.routes.auth import PASSWORD_RESET_TOKEN_HASH_KEY
+from ipray4u.routes.auth import (
+    PASSWORD_RESET_RATE_LIMIT_MESSAGE,
+    PASSWORD_RESET_TOKEN_HASH_KEY,
+)
 from .helpers.urls import (
     SIGNUP_URL,
     VERIFY_URL,
@@ -209,6 +212,8 @@ def test_forgot_password_is_rate_limited(mock_supabase):
 
     assert all(response.status_code == 302 for response in responses[:5])
     assert responses[5].status_code == 429
+    assert b"Forgot Password" in responses[5].data
+    assert PASSWORD_RESET_RATE_LIMIT_MESSAGE.encode() in responses[5].data
 
 
 def test_reset_password_stores_recovery_token_hash(client, mock_supabase):

@@ -17,6 +17,9 @@ MIN_PASSWORD_LENGTH = 8
 PASSWORD_RESET_SENT_MESSAGE = (
     "If an account exists for that email, a password reset link has been sent."
 )
+PASSWORD_RESET_RATE_LIMIT_MESSAGE = (
+    "Too many password reset attempts. Please try again later."
+)
 PASSWORD_RESET_ERROR_MESSAGE = (
     "Unable to reset your password. Please request a new reset link."
 )

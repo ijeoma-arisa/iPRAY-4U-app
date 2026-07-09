@@ -1,8 +1,10 @@
 import os
 from flask import (
   Flask,
+  flash,
   g,
   render_template,
+  session,
 )
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
@@ -94,6 +96,16 @@ def create_app(test_config=None):
   @app.errorhandler(500)
   def internal_server_error(error):
     return render_template("500.html"), 500
+
+  @app.errorhandler(429)
+  def too_many_requests(error):
+    from ipray4u.routes.auth import PASSWORD_RESET_RATE_LIMIT_MESSAGE
+
+    # This is correct while forgot password is the only rate-limited endpoint.
+    # Expand this handler if other flows start using rate limits.
+    session.pop("_flashes", None)
+    flash(PASSWORD_RESET_RATE_LIMIT_MESSAGE, "error")
+    return render_template("forgot-password.html"), 429
     
   with app.app_context():
     init_db()
