@@ -1,7 +1,7 @@
 import os
 import pytest
 from flask import request
-from ipray4u import create_app
+from ipray4u import create_app, limiter
 from ipray4u.utils.environment import (
     DEPLOYMENT_REQUIRED_ENV_VARS,
     get_ratelimit_storage_uri,
@@ -102,6 +102,7 @@ def test_create_app_allows_test_config_memory_storage_in_production(monkeypatch)
     app = create_app({
         "APP_BASE_URL": "https://test.ipray4u.example",
         "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
+        "RATELIMIT_ENABLED": False,
         "RATELIMIT_STORAGE_URI": "memory://",
         "TESTING": True,
         "WTF_CSRF_ENABLED": False,
@@ -214,6 +215,7 @@ def test_proxy_fix_uses_x_forwarded_for_when_configured(monkeypatch):
         "APP_BASE_URL": "https://test.ipray4u.example",
         "TESTING": True,
         "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
+        "RATELIMIT_ENABLED": False,
         "RATELIMIT_STORAGE_URI": "memory://",
         "WTF_CSRF_ENABLED": False,
     })
@@ -241,3 +243,30 @@ def test_proxy_fix_uses_x_forwarded_for_when_configured(monkeypatch):
         "remote_addr": "203.0.113.10",
         "scheme": "https",
     }
+
+
+def test_rate_limit_blocks_after_configured_limit():
+    app = create_app({
+        "APP_BASE_URL": "https://test.ipray4u.example",
+        "TESTING": True,
+        "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
+        "RATELIMIT_ENABLED": True,
+        "RATELIMIT_STORAGE_URI": "memory://",
+        "WTF_CSRF_ENABLED": False,
+    })
+
+    @app.get("/rate-limit-test")
+    @limiter.limit("2 per minute")
+    def rate_limit_test():
+        return {"ok": True}
+
+    client = app.test_client()
+
+    limiter.reset()
+
+    try:
+        assert client.get("/rate-limit-test").status_code == 200
+        assert client.get("/rate-limit-test").status_code == 200
+        assert client.get("/rate-limit-test").status_code == 429
+    finally:
+        limiter.reset()

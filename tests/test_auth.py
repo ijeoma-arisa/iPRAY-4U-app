@@ -1,5 +1,7 @@
+import os
+
 from .helpers.assertions import assert_success_response
-from ipray4u import limiter
+from ipray4u import create_app, limiter
 from ipray4u.utils.success_messages import get_success
 from ipray4u.routes.auth import PASSWORD_RESET_TOKEN_HASH_KEY
 from .helpers.urls import (
@@ -181,7 +183,17 @@ def test_forgot_password_does_not_reveal_account_existence(
     assert b"User not found" not in missing_account_response.data
 
 
-def test_forgot_password_is_rate_limited(client, mock_supabase):
+def test_forgot_password_is_rate_limited(mock_supabase):
+    app = create_app({
+        "APP_BASE_URL": "https://test.ipray4u.example",
+        "TESTING": True,
+        "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
+        "RATELIMIT_ENABLED": True,
+        "RATELIMIT_STORAGE_URI": "memory://",
+        "WTF_CSRF_ENABLED": False,
+    })
+    client = app.test_client()
+
     limiter.reset()
 
     try:

@@ -25,6 +25,7 @@ def app():
         "APP_BASE_URL": "https://test.ipray4u.example",
         "TESTING": True,
         "DATABASE_URL": os.environ["TEST_DATABASE_URL"],
+        "RATELIMIT_ENABLED": False,
         "RATELIMIT_STORAGE_URI": "memory://",
         "WTF_CSRF_ENABLED": False,
     })
