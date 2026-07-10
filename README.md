@@ -110,6 +110,11 @@ SUPABASE_PUBLISHABLE_KEY=
 # backend on Render.
 RATELIMIT_STORAGE_URI=memory://
 
+# Local/test default: no trusted proxies.
+# On Render, set TRUSTED_PROXY_COUNT=2 because requests reach the app
+# through two trusted proxy hops.
+# TRUSTED_PROXY_COUNT=2
+
 # Local development over HTTP
 SESSION_COOKIE_SECURE=False
 
@@ -118,9 +123,9 @@ SESSION_COOKIE_SECURE=False
 ```
 
 Staging and production must use a shared limiter backend, such as Redis/Valkey.
-Do not use `memory://` outside local development and tests. The app trusts one
-Render proxy hop by default so Flask-Limiter keys requests by the real client IP
-from `X-Forwarded-For`.
+Do not use `memory://` outside local development and tests. Staging and
+production must set `TRUSTED_PROXY_COUNT=2` on Render so Flask-Limiter keys
+requests by the real client IP from `X-Forwarded-For`.
 
 ### Supabase Password-Recovery Template
 

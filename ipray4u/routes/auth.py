@@ -89,7 +89,12 @@ def forgot_password():
         list(request.access_route),
         get_remote_address(),
     )
-    
+
+    current_app.logger.warning(
+    "X-Forwarded-Proto=%s",
+    request.headers.get("X-Forwarded-Proto"),
+    )
+
     email = request.form.get("email", "").strip()
     reset_url = (
         f"{current_app.config['APP_BASE_URL'].rstrip('/')}"

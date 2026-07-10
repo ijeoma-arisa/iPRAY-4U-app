@@ -105,6 +105,7 @@ def test_create_app_allows_test_config_memory_storage_in_production(monkeypatch)
         "RATELIMIT_ENABLED": False,
         "RATELIMIT_STORAGE_URI": "memory://",
         "TESTING": True,
+        "TRUSTED_PROXY_COUNT": "2",
         "WTF_CSRF_ENABLED": False,
     })
 
@@ -161,6 +162,7 @@ def test_create_app_rejects_memory_ratelimit_storage_in_production(monkeypatch):
 
     monkeypatch.setenv("APP_ENV", "production")
     monkeypatch.setenv("RATELIMIT_STORAGE_URI", "memory://")
+    monkeypatch.setenv("TRUSTED_PROXY_COUNT", "2")
     monkeypatch.setenv("SESSION_COOKIE_SECURE", "true")
 
     with pytest.raises(RuntimeError) as error:
@@ -176,6 +178,21 @@ def test_ratelimit_storage_allows_shared_backend_in_production(monkeypatch):
     assert get_ratelimit_storage_uri() == "redis://localhost:6379/0"
 
 
+def test_create_app_requires_trusted_proxy_count_for_production(monkeypatch):
+    for var in REQUIRED_ENV_VARS:
+        monkeypatch.setenv(var, "test-value")
+
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("RATELIMIT_STORAGE_URI", "redis://localhost:6379/0")
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "true")
+    monkeypatch.delenv("TRUSTED_PROXY_COUNT", raising=False)
+
+    with pytest.raises(RuntimeError) as error:
+        create_app()
+
+    assert "TRUSTED_PROXY_COUNT" in str(error.value)
+
+
 def test_trusted_proxy_count_defaults_to_zero_outside_deployed_env(monkeypatch):
     monkeypatch.delenv("TRUSTED_PROXY_COUNT", raising=False)
     monkeypatch.delenv("APP_ENV", raising=False)
@@ -183,11 +200,20 @@ def test_trusted_proxy_count_defaults_to_zero_outside_deployed_env(monkeypatch):
     assert get_trusted_proxy_count() == 0
 
 
-def test_trusted_proxy_count_defaults_to_one_in_production(monkeypatch):
+def test_trusted_proxy_count_is_required_in_production(monkeypatch):
     monkeypatch.delenv("TRUSTED_PROXY_COUNT", raising=False)
     monkeypatch.setenv("APP_ENV", "production")
 
-    assert get_trusted_proxy_count() == 1
+    with pytest.raises(RuntimeError) as error:
+        get_trusted_proxy_count()
+
+    assert "TRUSTED_PROXY_COUNT" in str(error.value)
+
+
+def test_trusted_proxy_count_allows_render_two_proxy_hops(monkeypatch):
+    monkeypatch.setenv("TRUSTED_PROXY_COUNT", "2")
+
+    assert get_trusted_proxy_count() == 2
 
 
 def test_trusted_proxy_count_rejects_invalid_value(monkeypatch):
@@ -209,7 +235,7 @@ def test_trusted_proxy_count_rejects_negative_value(monkeypatch):
 
 
 def test_proxy_fix_uses_x_forwarded_for_when_configured(monkeypatch):
-    monkeypatch.setenv("TRUSTED_PROXY_COUNT", "1")
+    monkeypatch.setenv("TRUSTED_PROXY_COUNT", "2")
 
     app = create_app({
         "APP_BASE_URL": "https://test.ipray4u.example",
@@ -233,7 +259,7 @@ def test_proxy_fix_uses_x_forwarded_for_when_configured(monkeypatch):
         "/remote-addr-test",
         environ_base={"REMOTE_ADDR": "10.0.0.5"},
         headers={
-            "X-Forwarded-For": "203.0.113.10",
+            "X-Forwarded-For": "203.0.113.10, 10.0.0.10",
             "X-Forwarded-Proto": "https",
         },
     )

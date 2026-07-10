@@ -14,6 +14,7 @@ DEPLOYMENT_REQUIRED_ENV_VARS = [
   "SUPABASE_URL",
   "SUPABASE_PUBLISHABLE_KEY",
   "RATELIMIT_STORAGE_URI",
+  "TRUSTED_PROXY_COUNT",
   "SECRET_KEY",
   "SESSION_COOKIE_SECURE",
 ]
@@ -69,7 +70,12 @@ def get_trusted_proxy_count(default=0):
   raw_value = os.environ.get("TRUSTED_PROXY_COUNT")
 
   if raw_value is None:
-    return 1 if is_deployed_environment() else default
+    if is_deployed_environment():
+      raise RuntimeError(
+        "TRUSTED_PROXY_COUNT must be configured in deployed environments."
+      )
+
+    return default
 
   try:
     proxy_count = int(raw_value)

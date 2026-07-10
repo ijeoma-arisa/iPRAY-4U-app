@@ -73,7 +73,9 @@ def create_app(test_config=None):
     app.wsgi_app = ProxyFix(
       app.wsgi_app,
       x_for=trusted_proxy_count,
-      x_proto=trusted_proxy_count,
+      # Header trust counts are independent; Render has two forwarded address
+      # values, but only one verified forwarded proto value so far.
+      x_proto=1,
     )
   
   csrf.init_app(app)

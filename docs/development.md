@@ -18,7 +18,8 @@ shared Redis/Valkey Flask-Limiter backend, such as `redis://...` or `rediss://..
 Set `APP_ENV` to `staging` or `production` in deployed environments. Leave it
 unset for local development.
 
-The app enables Werkzeug `ProxyFix` for one trusted Render proxy hop in deployed
-environments, which lets Flask and Flask-Limiter use the real client IP from
-`X-Forwarded-For`. If the proxy topology changes, set `TRUSTED_PROXY_COUNT` to
-the exact number of trusted proxy hops.
+Local/test default: no trusted proxies. On Render, set `TRUSTED_PROXY_COUNT=2`
+because requests reach the app through two trusted proxy hops. This lets Flask
+and Flask-Limiter use the real client IP from `X-Forwarded-For`. If the proxy
+topology changes, set `TRUSTED_PROXY_COUNT` to the exact number of trusted proxy
+hops.
