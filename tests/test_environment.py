@@ -168,7 +168,7 @@ def test_create_app_rejects_memory_ratelimit_storage_in_production(monkeypatch):
     with pytest.raises(RuntimeError) as error:
         create_app()
 
-    assert "Redis/Valkey" in str(error.value)
+    assert "RATELIMIT_STORAGE_URI" in str(error.value)
 
 
 def test_ratelimit_storage_allows_shared_backend_in_production(monkeypatch):
