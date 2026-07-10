@@ -74,15 +74,20 @@ def forgot_password_page():
 @auth_blueprint.post("/forgot-password")
 @limiter.limit("5 per hour")
 def forgot_password():
+    proxy_fix_original = request.environ.get("werkzeug.proxy_fix.orig", {})
+
     current_app.logger.warning(
-    "remote_addr=%s x_forwarded_for=%s",
-    request.remote_addr,
-    request.headers.get("X-Forwarded-For"),
-    )
-    
-    current_app.logger.warning(
-    "limiter_key=%s",
-    get_remote_address(),
+        "Limiter debug | "
+        "original_remote_addr=%s | "
+        "remote_addr=%s | "
+        "x_forwarded_for=%s | "
+        "access_route=%s | "
+        "limiter_key=%s",
+        proxy_fix_original.get("REMOTE_ADDR"),
+        request.remote_addr,
+        request.headers.get("X-Forwarded-For"),
+        list(request.access_route),
+        get_remote_address(),
     )
     
     email = request.form.get("email", "").strip()
