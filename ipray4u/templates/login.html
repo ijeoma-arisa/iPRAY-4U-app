@@ -27,7 +27,7 @@
       
       <div class="form-data">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" value="{{ email | default('') }}" required>
 
         <label for="password">Password</label>
         <div class="password-field">

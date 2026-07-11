@@ -1,3 +1,6 @@
+import hashlib
+import re
+
 from flask import (
     Blueprint, 
     render_template, 
@@ -12,21 +15,40 @@ from supabase_auth.errors import AuthApiError
 from ipray4u import limiter
 from ipray4u.supabase_client import get_supabase
 from ipray4u.db.profiles import ensure_profile_exists
-from flask_limiter.util import get_remote_address
 
 MIN_PASSWORD_LENGTH = 8
+EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+INVALID_EMAIL_MESSAGE = "Enter a valid email address."
 PASSWORD_RESET_SENT_MESSAGE = (
-    "If an account exists for that email, a password reset link has been sent."
+    "If an account exists for that email, a password reset link has been sent. "
+    "Please check your inbox and spam folder."
 )
 PASSWORD_RESET_RATE_LIMIT_MESSAGE = (
-    "Too many password reset attempts. Please try again later."
+    "Too many password reset requests. Please wait before trying again."
 )
 PASSWORD_RESET_ERROR_MESSAGE = (
-    "Unable to reset your password. Please request a new reset link."
+    "This password reset link is invalid or has expired. "
+    "Please request a new reset link."
 )
 PASSWORD_RESET_TOKEN_HASH_KEY = "password_reset_token_hash"
 
 auth_blueprint = Blueprint("auth", __name__)
+
+def normalize_email(value: str) -> str:
+    return value.strip().casefold()
+
+def is_valid_email(email: str) -> bool:
+    return bool(EMAIL_PATTERN.fullmatch(email))
+
+def get_password_reset_email_key() -> str:
+    email = normalize_email(request.form.get("email", ""))
+    email_hash = hashlib.sha256(email.encode("utf-8")).hexdigest()
+    return f"password-reset-email:{email_hash}"
+
+@auth_blueprint.after_request
+def prevent_auth_response_caching(response):
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 @auth_blueprint.get("/verify")
 def verify_page():
@@ -38,11 +60,13 @@ def signup_page():
 
 @auth_blueprint.post("/signup")
 def signup_user():   
-    supabase = get_supabase()
-     
-    email = request.form.get("email", "").strip()
+    email = normalize_email(request.form.get("email", ""))
     password = request.form.get("password", "")
     confirm_password = request.form.get("confirm-password", "")
+
+    if not is_valid_email(email):
+        flash(INVALID_EMAIL_MESSAGE, "error")
+        return render_template("signup.html", email=email), 400
     
     if not password or len(password) < MIN_PASSWORD_LENGTH:
         flash(f"Password must be at least {MIN_PASSWORD_LENGTH} characters.", "error")
@@ -51,7 +75,8 @@ def signup_user():
     if password != confirm_password:
         flash("Passwords do not match.", "error")
         return render_template("signup.html", email=email), 400
-    
+
+    supabase = get_supabase()
     supabase.auth.sign_up(
         {
             "email": email,
@@ -72,30 +97,21 @@ def forgot_password_page():
     return render_template("forgot-password.html")
 
 @auth_blueprint.post("/forgot-password")
-@limiter.limit("5 per hour")
+@limiter.limit("5 per hour", error_message=PASSWORD_RESET_RATE_LIMIT_MESSAGE)
+@limiter.limit(
+    "1 per minute",
+    key_func=get_password_reset_email_key,
+    error_message=PASSWORD_RESET_RATE_LIMIT_MESSAGE,
+    deduct_when=lambda response: response.status_code < 400,
+)
 def forgot_password():
-    proxy_fix_original = request.environ.get("werkzeug.proxy_fix.orig", {})
+    email = normalize_email(request.form.get("email", ""))
 
-    current_app.logger.warning(
-        "Limiter debug | "
-        "original_remote_addr=%s | "
-        "remote_addr=%s | "
-        "x_forwarded_for=%s | "
-        "access_route=%s | "
-        "limiter_key=%s",
-        proxy_fix_original.get("REMOTE_ADDR"),
-        request.remote_addr,
-        request.headers.get("X-Forwarded-For"),
-        list(request.access_route),
-        get_remote_address(),
-    )
+    if not is_valid_email(email):
+        flash(INVALID_EMAIL_MESSAGE, "error")
+        return render_template("forgot-password.html", email=email), 400
 
-    current_app.logger.warning(
-    "X-Forwarded-Proto=%s",
-    request.headers.get("X-Forwarded-Proto"),
-    )
-
-    email = request.form.get("email", "").strip()
+    session.pop(PASSWORD_RESET_TOKEN_HASH_KEY, None)
     reset_url = (
         f"{current_app.config['APP_BASE_URL'].rstrip('/')}"
         f"{url_for('auth.reset_password_page')}"
@@ -127,6 +143,10 @@ def reset_password_page():
         session[PASSWORD_RESET_TOKEN_HASH_KEY] = token_hash
         return redirect(url_for("auth.reset_password_page"))
 
+    if not session.get(PASSWORD_RESET_TOKEN_HASH_KEY):
+        flash(PASSWORD_RESET_ERROR_MESSAGE, "error")
+        return redirect(url_for("auth.forgot_password_page"))
+
     return render_template("reset-password.html")
 
 @auth_blueprint.post("/reset-password")
@@ -144,8 +164,8 @@ def reset_password():
         return render_template("reset-password.html"), 400
 
     if not token_hash:
-        flash("This reset link is invalid or expired. Please request a new one.", "error")
-        return render_template("reset-password.html"), 400
+        flash(PASSWORD_RESET_ERROR_MESSAGE, "error")
+        return redirect(url_for("auth.forgot_password_page"))
 
     try:
         supabase = get_supabase()
@@ -163,7 +183,7 @@ def reset_password():
         current_app.logger.exception("Unable to reset password")
         session.pop(PASSWORD_RESET_TOKEN_HASH_KEY, None)
         flash(PASSWORD_RESET_ERROR_MESSAGE, "error")
-        return render_template("reset-password.html"), 400
+        return redirect(url_for("auth.forgot_password_page"))
 
     session.pop(PASSWORD_RESET_TOKEN_HASH_KEY, None)
     try:
@@ -177,11 +197,16 @@ def reset_password():
 @auth_blueprint.post("/login")
 def login_user():
     supabase = get_supabase()
+    email = normalize_email(request.form.get("email", ""))
+
+    if not is_valid_email(email):
+        flash("Invalid email or password.", "error")
+        return render_template("login.html", email=email), 401
     
     try:
         response = supabase.auth.sign_in_with_password(
             {
-                "email": request.form.get("email"),
+                "email": email,
                 "password": request.form.get("password"),
             }
         )
@@ -199,7 +224,7 @@ def login_user():
         
     except AuthApiError:
         flash("Invalid email or password.", "error")
-        return redirect(url_for("auth.login_page"))
+        return render_template("login.html", email=email), 401
     
     except Exception:
         current_app.logger.exception("Unexpected error during login")
