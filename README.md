@@ -80,14 +80,64 @@ pip install -r requirements.txt
 ```
 
 ## Environment Variables
-Create a `.env` file in the project root and configure the following variables:
+Copy `.env.example` to `.env`, then replace its placeholders with values for your environment:
+
+```bash
+cp .env.example .env
+```
+
+The application validates its required environment variables at startup. `APP_BASE_URL` must be the public base URL for the current environment.
 
 ```env
+# Local development
+APP_BASE_URL=http://localhost:5000
+
+# Example production URL
+# APP_BASE_URL=https://your-app.example.com
+
+# Deployed environments only: staging or production.
+# Leave unset locally. When APP_ENV is unset, the app defaults to
+# local-development behavior (for example, allowing the in-memory rate-limit backend).
+# APP_ENV=production
+
 DATABASE_URL=
+TEST_DATABASE_URL=
 SECRET_KEY=
 SUPABASE_URL=
 SUPABASE_PUBLISHABLE_KEY=
+
+# Local/test default. Staging and production must use a shared Redis/Valkey
+# backend on Render.
+RATELIMIT_STORAGE_URI=memory://
+
+# Local/test default: no trusted proxies.
+# On Render, set TRUSTED_PROXY_COUNT=2 because requests reach the app
+# through two trusted proxy hops.
+# TRUSTED_PROXY_COUNT=2
+
+# Local development over HTTP
+SESSION_COOKIE_SECURE=False
+
+# Production over HTTPS
+# SESSION_COOKIE_SECURE=True
 ```
+
+Staging and production must use a shared limiter backend, such as Redis/Valkey.
+Do not use `memory://` outside local development and tests. Staging and
+production must set `TRUSTED_PROXY_COUNT=2` on Render so Flask-Limiter keys
+requests by the real client IP from `X-Forwarded-For`.
+
+### Supabase Password-Recovery Template
+
+Add `<APP_BASE_URL>/reset-password` to the allowed redirect URLs in Supabase Auth. Then update the **Reset Password** email template under **Authentication → Email Templates** so its link sends the recovery token hash to the Flask app:
+
+```html
+<a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=recovery">
+  Reset password
+</a>
+```
+
+The app verifies this one-time token on form submission with Supabase Python's public `verify_otp({"token_hash": ..., "type": "recovery"})` API. This server-rendered flow does not depend on URL fragments or browser-side authentication JavaScript.
 
 ## Run Locally
 Start the Flask development server:

@@ -27,13 +27,20 @@
       
       <div class="form-data">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" value="{{ email | default('') }}" required>
 
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+        <div class="password-field">
+          <input type="password" id="password" name="password" autocomplete="current-password" required>
+          <button type="button" class="password-toggle" data-password-toggle="password" aria-controls="password" aria-label="Show password" aria-pressed="false"></button>
+        </div>
       </div>
 
       <button type="submit" class="btn save-button">Log In</button>
+
+      <p class="auth-footer">
+        <a href="{{ url_for('auth.forgot_password_page') }}">Forgot password?</a>
+      </p>
 
       <p class="auth-footer">
         Don’t have an account?
@@ -42,4 +49,8 @@
     </form>
   </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/password-toggle.js') }}" defer></script>
 {% endblock %}
