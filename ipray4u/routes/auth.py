@@ -129,6 +129,11 @@ def forgot_password():
     flash(PASSWORD_RESET_SENT_MESSAGE, "success")
     return redirect(url_for("auth.forgot_password_page"))
 
+#TODO: Improve password recovery UX:
+# Verify recovery tokens before displaying the reset-password form
+# so expired, reused, or invalid links redirect immediately to Forgot Password page
+# instead of allowing password entry only to reject it afterwards.
+ 
 @auth_blueprint.get("/reset-password")
 def reset_password_page():
     token_hash = request.args.get("token_hash", "").strip()
