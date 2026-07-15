@@ -168,11 +168,6 @@ label {
   background: rgba(0, 0, 0, 0.5);
 }
 
-html.modal-open,
-body.modal-open {
-  overflow: hidden;
-}
-
 .modal form input, 
 .modal textarea, 
 .modal select {

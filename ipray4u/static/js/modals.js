@@ -6,15 +6,6 @@ export function openModal(modal) {
   if (modal.open) return;
 
   modal.showModal();
-  document.documentElement.classList.add('modal-open');
-  document.body.classList.add('modal-open');
-}
-
-function unlockBackgroundScroll() {
-  if (document.querySelector('.modal-js:open')) return;
-
-  document.documentElement.classList.remove('modal-open');
-  document.body.classList.remove('modal-open');
 }
 
 function renderPrayerRequestModal() {
@@ -311,8 +302,6 @@ export function initCloseModalListeners(){
   document.querySelectorAll('.modal-js').forEach((modal) =>{
     
     modal.addEventListener('close', (event) => {
-      unlockBackgroundScroll();
-
       Object.keys(modal.dataset).forEach(key => {
         delete modal.dataset[key];
       });
