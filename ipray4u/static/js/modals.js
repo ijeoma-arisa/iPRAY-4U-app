@@ -2,6 +2,21 @@ import { GET_PEOPLE_URL } from './api/endpoints.js';
 import { renderRelationshipDropdown } from './relationships.js';
 import { fetchWithCsrf } from './api/client.js';
 
+export function openModal(modal) {
+  if (modal.open) return;
+
+  modal.showModal();
+  document.documentElement.classList.add('modal-open');
+  document.body.classList.add('modal-open');
+}
+
+function unlockBackgroundScroll() {
+  if (document.querySelector('.modal-js:open')) return;
+
+  document.documentElement.classList.remove('modal-open');
+  document.body.classList.remove('modal-open');
+}
+
 function renderPrayerRequestModal() {
   document.querySelector('.add-prayer-request-modal-js').innerHTML = 
     `<button type="button" class="close-button close-modal-js" aria-label="Close">&times;</button>
@@ -56,7 +71,7 @@ function initPrayerRequestModalListeners(){
         } 
       }
 
-      addPrayerRequestModal.showModal();
+      openModal(addPrayerRequestModal);
   });
 }
 
@@ -178,7 +193,7 @@ function initEditPrayerModalListeners(){
       editPrayerForm.elements['has-prayed'].checked = hasPrayed === 'true';
     }
 
-    editPrayerModal.showModal();
+    openModal(editPrayerModal);
   });
 }
 
@@ -247,7 +262,7 @@ function initEditPersonModalListeners(){
       editPersonForm.elements.relationship.value = personRelationship;
     }
 
-    editPersonModal.showModal();
+    openModal(editPersonModal);
   });
 }
 
@@ -296,6 +311,8 @@ export function initCloseModalListeners(){
   document.querySelectorAll('.modal-js').forEach((modal) =>{
     
     modal.addEventListener('close', (event) => {
+      unlockBackgroundScroll();
+
       Object.keys(modal.dataset).forEach(key => {
         delete modal.dataset[key];
       });
@@ -305,7 +322,7 @@ export function initCloseModalListeners(){
       if (form){
         form.reset();
 
-        form.querySelectorAll('[disabled').forEach(elem => elem.disabled = false);
+        form.querySelectorAll('[disabled]').forEach(elem => elem.disabled = false);
 
         Object.keys(form.dataset).forEach(key => {
           delete form.dataset[key];
@@ -315,7 +332,15 @@ export function initCloseModalListeners(){
 
     modal.addEventListener('click', (event) => {
       const closeModalButton = event.target.closest('.close-modal-js');
-      if (!closeModalButton) return;
+      const bounds = modal.getBoundingClientRect();
+      const clickedBackdrop = event.target === modal && (
+        event.clientX < bounds.left ||
+        event.clientX > bounds.right ||
+        event.clientY < bounds.top ||
+        event.clientY > bounds.bottom
+      );
+
+      if (!closeModalButton && !clickedBackdrop) return;
 
       modal.close();
     });

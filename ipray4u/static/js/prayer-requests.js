@@ -1,4 +1,4 @@
-import { initModals } from './modals.js';
+import { initModals, openModal } from './modals.js';
 import { renderPersonCards } from './person-cards.js';
 import { renderRelationshipButtons, initRelationshipButtonsRowListener } from './relationships.js';
 import { GET_PEOPLE_URL } from './api/endpoints.js';
@@ -60,7 +60,7 @@ function initPrayerEventListeners({ onSuccess }) {
       deleteItemModal.dataset.route = personRoute;
       deleteItemModal.dataset.itemId = personCard.id;
 
-      deleteItemModal.showModal();
+      openModal(deleteItemModal);
     }
     
     if (deletePrayerButton && prayerCard){
@@ -74,7 +74,7 @@ function initPrayerEventListeners({ onSuccess }) {
       deleteItemModal.dataset.route = prayerRoute;
       deleteItemModal.dataset.itemId = prayerCard.id;
 
-      deleteItemModal.showModal();
+      openModal(deleteItemModal);
     }
     
     if (markPrayedButton && prayerCard){
