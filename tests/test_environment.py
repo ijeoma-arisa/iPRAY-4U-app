@@ -112,8 +112,11 @@ def test_create_app_allows_test_config_memory_storage_in_production(monkeypatch)
     assert app.config["RATELIMIT_STORAGE_URI"] == "memory://"
 
 
-def test_ratelimit_storage_rejects_missing_uri_in_production(monkeypatch):
-    monkeypatch.setenv("APP_ENV", "production")
+@pytest.mark.parametrize("app_env", ["staging", "production"])
+def test_ratelimit_storage_rejects_missing_uri_in_deployed_env(
+    monkeypatch, app_env
+):
+    monkeypatch.setenv("APP_ENV", app_env)
     monkeypatch.delenv("RATELIMIT_STORAGE_URI", raising=False)
 
     with pytest.raises(RuntimeError) as error:
@@ -136,8 +139,11 @@ def test_create_app_requires_ratelimit_storage_uri_for_production(monkeypatch):
     assert "RATELIMIT_STORAGE_URI" in str(error.value)
 
 
-def test_ratelimit_storage_rejects_blank_uri_in_staging(monkeypatch):
-    monkeypatch.setenv("APP_ENV", "staging")
+@pytest.mark.parametrize("app_env", ["staging", "production"])
+def test_ratelimit_storage_rejects_blank_uri_in_deployed_env(
+    monkeypatch, app_env
+):
+    monkeypatch.setenv("APP_ENV", app_env)
     monkeypatch.setenv("RATELIMIT_STORAGE_URI", " ")
 
     with pytest.raises(RuntimeError) as error:
@@ -146,8 +152,11 @@ def test_ratelimit_storage_rejects_blank_uri_in_staging(monkeypatch):
     assert "RATELIMIT_STORAGE_URI" in str(error.value)
 
 
-def test_ratelimit_storage_rejects_memory_uri_in_production(monkeypatch):
-    monkeypatch.setenv("APP_ENV", "production")
+@pytest.mark.parametrize("app_env", ["staging", "production"])
+def test_ratelimit_storage_rejects_memory_uri_in_deployed_env(
+    monkeypatch, app_env
+):
+    monkeypatch.setenv("APP_ENV", app_env)
     monkeypatch.setenv("RATELIMIT_STORAGE_URI", "memory://")
 
     with pytest.raises(RuntimeError) as error:
@@ -171,8 +180,11 @@ def test_create_app_rejects_memory_ratelimit_storage_in_production(monkeypatch):
     assert "RATELIMIT_STORAGE_URI" in str(error.value)
 
 
-def test_ratelimit_storage_allows_shared_backend_in_production(monkeypatch):
-    monkeypatch.setenv("APP_ENV", "production")
+@pytest.mark.parametrize("app_env", ["staging", "production"])
+def test_ratelimit_storage_allows_shared_backend_in_deployed_env(
+    monkeypatch, app_env
+):
+    monkeypatch.setenv("APP_ENV", app_env)
     monkeypatch.setenv("RATELIMIT_STORAGE_URI", "redis://localhost:6379/0")
 
     assert get_ratelimit_storage_uri() == "redis://localhost:6379/0"
