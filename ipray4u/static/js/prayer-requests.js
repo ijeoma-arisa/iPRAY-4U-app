@@ -13,7 +13,7 @@ function displayTime(){
   const today = new Date();
   const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
   
-  document.querySelector('.current-date-js').innerHTML = today.toLocaleDateString('en-US', options);
+  currentTime.textContent = today.toLocaleDateString('en-US', options);
 }
 
 function initPageLoadListeners(){
@@ -53,9 +53,9 @@ function initPrayerEventListeners({ onSuccess }) {
     const personRoute = `${GET_PEOPLE_URL}/${personId}`;
     
     if (deletePersonButton){
-      deleteTitle.innerHTML = 'Delete Person';
-      itemToDeleteType.innerHTML = 'person';
-      itemToDelete.innerHTML = personCard.dataset.personName;
+      deleteTitle.textContent = 'Delete Person';
+      itemToDeleteType.textContent = 'person';
+      itemToDelete.textContent = personCard.dataset.personName;
 
       deleteItemModal.dataset.route = personRoute;
       deleteItemModal.dataset.itemId = personCard.id;
@@ -67,9 +67,9 @@ function initPrayerEventListeners({ onSuccess }) {
       const prayerId = prayerCard.dataset.prayerId;
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
-      deleteTitle.innerHTML = 'Delete Prayer';
-      itemToDeleteType.innerHTML = 'prayer';
-      itemToDelete.innerHTML = prayerCard.dataset.prayerText;
+      deleteTitle.textContent = 'Delete Prayer';
+      itemToDeleteType.textContent = 'prayer';
+      itemToDelete.textContent = prayerCard.dataset.prayerText;
 
       deleteItemModal.dataset.route = prayerRoute;
       deleteItemModal.dataset.itemId = prayerCard.id;
