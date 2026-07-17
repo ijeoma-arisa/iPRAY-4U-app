@@ -653,3 +653,7 @@ label {
     font-size: 0.9rem;
   }
 }
+
+.prayer-text-value {
+  white-space: pre-wrap;
+}

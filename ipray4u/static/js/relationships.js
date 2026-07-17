@@ -15,11 +15,18 @@ export async function renderRelationshipDropdown(modal) {
   
   let relationshipsHTML = '<option value="" disabled selected hidden>Select</option>';
 
-  relationships.forEach(relationship => {
-    relationshipsHTML += `<option value="${relationship.relationship}">${relationship.relationship}</option>`;
+  relationships.forEach(() => {
+    relationshipsHTML += '<option></option>';
   });
 
-  modal.querySelector('.relationship-dropdown-js').innerHTML = relationshipsHTML;
+  const dropdown = modal.querySelector('.relationship-dropdown-js');
+  dropdown.innerHTML = relationshipsHTML;
+  const renderedOptions = dropdown.querySelectorAll('option');
+  relationships.forEach((relationship, index) => {
+    const option = renderedOptions[index + 1];
+    option.value = relationship.relationship;
+    option.textContent = relationship.relationship;
+  });
 }
 
 export async function renderRelationshipButtons(selectedRelationship) {
@@ -32,22 +39,29 @@ export async function renderRelationshipButtons(selectedRelationship) {
 
   let relationshipsHTML = '<button type="button" class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js">All</button>';
 
-  relationships.forEach(relationship => {
+  relationships.forEach(() => {
     relationshipsHTML += 
     `<button
       type="button" 
-      class="btn relationship-button relationship-button-js relationship-button-${relationship.id}" 
-      data-rel="${relationship.relationship.toLowerCase()}"
+      class="btn relationship-button relationship-button-js"
     >
-      ${relationship.relationship}
     </button>`;
   });
 
   const relationshipButtonsRow = document.querySelector('.relationship-buttons-row-js');
   relationshipButtonsRow.innerHTML = relationshipsHTML;
+
+  const renderedButtons = relationshipButtonsRow.querySelectorAll('.relationship-button-js');
+  relationships.forEach((relationship, index) => {
+    const button = renderedButtons[index + 1];
+    button.classList.add(`relationship-button-${relationship.id}`);
+    button.dataset.rel = relationship.relationship.toLowerCase();
+    button.textContent = relationship.relationship;
+  });
   
   const selectedButton = selectedRelationship
-    ? relationshipButtonsRow.querySelector(`[data-rel="${selectedRelationship.toLowerCase()}"]`)
+    ? [...relationshipButtonsRow.querySelectorAll('.relationship-button-js')]
+      .find(button => button.dataset.rel === selectedRelationship.toLowerCase())
     : relationshipButtonsRow.querySelector('.relationship-button-all-js');
 
   if (selectedButton){
