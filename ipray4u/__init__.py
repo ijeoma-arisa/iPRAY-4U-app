@@ -14,9 +14,11 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from .db import init_db
 from .utils.environment import (
   TEST_REQUIRED_ENV_VARS,
-  DEPLOYMENT_REQUIRED_ENV_VARS,
+  APP_REQUIRED_ENV_VARS,
+  get_app_env,
   get_ratelimit_storage_uri,
   get_trusted_proxy_count,
+  parse_trusted_proxy_count,
   validate_required_env_vars,
 )
 
@@ -28,7 +30,7 @@ limiter = Limiter(key_func=get_remote_address)
 def create_app(test_config=None):
   app = Flask(__name__, instance_relative_config=True)
   
-  required_env_vars = TEST_REQUIRED_ENV_VARS if test_config else DEPLOYMENT_REQUIRED_ENV_VARS
+  required_env_vars = TEST_REQUIRED_ENV_VARS if test_config else APP_REQUIRED_ENV_VARS
   validate_required_env_vars(required_env_vars)
   test_ratelimit_storage_uri = None
 
@@ -42,6 +44,7 @@ def create_app(test_config=None):
   )
   
   app.config.from_mapping(
+    APP_ENV=get_app_env(),
     APP_BASE_URL=os.environ["APP_BASE_URL"],
     DATABASE_URL=os.environ.get("DATABASE_URL"),
     RATELIMIT_STORAGE_URI=ratelimit_storage_uri,
@@ -67,9 +70,11 @@ def create_app(test_config=None):
   if trusted_proxy_count is None:
     trusted_proxy_count = get_trusted_proxy_count()
   else:
-    trusted_proxy_count = int(trusted_proxy_count)
+    trusted_proxy_count = parse_trusted_proxy_count(trusted_proxy_count)
 
-  if trusted_proxy_count:
+  app.config["TRUSTED_PROXY_COUNT"] = trusted_proxy_count
+
+  if trusted_proxy_count > 0:
     app.wsgi_app = ProxyFix(
       app.wsgi_app,
       x_for=trusted_proxy_count,
