@@ -4,6 +4,7 @@ import {
   LOGIN_URL, 
 } from './api/endpoints.js';
 import { renderPersonCards } from './person-cards.js';
+import { createRelationshipButtonSkeletonsHTML } from './loading-states.js';
 
 export async function renderRelationshipDropdown(modal) {
   const response = await fetch(GET_RELATIONSHIPS_URL);
@@ -30,6 +31,10 @@ export async function renderRelationshipDropdown(modal) {
 }
 
 export async function renderRelationshipButtons(selectedRelationship) {
+  const relationshipButtonsRow = document.querySelector('.relationship-buttons-row-js');
+  relationshipButtonsRow.setAttribute('aria-busy', 'true');
+  relationshipButtonsRow.innerHTML = createRelationshipButtonSkeletonsHTML();
+
   const response = await fetch(GET_RELATIONSHIPS_URL);
   if (response.status === 401) {
     window.location.href = LOGIN_URL;
@@ -48,8 +53,8 @@ export async function renderRelationshipButtons(selectedRelationship) {
     </button>`;
   });
 
-  const relationshipButtonsRow = document.querySelector('.relationship-buttons-row-js');
   relationshipButtonsRow.innerHTML = relationshipsHTML;
+  relationshipButtonsRow.setAttribute('aria-busy', 'false');
 
   const renderedButtons = relationshipButtonsRow.querySelectorAll('.relationship-button-js');
   relationships.forEach((relationship, index) => {

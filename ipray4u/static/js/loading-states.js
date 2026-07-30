@@ -1,5 +1,6 @@
 const PRAYER_CARD_SKELETON_COUNT = 3;
 
+// Keep this generated skeleton markup structurally aligned with prayer-requests.html.
 export function createRelationshipButtonSkeletonsHTML(count = 4) {
   return Array.from({ length: count }, () => `
     <div

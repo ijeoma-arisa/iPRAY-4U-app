@@ -1,4 +1,5 @@
 import { GET_PEOPLE_URL, LOGIN_URL } from './api/endpoints.js';
+import { createPersonCardSkeletonsHTML } from './loading-states.js';
 
 async function loadPrayers(person_id) {
   const response = await fetch(`${GET_PEOPLE_URL}/${person_id}/prayers`);
@@ -45,11 +46,12 @@ function renderPrayerCardsHTML(prayers) {
       </div>`).join('');
 }
 
-export async function renderPersonCards(url, showSpinner = false) {
+export async function renderPersonCards(url, showSkeletons = false) {
   const personCards = document.querySelector('.person-cards-js'); 
   
-  if (showSpinner) {
-    personCards.innerHTML = '<div class="loading-spinner"></div>';
+  if (showSkeletons) {
+    personCards.setAttribute('aria-busy', 'true');
+    personCards.innerHTML = createPersonCardSkeletonsHTML();
   }
 
   const response = await fetch(url);
@@ -111,6 +113,9 @@ export async function renderPersonCards(url, showSpinner = false) {
   }
   
   personCards.innerHTML = personCardsHTML || 'No people found.';
+  if (showSkeletons) {
+    personCards.setAttribute('aria-busy', 'false');
+  }
 
   const renderedPersonCards = personCards.querySelectorAll('.person-card-js');
 

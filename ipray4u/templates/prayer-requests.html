@@ -37,16 +37,63 @@
       <div class="prayer-requests-banner">
         <div class="prayer-requests-title">
           <h1>Prayer Requests</h1>
-          <p class="page-subtitle">Keep track of who you're praying for </p>
+          <p class="page-subtitle">Keep track of who you're praying for</p>
         </div>
       </div>
       
       <div class="prayer-requests-controls">
         <button type="button" class="btn add-prayer-button add-prayer-button-js">Add New Prayer Request</button>
-        <div class="relationship-buttons-row relationship-buttons-row-js"></div>
+        <!-- Keep this server-rendered skeleton structure aligned with loading-states.js. -->
+        <div
+          class="relationship-buttons-row relationship-buttons-row-js"
+          aria-busy="true"
+        >
+          {% for _ in range(4) %}
+            <div
+              class="skeleton skeleton-relationship-button"
+              aria-hidden="true"
+            ></div>
+          {% endfor %}
+        </div>
       </div>
-
-      <div class="person-cards person-cards-js"></div>
+      
+      <!-- Keep this server-rendered skeleton structure aligned with loading-states.js. -->
+      <div
+        class="person-cards person-cards-js"
+        aria-busy="true"
+      >
+        {% for _ in range(3) %}
+          <div class="person-card person-card-skeleton" aria-hidden="true">
+            <div class="person-info-section skeleton-person-info-section">
+              <div class="skeleton-person-header">
+                <div class="skeleton-person-title">
+                  <div class="skeleton skeleton-person-name"></div>
+                  <div class="skeleton skeleton-person-relationship"></div>
+                </div>
+                <div class="skeleton-person-actions">
+                  <div class="skeleton skeleton-person-action"></div>
+                  <div class="skeleton skeleton-person-action"></div>
+                </div>
+              </div>
+            </div>
+            <div class="prayer-cards-section skeleton-prayer-cards-section">
+              {% for _ in range(3) %}
+                <div class="prayer-card skeleton-prayer-card">
+                  <div class="skeleton-prayer-text">
+                    <div class="skeleton skeleton-prayer-text-placeholder"></div>
+                  </div>
+                  <div class="skeleton-prayer-actions">
+                    <div class="skeleton skeleton-prayer-action"></div>
+                    <div class="skeleton skeleton-prayer-action"></div>
+                    <div class="skeleton skeleton-prayer-action"></div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="skeleton skeleton-add-prayer"></div>
+          </div>
+        {% endfor %}
+      </div>
     </section>
   </main>
 
