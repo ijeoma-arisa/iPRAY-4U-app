@@ -640,6 +640,70 @@ label {
   white-space: pre-wrap;
 }
 
+/* Reusable load error states */
+.load-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(137, 39, 39, 0.25);
+  border-radius: 6px;
+  background: #fff7f7;
+  color: var(--darker-red);
+  text-align: center;
+}
+
+.load-error p {
+  margin: 0;
+}
+
+.load-error-message {
+  font-weight: 700;
+}
+
+.load-error-detail {
+  margin-top: 0.2rem;
+  font-size: 0.9rem;
+}
+
+.relationship-load-error {
+  flex-wrap: wrap;
+}
+
+.person-cards-load-error {
+  width: 100%;
+  flex-direction: column;
+  padding-block: 1rem;
+}
+
+.error-retry-button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.85rem;
+  background: var(--darker-red);
+}
+
+.relationship-load-error .error-retry-button {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.9rem;
+  gap: 0.35rem;
+}
+
+@media (hover: hover) {
+  .error-retry-button:hover {
+    background: var(--darkest-red);
+  }
+}
+
+.error-retry-button:focus-visible {
+  outline: 3px solid rgba(137, 39, 39, 0.35);
+  outline-offset: 2px;
+}
+
 /* Reusable loading placeholders */
 .skeleton {
   background-color: var(--primary-soft);

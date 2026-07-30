@@ -49,3 +49,34 @@ export function createPersonCardSkeletonsHTML(count = 3) {
       <div class="skeleton skeleton-add-prayer"></div>
     </div>`).join('');
 }
+
+export function createRelationshipLoadErrorHTML() {
+  return `
+    <div class="load-error relationship-load-error" role="alert">
+      <p class="load-error-message">Unable to load relationships.</p>
+      <button
+        type="button"
+        class="btn error-retry-button retry-relationships-js"
+      >
+        <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+        Try Again
+      </button>
+    </div>`;
+}
+
+export function createPersonCardsLoadErrorHTML() {
+  return `
+    <div class="load-error person-cards-load-error" role="alert">
+      <div>
+        <p class="load-error-message">Unable to load prayer requests.</p>
+        <p class="load-error-detail">Please try again.</p>
+      </div>
+      <button
+        type="button"
+        class="btn error-retry-button retry-person-cards-js"
+      >
+        <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+        Try Again
+      </button>
+    </div>`;
+}
