@@ -15,10 +15,11 @@ Render staging and production services must set `RATELIMIT_STORAGE_URI` to a
 shared Redis/Valkey Flask-Limiter backend, such as `redis://...` or `rediss://...`.
 `memory://` is only for local development and tests.
 
-Set `APP_ENV` to `staging` or `production` in deployed environments. Leave it
-unset for local development.
+Set `APP_ENV=local` for local development. Use `staging` or `production` in
+deployed environments.
 
-Local/test default: no trusted proxies. On Render, set `TRUSTED_PROXY_COUNT=2`
+Local development uses `TRUSTED_PROXY_COUNT=0` (and defaults to zero if it is
+omitted). On Render, set `TRUSTED_PROXY_COUNT=2`
 because requests reach the app through two trusted proxy hops. This lets Flask
 and Flask-Limiter use the real client IP from `X-Forwarded-For`. If the proxy
 topology changes, set `TRUSTED_PROXY_COUNT` to the exact number of trusted proxy

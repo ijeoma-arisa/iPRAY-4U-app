@@ -1,14 +1,36 @@
 import { GET_PEOPLE_URL, LOGIN_URL } from './api/endpoints.js';
+import {
+  createPersonCardSkeletonsHTML,
+  createPersonCardsLoadErrorHTML,
+} from './loading-states.js';
+
+class AuthenticationRedirectError extends Error {}
 
 async function loadPrayers(person_id) {
   const response = await fetch(`${GET_PEOPLE_URL}/${person_id}/prayers`);
   if (response.status === 401) {
     window.location.href = LOGIN_URL;
-    return [];
+    throw new AuthenticationRedirectError();
+  }
+
+  if (!response.ok) {
+    throw new Error(`Prayer request failed with status ${response.status}`);
   }
 
   const {data: prayers} = await response.json();
   return prayers;
+}
+
+function renderPersonCardsLoadError(personCards, url) {
+  personCards.innerHTML = createPersonCardsLoadErrorHTML();
+  personCards.setAttribute('aria-busy', 'false');
+
+  const retryButton = personCards.querySelector('.retry-person-cards-js');
+  retryButton.addEventListener(
+    'click',
+    () => renderPersonCards(url, true),
+    { once: true },
+  );
 }
 
 function renderPrayerCardsHTML(prayers) {
@@ -45,31 +67,37 @@ function renderPrayerCardsHTML(prayers) {
       </div>`).join('');
 }
 
-export async function renderPersonCards(url, showSpinner = false) {
+export async function renderPersonCards(url, showSkeletons = false) {
   const personCards = document.querySelector('.person-cards-js'); 
   
-  if (showSpinner) {
-    personCards.innerHTML = '<div class="loading-spinner"></div>';
+  if (showSkeletons) {
+    personCards.setAttribute('aria-busy', 'true');
+    personCards.innerHTML = createPersonCardSkeletonsHTML();
   }
 
-  const response = await fetch(url);
-  if (response.status === 401) {
-    window.location.href = LOGIN_URL;
-    return;
-  }
-  
-  const {status, data: persons} = await response.json();
-  
-  let personCardsHTML = '';
+  try {
+    const response = await fetch(url);
+    if (response.status === 401) {
+      window.location.href = LOGIN_URL;
+      return;
+    }
 
-  const prayersByPerson = [];
+    if (!response.ok) {
+      throw new Error(`People request failed with status ${response.status}`);
+    }
 
-  for (const person of persons){
-    const prayers = await loadPrayers(person.id);
-    prayersByPerson.push(prayers);
-    const prayersHTML = renderPrayerCardsHTML(prayers);
+    const {data: persons} = await response.json();
     
-    personCardsHTML += `
+    let personCardsHTML = '';
+
+    const prayersByPerson = [];
+
+    for (const person of persons){
+      const prayers = await loadPrayers(person.id);
+      prayersByPerson.push(prayers);
+      const prayersHTML = renderPrayerCardsHTML(prayers);
+
+      personCardsHTML += `
       <div
           class="person-card person-card-js" 
       >
@@ -108,40 +136,52 @@ export async function renderPersonCards(url, showSpinner = false) {
           Add Prayer 
         </button>
       </div>`;
-  }
-  
-  personCards.innerHTML = personCardsHTML || 'No people found.';
+    }
 
-  const renderedPersonCards = personCards.querySelectorAll('.person-card-js');
+    personCards.innerHTML = personCardsHTML || 'No people found.';
 
-  persons.forEach((person, personIndex) => {
-    const personCard = renderedPersonCards[personIndex];
-    personCard.id = `person-${person.id}`;
-    personCard.dataset.personId = person.id;
-    personCard.dataset.personName = person.name;
-    personCard.dataset.personRelationship = person.relationship;
-    personCard.querySelector('.person-name-value-js').textContent = person.name;
-    personCard.querySelector('.person-relationship-value-js').textContent = person.relationship;
-    personCard.querySelector('.edit-person-button-js').setAttribute('aria-label', `Edit ${person.name}`);
-    personCard.querySelector('.delete-person-button-js').setAttribute('aria-label', `Delete ${person.name}`);
+    const renderedPersonCards = personCards.querySelectorAll('.person-card-js');
 
-    const addPrayerButton = personCard.querySelector('.add-prayer-button-js');
-    addPrayerButton.id = `${person.id}`;
-    addPrayerButton.dataset.personId = person.id;
-    addPrayerButton.dataset.personName = person.name;
-    addPrayerButton.dataset.personRelationship = person.relationship;
+    persons.forEach((person, personIndex) => {
+      const personCard = renderedPersonCards[personIndex];
+      personCard.id = `person-${person.id}`;
+      personCard.dataset.personId = person.id;
+      personCard.dataset.personName = person.name;
+      personCard.dataset.personRelationship = person.relationship;
+      personCard.querySelector('.person-name-value-js').textContent = person.name;
+      personCard.querySelector('.person-relationship-value-js').textContent = person.relationship;
+      personCard.querySelector('.edit-person-button-js').setAttribute('aria-label', `Edit ${person.name}`);
+      personCard.querySelector('.delete-person-button-js').setAttribute('aria-label', `Delete ${person.name}`);
 
-    const renderedPrayerCards = personCard.querySelectorAll('.prayer-card-js');
+      const addPrayerButton = personCard.querySelector('.add-prayer-button-js');
+      addPrayerButton.id = `${person.id}`;
+      addPrayerButton.dataset.personId = person.id;
+      addPrayerButton.dataset.personName = person.name;
+      addPrayerButton.dataset.personRelationship = person.relationship;
 
-    prayersByPerson[personIndex].forEach((prayer, prayerIndex) => {
-      const prayerCard = renderedPrayerCards[prayerIndex];
-      prayerCard.id = `prayer-${prayer.id}`;
-      prayerCard.dataset.personId = person.id;
-      prayerCard.dataset.prayerId = prayer.id;
-      prayerCard.dataset.prayerText = prayer.prayer;
-      prayerCard.dataset.hasPrayed = prayer.has_prayed;
-      prayerCard.querySelector('.prayer-text-value-js').textContent = prayer.prayer;
+      const renderedPrayerCards = personCard.querySelectorAll('.prayer-card-js');
+
+      prayersByPerson[personIndex].forEach((prayer, prayerIndex) => {
+        const prayerCard = renderedPrayerCards[prayerIndex];
+        prayerCard.id = `prayer-${prayer.id}`;
+        prayerCard.dataset.personId = person.id;
+        prayerCard.dataset.prayerId = prayer.id;
+        prayerCard.dataset.prayerText = prayer.prayer;
+        prayerCard.dataset.hasPrayed = prayer.has_prayed;
+        prayerCard.querySelector('.prayer-text-value-js').textContent = prayer.prayer;
+      });
     });
-  });
+
+    personCards.setAttribute('aria-busy', 'false');
+  } catch (error) {
+    if (error instanceof AuthenticationRedirectError) return;
+
+    console.error(
+      'Unable to load prayer requests',
+      { url },
+      error,
+    );
+    renderPersonCardsLoadError(personCards, url);
+  }
 }
 

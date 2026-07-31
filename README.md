@@ -95,10 +95,8 @@ APP_BASE_URL=http://localhost:5000
 # Example production URL
 # APP_BASE_URL=https://your-app.example.com
 
-# Deployed environments only: staging or production.
-# Leave unset locally. When APP_ENV is unset, the app defaults to
-# local-development behavior (for example, allowing the in-memory rate-limit backend).
-# APP_ENV=production
+# Use local for development; deployed environments use staging or production.
+APP_ENV=local
 
 DATABASE_URL=
 TEST_DATABASE_URL=
@@ -110,10 +108,10 @@ SUPABASE_PUBLISHABLE_KEY=
 # backend on Render.
 RATELIMIT_STORAGE_URI=memory://
 
-# Local/test default: no trusted proxies.
+# Local development: do not trust forwarded proxy headers.
+TRUSTED_PROXY_COUNT=0
 # On Render, set TRUSTED_PROXY_COUNT=2 because requests reach the app
 # through two trusted proxy hops.
-# TRUSTED_PROXY_COUNT=2
 
 # Local development over HTTP
 SESSION_COOKIE_SECURE=False

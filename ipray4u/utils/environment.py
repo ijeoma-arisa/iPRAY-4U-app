@@ -7,14 +7,13 @@ TEST_REQUIRED_ENV_VARS = [
   "SESSION_COOKIE_SECURE",
 ]
 
-DEPLOYMENT_REQUIRED_ENV_VARS = [
+APP_REQUIRED_ENV_VARS = [
   "APP_ENV",
   "APP_BASE_URL",
   "DATABASE_URL",
   "SUPABASE_URL",
   "SUPABASE_PUBLISHABLE_KEY",
   "RATELIMIT_STORAGE_URI",
-  "TRUSTED_PROXY_COUNT",
   "SECRET_KEY",
   "SESSION_COOKIE_SECURE",
 ]
@@ -27,8 +26,9 @@ def validate_required_env_vars(required_vars):
       f"Missing required environment variables: {', '.join(missing_vars)}"
     )
 
-  if required_vars is DEPLOYMENT_REQUIRED_ENV_VARS:
+  if required_vars is APP_REQUIRED_ENV_VARS:
     validate_app_env()
+    get_trusted_proxy_count()
 
 def get_app_env():
   return os.environ.get("APP_ENV", "").strip().lower()
@@ -36,9 +36,9 @@ def get_app_env():
 def validate_app_env():
   app_env = get_app_env()
 
-  if app_env not in {"staging", "production"}:
+  if app_env not in {"local", "staging", "production"}:
     raise RuntimeError(
-      "APP_ENV must be either 'staging' or 'production'."
+      "APP_ENV must be one of 'local', 'staging', or 'production'."
     )
 
 def is_production():
@@ -66,7 +66,18 @@ def get_ratelimit_storage_uri():
 
   return storage_uri
 
-def get_trusted_proxy_count(default=0):
+def parse_trusted_proxy_count(raw_value):
+  try:
+    proxy_count = int(raw_value)
+  except (TypeError, ValueError) as error:
+    raise RuntimeError("TRUSTED_PROXY_COUNT must be a non-negative integer.") from error
+
+  if proxy_count < 0:
+    raise RuntimeError("TRUSTED_PROXY_COUNT must be a non-negative integer.")
+
+  return proxy_count
+
+def get_trusted_proxy_count():
   raw_value = os.environ.get("TRUSTED_PROXY_COUNT")
 
   if raw_value is None:
@@ -75,14 +86,6 @@ def get_trusted_proxy_count(default=0):
         "TRUSTED_PROXY_COUNT must be configured in deployed environments."
       )
 
-    return default
+    return 0
 
-  try:
-    proxy_count = int(raw_value)
-  except ValueError as error:
-    raise RuntimeError("TRUSTED_PROXY_COUNT must be an integer.") from error
-
-  if proxy_count < 0:
-    raise RuntimeError("TRUSTED_PROXY_COUNT must be zero or greater.")
-
-  return proxy_count
+  return parse_trusted_proxy_count(raw_value)
