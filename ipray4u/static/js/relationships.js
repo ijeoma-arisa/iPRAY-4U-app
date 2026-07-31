@@ -4,7 +4,22 @@ import {
   LOGIN_URL, 
 } from './api/endpoints.js';
 import { renderPersonCards } from './person-cards.js';
-import { createRelationshipButtonSkeletonsHTML } from './loading-states.js';
+import {
+  createRelationshipButtonSkeletonsHTML,
+  createRelationshipLoadErrorHTML,
+} from './loading-states.js';
+
+function renderRelationshipLoadError(relationshipButtonsRow, selectedRelationship) {
+  relationshipButtonsRow.innerHTML = createRelationshipLoadErrorHTML();
+  relationshipButtonsRow.setAttribute('aria-busy', 'false');
+
+  const retryButton = relationshipButtonsRow.querySelector('.retry-relationships-js');
+  retryButton.addEventListener(
+    'click',
+    () => renderRelationshipButtons(selectedRelationship),
+    { once: true },
+  );
+}
 
 export async function renderRelationshipDropdown(modal) {
   const response = await fetch(GET_RELATIONSHIPS_URL);
@@ -12,7 +27,7 @@ export async function renderRelationshipDropdown(modal) {
     window.location.href = LOGIN_URL;
     return;
   }
-  const {status, data: relationships} = await response.json();
+  const {data: relationships} = await response.json();
   
   let relationshipsHTML = '<option value="" disabled selected hidden>Select</option>';
 
@@ -35,42 +50,57 @@ export async function renderRelationshipButtons(selectedRelationship) {
   relationshipButtonsRow.setAttribute('aria-busy', 'true');
   relationshipButtonsRow.innerHTML = createRelationshipButtonSkeletonsHTML();
 
-  const response = await fetch(GET_RELATIONSHIPS_URL);
-  if (response.status === 401) {
-    window.location.href = LOGIN_URL;
-    return;
-  }
-  const { status, data: relationships } = await response.json();
+  try {
+    const response = await fetch(GET_RELATIONSHIPS_URL);
+    if (response.status === 401) {
+      window.location.href = LOGIN_URL;
+      return;
+    }
 
-  let relationshipsHTML = '<button type="button" class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js">All</button>';
+    if (!response.ok) {
+      throw new Error(`Relationships request failed with status ${response.status}`);
+    }
 
-  relationships.forEach(() => {
-    relationshipsHTML += 
-    `<button
-      type="button" 
-      class="btn relationship-button relationship-button-js"
-    >
-    </button>`;
-  });
+    const { data: relationships } = await response.json();
 
-  relationshipButtonsRow.innerHTML = relationshipsHTML;
-  relationshipButtonsRow.setAttribute('aria-busy', 'false');
+    let relationshipsHTML = '<button type="button" class="btn relationship-button relationship-button-js relationship-button-all relationship-button-all-js">All</button>';
 
-  const renderedButtons = relationshipButtonsRow.querySelectorAll('.relationship-button-js');
-  relationships.forEach((relationship, index) => {
-    const button = renderedButtons[index + 1];
-    button.classList.add(`relationship-button-${relationship.id}`);
-    button.dataset.rel = relationship.relationship.toLowerCase();
-    button.textContent = relationship.relationship;
-  });
-  
-  const selectedButton = selectedRelationship
-    ? [...relationshipButtonsRow.querySelectorAll('.relationship-button-js')]
-      .find(button => button.dataset.rel === selectedRelationship.toLowerCase())
-    : relationshipButtonsRow.querySelector('.relationship-button-all-js');
+    relationships.forEach(() => {
+      relationshipsHTML +=
+      `<button
+        type="button"
+        class="btn relationship-button relationship-button-js"
+      >
+      </button>`;
+    });
 
-  if (selectedButton){
-    selectedButton.classList.add('is-selected');
+    relationshipButtonsRow.innerHTML = relationshipsHTML;
+
+    const renderedButtons = relationshipButtonsRow.querySelectorAll('.relationship-button-js');
+    relationships.forEach((relationship, index) => {
+      const button = renderedButtons[index + 1];
+      button.classList.add(`relationship-button-${relationship.id}`);
+      button.dataset.rel = relationship.relationship.toLowerCase();
+      button.textContent = relationship.relationship;
+    });
+
+    const selectedButton = selectedRelationship
+      ? [...relationshipButtonsRow.querySelectorAll('.relationship-button-js')]
+        .find(button => button.dataset.rel === selectedRelationship.toLowerCase())
+      : relationshipButtonsRow.querySelector('.relationship-button-all-js');
+
+    if (selectedButton){
+      selectedButton.classList.add('is-selected');
+    }
+
+    relationshipButtonsRow.setAttribute('aria-busy', 'false');
+  } catch (error) {
+    console.error(
+      'Unable to load relationships',
+      { selectedRelationship },
+      error,
+    );
+    renderRelationshipLoadError(relationshipButtonsRow, selectedRelationship);
   }
 }
 
