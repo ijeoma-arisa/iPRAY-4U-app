@@ -16,6 +16,59 @@
   opacity: 0.65;
 }
 
+.btn[aria-busy="true"] {
+  display: inline-grid;
+  place-items: center;
+}
+
+.mutation-spinner {
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: mutation-spin 700ms linear infinite;
+}
+
+.mutation-spinner-small {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+@keyframes mutation-spin {
+  to { transform: rotate(360deg); }
+}
+
+.mutation-feedback {
+  margin: 0.5rem 0 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.mutation-feedback-success {
+  background: #ecfdf3;
+  border-color: #abefc6;
+  color: #067647;
+}
+
+.mutation-feedback-error {
+  background: #fef3f2;
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.page-mutation-feedback-js:empty,
+.delete-mutation-feedback-js:empty,
+.edit-prayer-mutation-feedback-js:empty,
+.edit-person-mutation-feedback-js:empty,
+.prayer-request-feedback-js:empty,
+.person-mutation-feedback-js:empty,
+.prayer-mutation-feedback-js:empty {
+  display: none;
+}
+
 @media (hover: hover) {
   .btn:not(:disabled):hover {
     transform: scale(1.05);
@@ -55,9 +108,9 @@
 }
 
 @media (hover: hover) {
-  .add-prayer-button:hover, 
-  .save-button:hover,
-  .create-account-button:hover {
+  .add-prayer-button:not(:disabled):hover,
+  .save-button:not(:disabled):hover,
+  .create-account-button:not(:disabled):hover {
     background: var(--primary-hover);
   }
 }
@@ -438,7 +491,7 @@ label {
 }
 
 @media (hover: hover) {
-  .mark-prayed-button:hover {
+  .mark-prayed-button:not(:disabled):hover {
     background-color: var(--darker-green);
   }
 }
@@ -454,9 +507,9 @@ label {
 }
 
 @media (hover: hover){
-  .edit-person-button:hover,
-  .edit-prayer-button:hover,
-  .deny-delete-button:hover {
+  .edit-person-button:not(:disabled):hover,
+  .edit-prayer-button:not(:disabled):hover,
+  .deny-delete-button:not(:disabled):hover {
     background-color: var(--darker-gray);
   }
 }
@@ -468,9 +521,9 @@ label {
 }
 
 @media (hover: hover){
-  .delete-person-button:hover, 
-  .delete-prayer-button:hover,
-  .confirm-delete-button:hover {
+  .delete-person-button:not(:disabled):hover,
+  .delete-prayer-button:not(:disabled):hover,
+  .confirm-delete-button:not(:disabled):hover {
     background-color: var(--darker-red);
   }
 }
@@ -863,7 +916,8 @@ label {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton {
+  .skeleton,
+  .mutation-spinner {
     animation: none;
   }
 }

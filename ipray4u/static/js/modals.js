@@ -1,6 +1,23 @@
 import { GET_PEOPLE_URL } from './api/endpoints.js';
 import { renderRelationshipDropdown } from './relationships.js';
 import { fetchWithCsrf } from './api/client.js';
+import {
+  clearMutationFeedback,
+  mutationErrorMessage,
+  queueMutationSuccess,
+  restoreMutationControl,
+  setMutationPending,
+  showMutationFeedback,
+} from './mutation-feedback.js';
+
+async function mutationResponse(response, fallbackMessage) {
+  if (!response) throw new Error(fallbackMessage);
+  const result = await response.json();
+  if (!response.ok || result.status !== 'success') {
+    throw new Error(result.message || fallbackMessage);
+  }
+  return result;
+}
 
 export function openModal(modal) {
   if (modal.open) return;
@@ -26,7 +43,7 @@ function renderPrayerRequestModal() {
         <label for="prayer">Prayer Request</label>
         <textarea id="prayer" name="prayer" placeholder="Enter prayer here" rows="5" cols="20" required></textarea>
       </div>
-      <p class="prayer-request-error-js" role="alert" hidden></p>
+      <div class="prayer-request-feedback-js"></div>
       <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
     </form>`;
 }
@@ -41,10 +58,7 @@ function initPrayerRequestModalListeners(){
       
       const personCard = event.target.closest('.person-card-js');
       const prayerRequestForm = document.querySelector('.prayer-request-form-js');
-      const errorMessage = prayerRequestForm.querySelector('.prayer-request-error-js');
-
-      errorMessage.hidden = true;
-      errorMessage.textContent = '';
+      clearMutationFeedback(prayerRequestForm.querySelector('.prayer-request-feedback-js'));
       
       if (personCard){
         
@@ -75,12 +89,13 @@ async function handlePrayerRequestInput({ onSuccess }){
     if (prayerRequestForm.dataset.submitting === 'true') return;
 
     const saveButton = prayerRequestForm.querySelector('.save-button-js');
-    const errorMessage = prayerRequestForm.querySelector('.prayer-request-error-js');
+    const feedback = prayerRequestForm.querySelector('.prayer-request-feedback-js');
 
     prayerRequestForm.dataset.submitting = 'true';
-    saveButton.disabled = true;
-    errorMessage.hidden = true;
-    errorMessage.textContent = '';
+    const pendingState = setMutationPending(saveButton, 'Saving prayer request', {
+      region: prayerRequestForm,
+    });
+    clearMutationFeedback(feedback);
     
     const formData = {
       name: prayerRequestForm.elements.name.value,
@@ -102,24 +117,25 @@ async function handlePrayerRequestInput({ onSuccess }){
         
     try {
       const response = await fetchWithCsrf(prayerRoute, options);
-      const { status, message } = await response.json();
-
-      if (status === 'success') {
-        const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
-        addPrayerRequestModal.close();
-
-        const url = `${GET_PEOPLE_URL}${window.location.search}`;
-        onSuccess();
-      } else {
-        errorMessage.textContent = message || 'Unable to save. Please try again.';
-        errorMessage.hidden = false;
+      await mutationResponse(response, 'Unable to save prayer request. Please try again.');
+      const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+      const successMessage = personExists ? 'Prayer request added.' : 'Person added.';
+      const pageFeedback = document.querySelector('.page-mutation-feedback-js');
+      if (!pageFeedback) queueMutationSuccess(successMessage);
+      await onSuccess();
+      addPrayerRequestModal.close();
+      if (pageFeedback) {
+        showMutationFeedback(pageFeedback, successMessage, 'success', { autoDismiss: true });
       }
     } catch (error) {
-      errorMessage.textContent = 'Unable to save. Please try again.';
-      errorMessage.hidden = false;
+      showMutationFeedback(
+        feedback,
+        mutationErrorMessage(error, 'Unable to save prayer request. Please try again.'),
+        'error',
+      );
     } finally {
       delete prayerRequestForm.dataset.submitting;
-      saveButton.disabled = false;
+      restoreMutationControl(saveButton, pendingState);
     }
   });
 
@@ -140,18 +156,42 @@ function initDeleteModalListeners({ onSuccess }){
   deleteItemModal.addEventListener('click', async (event) => {
     const confirmDeleteButton = event.target.closest('.confirm-delete-button-js');
     if (!confirmDeleteButton) return;
+    if (deleteItemModal.dataset.submitting === 'true') return;
 
     const route = deleteItemModal.dataset.route;
     const itemId = deleteItemModal.dataset.itemId;
-    const item = document.getElementById(itemId);
-    
-    await fetchWithCsrf(route, {method: "DELETE"});
-    item?.remove();
+    const itemType = deleteItemModal.dataset.itemType;
+    const feedback = deleteItemModal.querySelector('.delete-mutation-feedback-js');
+    deleteItemModal.dataset.submitting = 'true';
+    clearMutationFeedback(feedback);
+    const pendingState = setMutationPending(
+      confirmDeleteButton,
+      itemType === 'person' ? 'Deleting person' : 'Deleting prayer request',
+      { region: deleteItemModal },
+    );
 
-    const url = `${GET_PEOPLE_URL}${window.location.search}`;
-    onSuccess();
-
-    deleteItemModal.close();
+    try {
+      const response = await fetchWithCsrf(route, {method: "DELETE"});
+      await mutationResponse(response, `Unable to delete ${itemType}. Please try again.`);
+      document.getElementById(itemId)?.remove();
+      await onSuccess();
+      deleteItemModal.close();
+      showMutationFeedback(
+        document.querySelector('.page-mutation-feedback-js'),
+        itemType === 'person' ? 'Person deleted.' : 'Prayer request deleted.',
+        'success',
+        { autoDismiss: true },
+      );
+    } catch (error) {
+      showMutationFeedback(
+        feedback,
+        mutationErrorMessage(error, `Unable to delete ${itemType}. Please try again.`),
+        'error',
+      );
+    } finally {
+      delete deleteItemModal.dataset.submitting;
+      restoreMutationControl(confirmDeleteButton, pendingState);
+    }
   
   });
 }
@@ -184,6 +224,7 @@ function initEditPrayerModalListeners(){
       editPrayerForm.elements['has-prayed'].checked = hasPrayed === 'true';
     }
 
+    clearMutationFeedback(editPrayerModal.querySelector('.edit-prayer-mutation-feedback-js'));
     openModal(editPrayerModal);
   });
 }
@@ -193,6 +234,15 @@ async function handleEditPrayerInput({ onSuccess }){
 
   editPrayerForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (editPrayerForm.dataset.submitting === 'true') return;
+
+    const saveButton = editPrayerForm.querySelector('.save-button-js');
+    const feedback = editPrayerForm.querySelector('.edit-prayer-mutation-feedback-js');
+    editPrayerForm.dataset.submitting = 'true';
+    clearMutationFeedback(feedback);
+    const pendingState = setMutationPending(saveButton, 'Updating prayer request', {
+      region: editPrayerForm,
+    });
 
     const formData = {
       prayer: editPrayerForm.elements.prayer.value,
@@ -209,16 +259,24 @@ async function handleEditPrayerInput({ onSuccess }){
     const prayerId = editPrayerForm.dataset.prayerId;
     const prayerRoute = `${GET_PEOPLE_URL}/${personId}/prayers/${prayerId}`;
 
-    const response = await fetchWithCsrf(prayerRoute, options);
-    const { status, message } = await response.json();
-
-    if (status === 'success') {
+    try {
+      const response = await fetchWithCsrf(prayerRoute, options);
+      await mutationResponse(response, 'Unable to update prayer request. Please try again.');
+      await onSuccess();
       const editPrayerModal = document.querySelector('.edit-prayer-modal-js');
-
-      const url = `${GET_PEOPLE_URL}${window.location.search}`;
-      onSuccess();
-
       editPrayerModal.close();
+      const prayerCard = document.getElementById(`prayer-${prayerId}`);
+      showMutationFeedback(
+        prayerCard?.querySelector('.prayer-mutation-feedback-js') || document.querySelector('.page-mutation-feedback-js'),
+        'Prayer request updated.',
+        'success',
+        { autoDismiss: true },
+      );
+    } catch (error) {
+      showMutationFeedback(feedback, mutationErrorMessage(error, 'Unable to update prayer request. Please try again.'), 'error');
+    } finally {
+      delete editPrayerForm.dataset.submitting;
+      restoreMutationControl(saveButton, pendingState);
     }
   });
 }
@@ -253,6 +311,7 @@ function initEditPersonModalListeners(){
       editPersonForm.elements.relationship.value = personRelationship;
     }
 
+    clearMutationFeedback(editPersonModal.querySelector('.edit-person-mutation-feedback-js'));
     openModal(editPersonModal);
   });
 }
@@ -262,6 +321,13 @@ async function handleEditPersonInput({ onSuccess }){
 
   editPersonForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (editPersonForm.dataset.submitting === 'true') return;
+
+    const saveButton = editPersonForm.querySelector('.save-button-js');
+    const feedback = editPersonForm.querySelector('.edit-person-mutation-feedback-js');
+    editPersonForm.dataset.submitting = 'true';
+    clearMutationFeedback(feedback);
+    const pendingState = setMutationPending(saveButton, 'Updating person', { region: editPersonForm });
 
     const formData = {
       name: editPersonForm.elements.name.value,
@@ -278,14 +344,24 @@ async function handleEditPersonInput({ onSuccess }){
 
     const personRoute = `${GET_PEOPLE_URL}/${personId}`;
 
-    const response = await fetchWithCsrf(personRoute, options);
-    const { status, message } = await response.json();
-
-    if (status === 'success') {
-      onSuccess();
-
+    try {
+      const response = await fetchWithCsrf(personRoute, options);
+      await mutationResponse(response, 'Unable to update person. Please try again.');
+      await onSuccess();
       const editPersonModal = document.querySelector('.edit-person-modal-js');
       editPersonModal.close();
+      const personCard = document.getElementById(`person-${personId}`);
+      showMutationFeedback(
+        personCard?.querySelector('.person-mutation-feedback-js') || document.querySelector('.page-mutation-feedback-js'),
+        'Person updated.',
+        'success',
+        { autoDismiss: true },
+      );
+    } catch (error) {
+      showMutationFeedback(feedback, mutationErrorMessage(error, 'Unable to update person. Please try again.'), 'error');
+    } finally {
+      delete editPersonForm.dataset.submitting;
+      restoreMutationControl(saveButton, pendingState);
     }
   });
 }

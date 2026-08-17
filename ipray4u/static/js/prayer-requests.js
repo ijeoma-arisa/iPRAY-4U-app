@@ -4,6 +4,14 @@ import { renderRelationshipButtons, initRelationshipButtonsRowListener } from '.
 import { GET_PEOPLE_URL } from './api/endpoints.js';
 import { buildPeopleApiUrl } from './utils.js';
 import { fetchWithCsrf } from './api/client.js';
+import {
+  clearMutationFeedback,
+  mutationErrorMessage,
+  restoreMutationControl,
+  setMutationPending,
+  showMutationFeedback,
+  showQueuedMutationSuccess,
+} from './mutation-feedback.js';
 
 
 function displayTime(){
@@ -59,6 +67,8 @@ function initPrayerEventListeners({ onSuccess }) {
 
       deleteItemModal.dataset.route = personRoute;
       deleteItemModal.dataset.itemId = personCard.id;
+      deleteItemModal.dataset.itemType = 'person';
+      clearMutationFeedback(deleteItemModal.querySelector('.delete-mutation-feedback-js'));
 
       openModal(deleteItemModal);
     }
@@ -73,15 +83,27 @@ function initPrayerEventListeners({ onSuccess }) {
 
       deleteItemModal.dataset.route = prayerRoute;
       deleteItemModal.dataset.itemId = prayerCard.id;
+      deleteItemModal.dataset.itemType = 'prayer request';
+      clearMutationFeedback(deleteItemModal.querySelector('.delete-mutation-feedback-js'));
 
       openModal(deleteItemModal);
     }
     
     if (markPrayedButton && prayerCard){
+      if (markPrayedButton.dataset.mutationPending === 'true') return;
       const prayerId = prayerCard.dataset.prayerId;
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
       const toggledHasPrayed = prayerCard.dataset.hasPrayed === "true" ? false : true;
+      const feedback = prayerCard.querySelector('.prayer-mutation-feedback-js');
+      clearMutationFeedback(feedback);
+      const pendingName = toggledHasPrayed
+        ? 'Marking prayer request as prayed'
+        : 'Marking prayer request as unprayed';
+      const pendingState = setMutationPending(markPrayedButton, pendingName, {
+        region: prayerCard,
+        compact: true,
+      });
 
       const data = {
         ['has_prayed']: toggledHasPrayed,
@@ -93,12 +115,34 @@ function initPrayerEventListeners({ onSuccess }) {
         body: JSON.stringify(data)
       };
       
-      const response = await fetchWithCsrf(prayerRoute, options);
-      const { status, message } = await response.json();
-      if (status === 'success') {
+      try {
+        const response = await fetchWithCsrf(prayerRoute, options);
+        if (!response) throw new Error('Unable to update prayer request. Please try again.');
+        const result = await response.json();
+        if (!response.ok || result.status !== 'success') {
+          throw new Error(result.message || 'Unable to update prayer request. Please try again.');
+        }
+
         const url = `${GET_PEOPLE_URL}${window.location.search}`;
-        onSuccess(url);
-      }    
+        await onSuccess(url);
+        const refreshedPrayerCard = document.getElementById(`prayer-${prayerId}`);
+        showMutationFeedback(
+          refreshedPrayerCard?.querySelector('.prayer-mutation-feedback-js') || document.querySelector('.page-mutation-feedback-js'),
+          toggledHasPrayed
+            ? 'Prayer request marked as prayed.'
+            : 'Prayer request marked as unprayed.',
+          'success',
+          { autoDismiss: true },
+        );
+      } catch (error) {
+        showMutationFeedback(
+          feedback,
+          mutationErrorMessage(error, 'Unable to update prayer request. Please try again.'),
+          'error',
+        );
+      } finally {
+        restoreMutationControl(markPrayedButton, pendingState);
+      }
     }
   });
 }
@@ -106,6 +150,7 @@ function initPrayerEventListeners({ onSuccess }) {
 
 function initPage(){
   displayTime();
+  showQueuedMutationSuccess(document.querySelector('.page-mutation-feedback-js'));
 
   initPageLoadListeners();
   initRelationshipButtonsRowListener();

@@ -41,6 +41,7 @@ function renderPrayerCardsHTML(prayers) {
         <div class="prayer-text">
           <span class="prayer-text-value prayer-text-value-js"></span>
           ${prayer['has_prayed'] ? '<span class="prayed-badge">Prayed!</span>' : ""}
+          <div class="prayer-mutation-feedback-js"></div>
         </div>
         <div class="update-prayer-buttons">
           <button
@@ -122,6 +123,7 @@ export async function renderPersonCards(url, showSkeletons = false) {
                 <i class="fa-solid fa-trash" aria-hidden="true"></i>
               </button>
             </div>
+            <div class="person-mutation-feedback-js"></div>
           </div>
         </div>
 
@@ -169,6 +171,12 @@ export async function renderPersonCards(url, showSkeletons = false) {
         prayerCard.dataset.prayerText = prayer.prayer;
         prayerCard.dataset.hasPrayed = prayer.has_prayed;
         prayerCard.querySelector('.prayer-text-value-js').textContent = prayer.prayer;
+        prayerCard.querySelector('.mark-prayed-button-js').setAttribute(
+          'aria-label',
+          prayer.has_prayed ? 'Mark prayer request as unprayed' : 'Mark prayer request as prayed',
+        );
+        prayerCard.querySelector('.edit-prayer-button-js').setAttribute('aria-label', 'Edit prayer request');
+        prayerCard.querySelector('.delete-prayer-button-js').setAttribute('aria-label', 'Delete prayer request');
       });
     });
 
