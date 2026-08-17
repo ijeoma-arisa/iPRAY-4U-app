@@ -41,7 +41,6 @@ function renderPrayerCardsHTML(prayers) {
         <div class="prayer-text">
           <span class="prayer-text-value prayer-text-value-js"></span>
           ${prayer['has_prayed'] ? '<span class="prayed-badge">Prayed!</span>' : ""}
-          <div class="prayer-mutation-feedback-js"></div>
         </div>
         <div class="update-prayer-buttons">
           <button
@@ -68,7 +67,11 @@ function renderPrayerCardsHTML(prayers) {
       </div>`).join('');
 }
 
-export async function renderPersonCards(url, showSkeletons = false) {
+export async function renderPersonCards(
+  url,
+  showSkeletons = false,
+  throwOnError = false,
+) {
   const personCards = document.querySelector('.person-cards-js'); 
   
   if (showSkeletons) {
@@ -123,7 +126,6 @@ export async function renderPersonCards(url, showSkeletons = false) {
                 <i class="fa-solid fa-trash" aria-hidden="true"></i>
               </button>
             </div>
-            <div class="person-mutation-feedback-js"></div>
           </div>
         </div>
 
@@ -190,6 +192,7 @@ export async function renderPersonCards(url, showSkeletons = false) {
       error,
     );
     renderPersonCardsLoadError(personCards, url);
+    if (throwOnError) throw error;
   }
 }
 

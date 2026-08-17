@@ -7,6 +7,7 @@ import { fetchWithCsrf } from './api/client.js';
 import {
   clearMutationFeedback,
   mutationErrorMessage,
+  mutationResponse,
   restoreMutationControl,
   setMutationPending,
   showMutationFeedback,
@@ -68,7 +69,7 @@ function initPrayerEventListeners({ onSuccess }) {
       deleteItemModal.dataset.route = personRoute;
       deleteItemModal.dataset.itemId = personCard.id;
       deleteItemModal.dataset.itemType = 'person';
-      clearMutationFeedback(deleteItemModal.querySelector('.delete-mutation-feedback-js'));
+      clearMutationFeedback();
 
       openModal(deleteItemModal);
     }
@@ -84,7 +85,7 @@ function initPrayerEventListeners({ onSuccess }) {
       deleteItemModal.dataset.route = prayerRoute;
       deleteItemModal.dataset.itemId = prayerCard.id;
       deleteItemModal.dataset.itemType = 'prayer request';
-      clearMutationFeedback(deleteItemModal.querySelector('.delete-mutation-feedback-js'));
+      clearMutationFeedback();
 
       openModal(deleteItemModal);
     }
@@ -95,8 +96,7 @@ function initPrayerEventListeners({ onSuccess }) {
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
       const toggledHasPrayed = prayerCard.dataset.hasPrayed === "true" ? false : true;
-      const feedback = prayerCard.querySelector('.prayer-mutation-feedback-js');
-      clearMutationFeedback(feedback);
+      clearMutationFeedback();
       const pendingName = toggledHasPrayed
         ? 'Marking prayer request as prayed'
         : 'Marking prayer request as unprayed';
@@ -117,31 +117,41 @@ function initPrayerEventListeners({ onSuccess }) {
       
       try {
         const response = await fetchWithCsrf(prayerRoute, options);
-        if (!response) throw new Error('Unable to update prayer request. Please try again.');
-        const result = await response.json();
-        if (!response.ok || result.status !== 'success') {
-          throw new Error(result.message || 'Unable to update prayer request. Please try again.');
-        }
+        await mutationResponse(
+          response,
+          'Unable to update prayer request. Please try again.',
+        );
+      } catch (error) {
+        showMutationFeedback(
+          mutationErrorMessage(
+            error,
+            'Unable to update prayer request. Please try again.',
+          ),
+          'error',
+        );
+        return;
+      } finally {
+        restoreMutationControl(markPrayedButton, pendingState);
+      }
 
+      const successMessage = toggledHasPrayed
+        ? 'Prayer request marked as prayed.'
+        : 'Prayer request marked as unprayed.';
+      const refreshFailureMessage = toggledHasPrayed
+        ? 'Prayer request was marked as prayed, but the page could not refresh. Please try again.'
+        : 'Prayer request was marked as unprayed, but the page could not refresh. Please try again.';
+
+      try {
         const url = `${GET_PEOPLE_URL}${window.location.search}`;
         await onSuccess(url);
-        const refreshedPrayerCard = document.getElementById(`prayer-${prayerId}`);
         showMutationFeedback(
-          refreshedPrayerCard?.querySelector('.prayer-mutation-feedback-js') || document.querySelector('.page-mutation-feedback-js'),
-          toggledHasPrayed
-            ? 'Prayer request marked as prayed.'
-            : 'Prayer request marked as unprayed.',
+          successMessage,
           'success',
           { autoDismiss: true },
         );
       } catch (error) {
-        showMutationFeedback(
-          feedback,
-          mutationErrorMessage(error, 'Unable to update prayer request. Please try again.'),
-          'error',
-        );
-      } finally {
-        restoreMutationControl(markPrayedButton, pendingState);
+        console.error(refreshFailureMessage, error);
+        showMutationFeedback(refreshFailureMessage, 'error');
       }
     }
   });
@@ -150,13 +160,17 @@ function initPrayerEventListeners({ onSuccess }) {
 
 function initPage(){
   displayTime();
-  showQueuedMutationSuccess(document.querySelector('.page-mutation-feedback-js'));
+  showQueuedMutationSuccess();
 
   initPageLoadListeners();
   initRelationshipButtonsRowListener();
   
-  initPrayerEventListeners({onSuccess: (url) => renderPersonCards(url)});
-  initModals({onSuccess: () => renderPersonCards(buildPeopleApiUrl())});
+  initPrayerEventListeners({
+    onSuccess: (url) => renderPersonCards(url, false, true),
+  });
+  initModals({
+    onSuccess: () => renderPersonCards(buildPeopleApiUrl(), false, true),
+  });
 }
 
 initPage();

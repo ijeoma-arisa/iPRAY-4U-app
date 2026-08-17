@@ -39,12 +39,35 @@
   to { transform: rotate(360deg); }
 }
 
+.mutation-feedback-region {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  bottom: 1.25rem;
+  width: min(32rem, calc(100vw - 2rem));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.mutation-feedback-region:empty {
+  display: none;
+}
+
 .mutation-feedback {
-  margin: 0.5rem 0 0;
-  padding: 0.55rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
   border: 1px solid;
   border-radius: 8px;
   font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(63, 53, 46, 0.18);
+  pointer-events: auto;
+}
+
+.mutation-feedback p {
+  margin: 0;
 }
 
 .mutation-feedback-success {
@@ -59,14 +82,31 @@
   color: #b42318;
 }
 
-.page-mutation-feedback-js:empty,
-.delete-mutation-feedback-js:empty,
-.edit-prayer-mutation-feedback-js:empty,
-.edit-person-mutation-feedback-js:empty,
-.prayer-request-feedback-js:empty,
-.person-mutation-feedback-js:empty,
-.prayer-mutation-feedback-js:empty {
-  display: none;
+.mutation-feedback-close {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mutation-feedback-close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .mutation-feedback-region {
+    bottom: 0.75rem;
+    width: calc(100vw - 1.5rem);
+  }
 }
 
 @media (hover: hover) {

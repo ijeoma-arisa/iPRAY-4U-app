@@ -1,7 +1,15 @@
 const SUCCESS_DURATION_MS = 2500;
 const QUEUED_SUCCESS_KEY = 'ipray4u-mutation-success';
 
-export function setMutationPending(button, pendingName, { region, compact = false } = {}) {
+let dismissTimeout;
+
+class MutationApplicationError extends Error {}
+
+export function setMutationPending(
+  button,
+  pendingName,
+  { region, compact = false } = {},
+) {
   if (button.dataset.mutationPending === 'true') return null;
 
   const state = {
@@ -16,8 +24,13 @@ export function setMutationPending(button, pendingName, { region, compact = fals
   button.style.minWidth = `${state.width}px`;
   button.setAttribute('aria-label', pendingName);
   button.setAttribute('aria-busy', 'true');
-  button.innerHTML = `<span class="mutation-spinner${compact ? ' mutation-spinner-small' : ''}" aria-hidden="true"></span>`;
+  button.innerHTML = `
+    <span
+      class="mutation-spinner${compact ? ' mutation-spinner-small' : ''}"
+      aria-hidden="true"
+    ></span>`;
   region?.setAttribute('aria-busy', 'true');
+
   return state;
 }
 
@@ -30,46 +43,92 @@ export function restoreMutationControl(button, state) {
   button.removeAttribute('aria-busy');
   delete button.dataset.mutationPending;
 
-  if (state.ariaLabel === null) button.removeAttribute('aria-label');
-  else button.setAttribute('aria-label', state.ariaLabel);
+  if (state.ariaLabel === null) {
+    button.removeAttribute('aria-label');
+  } else {
+    button.setAttribute('aria-label', state.ariaLabel);
+  }
 
   state.region?.removeAttribute('aria-busy');
 }
 
-export function clearMutationFeedback(container) {
-  container?.querySelectorAll('.mutation-feedback').forEach(feedback => feedback.remove());
+export async function mutationResponse(response, fallbackMessage) {
+  if (!response) throw new Error('Mutation response was unavailable.');
+
+  const responseText = await response.text();
+  if (!responseText.trim()) {
+    if (response.ok) return null;
+    throw new MutationApplicationError(fallbackMessage);
+  }
+
+  const result = JSON.parse(responseText);
+  if (!response.ok || result.status !== 'success') {
+    throw new MutationApplicationError(result.message || fallbackMessage);
+  }
+
+  return result;
 }
 
-export function showMutationFeedback(container, message, type, { autoDismiss = false } = {}) {
+export function mutationErrorMessage(error, fallbackMessage) {
+  if (error instanceof MutationApplicationError) return error.message;
+
+  console.error(fallbackMessage, error);
+  return fallbackMessage;
+}
+
+export function clearMutationFeedback() {
+  window.clearTimeout(dismissTimeout);
+  document.querySelector('.mutation-feedback-region-js')?.replaceChildren();
+}
+
+export function showMutationFeedback(
+  message,
+  type,
+  { autoDismiss = false } = {},
+) {
+  const container = document.querySelector('.mutation-feedback-region-js');
   if (!container) return null;
 
-  clearMutationFeedback(container);
-  const feedback = document.createElement('p');
+  clearMutationFeedback();
+
+  const feedback = document.createElement('div');
   feedback.className = `mutation-feedback mutation-feedback-${type}`;
-  feedback.textContent = message;
   feedback.setAttribute('role', type === 'error' ? 'alert' : 'status');
+
+  const messageElement = document.createElement('p');
+  messageElement.textContent = message;
+  feedback.append(messageElement);
+
+  if (type === 'error') {
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'mutation-feedback-close';
+    closeButton.setAttribute('aria-label', 'Dismiss error message');
+    closeButton.textContent = '\u00d7';
+    closeButton.addEventListener('click', clearMutationFeedback);
+    feedback.append(closeButton);
+  }
+
   container.append(feedback);
 
   if (autoDismiss) {
-    window.setTimeout(() => feedback.remove(), SUCCESS_DURATION_MS);
+    dismissTimeout = window.setTimeout(
+      clearMutationFeedback,
+      SUCCESS_DURATION_MS,
+    );
   }
 
   return feedback;
-}
-
-export function mutationErrorMessage(error, fallback) {
-  console.error(fallback, error);
-  return error?.message || fallback;
 }
 
 export function queueMutationSuccess(message) {
   window.sessionStorage.setItem(QUEUED_SUCCESS_KEY, message);
 }
 
-export function showQueuedMutationSuccess(container) {
+export function showQueuedMutationSuccess() {
   const message = window.sessionStorage.getItem(QUEUED_SUCCESS_KEY);
   if (!message) return;
 
   window.sessionStorage.removeItem(QUEUED_SUCCESS_KEY);
-  showMutationFeedback(container, message, 'success', { autoDismiss: true });
+  showMutationFeedback(message, 'success', { autoDismiss: true });
 }
