@@ -3,7 +3,12 @@ const QUEUED_SUCCESS_KEY = 'ipray4u-mutation-success';
 
 let dismissTimeout;
 
-class MutationApplicationError extends Error {}
+class MutationApplicationError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.status = status;
+  }
+}
 
 export function setMutationPending(
   button,
@@ -58,12 +63,15 @@ export async function mutationResponse(response, fallbackMessage) {
   const responseText = await response.text();
   if (!responseText.trim()) {
     if (response.ok) return null;
-    throw new MutationApplicationError(fallbackMessage);
+    throw new MutationApplicationError(fallbackMessage, response.status);
   }
 
   const result = JSON.parse(responseText);
   if (!response.ok || result.status !== 'success') {
-    throw new MutationApplicationError(result.message || fallbackMessage);
+    throw new MutationApplicationError(
+      result.message || fallbackMessage,
+      response.status,
+    );
   }
 
   return result;
@@ -76,17 +84,35 @@ export function mutationErrorMessage(error, fallbackMessage) {
   return fallbackMessage;
 }
 
+export function isFormCorrectableMutationError(error) {
+  return error instanceof MutationApplicationError
+    && (error.status === 400 || error.status === 409);
+}
+
 export function clearMutationFeedback() {
   window.clearTimeout(dismissTimeout);
-  document.querySelector('.mutation-feedback-region-js')?.replaceChildren();
+  document
+    .querySelectorAll(
+      '.mutation-feedback-region-js, .modal-mutation-feedback-js',
+    )
+    .forEach(container => container.replaceChildren());
 }
 
 export function showMutationFeedback(
   message,
   type,
-  { autoDismiss = false } = {},
+  { autoDismiss = false, forceGlobal = false } = {},
 ) {
-  const container = document.querySelector('.mutation-feedback-region-js');
+  const openModalFeedback = document.querySelector(
+    '.modal-js[open] .modal-mutation-feedback-js',
+  );
+  const globalFeedback = document.querySelector(
+    '.mutation-feedback-region-js',
+  );
+  const container = type === 'error' && !forceGlobal
+    ? openModalFeedback || globalFeedback
+    : globalFeedback;
+
   if (!container) return null;
 
   clearMutationFeedback();
@@ -105,7 +131,10 @@ export function showMutationFeedback(
     closeButton.className = 'mutation-feedback-close';
     closeButton.setAttribute('aria-label', 'Dismiss error message');
     closeButton.textContent = '\u00d7';
-    closeButton.addEventListener('click', clearMutationFeedback);
+    closeButton.addEventListener(
+      'click',
+      () => container.replaceChildren(),
+    );
     feedback.append(closeButton);
   }
 
@@ -113,7 +142,7 @@ export function showMutationFeedback(
 
   if (autoDismiss) {
     dismissTimeout = window.setTimeout(
-      clearMutationFeedback,
+      () => container.replaceChildren(),
       SUCCESS_DURATION_MS,
     );
   }

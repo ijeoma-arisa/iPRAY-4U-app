@@ -122,6 +122,7 @@ function initPrayerEventListeners({ onSuccess }) {
           'Unable to update prayer request. Please try again.',
         );
       } catch (error) {
+        restoreMutationControl(markPrayedButton, pendingState);
         showMutationFeedback(
           mutationErrorMessage(
             error,
@@ -130,8 +131,6 @@ function initPrayerEventListeners({ onSuccess }) {
           'error',
         );
         return;
-      } finally {
-        restoreMutationControl(markPrayedButton, pendingState);
       }
 
       const successMessage = toggledHasPrayed
@@ -151,7 +150,15 @@ function initPrayerEventListeners({ onSuccess }) {
         );
       } catch (error) {
         console.error(refreshFailureMessage, error);
-        showMutationFeedback(refreshFailureMessage, 'error');
+        showMutationFeedback(
+          refreshFailureMessage,
+          'error',
+          { forceGlobal: true },
+        );
+      } finally {
+        if (markPrayedButton.isConnected) {
+          restoreMutationControl(markPrayedButton, pendingState);
+        }
       }
     }
   });

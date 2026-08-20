@@ -49,8 +49,17 @@
   pointer-events: none;
 }
 
-.mutation-feedback-region:empty {
+.mutation-feedback-region:empty,
+.modal-mutation-feedback:empty {
   display: none;
+}
+
+.modal-mutation-feedback {
+  width: 100%;
+}
+
+.modal-mutation-feedback .mutation-feedback {
+  box-shadow: none;
 }
 
 .mutation-feedback {
@@ -80,6 +89,16 @@
   background: #fef3f2;
   border-color: #fecdca;
   color: #b42318;
+}
+
+.form-error {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #fecdca;
+  border-radius: 8px;
+  background: #fef3f2;
+  color: #b42318;
+  font-size: 0.9rem;
 }
 
 .mutation-feedback-close {
