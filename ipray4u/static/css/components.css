@@ -58,8 +58,13 @@
   width: 100%;
 }
 
+.modal-mutation-feedback:not(:empty) {
+  margin-top: 1rem;
+}
+
 .modal-mutation-feedback .mutation-feedback {
   box-shadow: none;
+  text-align: left;
 }
 
 .mutation-feedback {
@@ -555,7 +560,7 @@ label {
   }
 }
 
-.mark-prayed-button:active {
+.mark-prayed-button:not(:disabled):active {
   background-color: var(--darker-green);
 }
 
