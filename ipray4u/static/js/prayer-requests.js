@@ -78,10 +78,7 @@ async function applyLocalizedMutation({ type, data, personId, itemId }) {
   if (type === 'add-person') {
     if (!personMatchesCurrentFilter(data)) return;
 
-    // The current POST /api/people response does not include its default prayer.
-    const prayers = Array.isArray(data.prayers)
-      ? data.prayers
-      : await loadPrayers(data.id);
+    const prayers = await loadPrayers(data.id);
     const newPersonCard = createPersonCard(data, prayers);
 
     insertPersonCard(newPersonCard);

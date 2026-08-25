@@ -248,6 +248,9 @@ def test_get_people_no_filter(auth_client):
 
   assert isinstance(data, list)
   assert len(data) == 3
+
+  for person_data, person in zip(data, people):
+    assert_person_data(person_data, person)
   
 def test_get_people_with_relationship_filter(auth_client):
   people = [
@@ -270,6 +273,7 @@ def test_get_people_with_relationship_filter(auth_client):
     
     assert isinstance(data, list)
     assert len(data) == 1
+    assert_person_data(data[0], person)
     
 def test_get_person_valid(auth_client):
   person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")
