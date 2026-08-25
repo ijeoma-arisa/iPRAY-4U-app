@@ -248,8 +248,9 @@ def test_get_people_no_filter(auth_client):
 
   assert isinstance(data, list)
   assert len(data) == 3
+  assert [person_data["id"] for person_data in data] == [3, 2, 1]
 
-  for person_data, person in zip(data, people):
+  for person_data, person in zip(data, reversed(people)):
     assert_person_data(person_data, person)
   
 def test_get_people_with_relationship_filter(auth_client):
@@ -274,6 +275,29 @@ def test_get_people_with_relationship_filter(auth_client):
     assert isinstance(data, list)
     assert len(data) == 1
     assert_person_data(data[0], person)
+
+def test_get_people_with_relationship_filter_newest_first(auth_client):
+  people = [
+    generate_person_json("Bob", Relationship.FRIENDS.value, "Strength"),
+    generate_person_json("Sarah", Relationship.FRIENDS.value, "Peace"),
+  ]
+
+  for person in people:
+    auth_client.post(PEOPLE_URL, json=person)
+
+  relationship_url = f"{PEOPLE_URL}?rel={Relationship.FRIENDS.value}"
+  response = auth_client.get(relationship_url)
+
+  data = assert_success_response(
+    response,
+    expected_message=get_success("People"),
+    data_type=list,
+  )
+
+  assert [person_data["id"] for person_data in data] == [2, 1]
+
+  for person_data, person in zip(data, reversed(people)):
+    assert_person_data(person_data, person)
     
 def test_get_person_valid(auth_client):
   person = generate_person_json("Sam", Relationship.FAMILY.value, "Obedience")

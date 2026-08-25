@@ -204,11 +204,32 @@ export function showPeopleEmptyState(
   }
 }
 
+function prefersReducedMotion() {
+  return window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches;
+}
+
+function scrollPageToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+  });
+}
+
+function scrollPrayerCardsToTop(prayerCardsSection) {
+  prayerCardsSection.scrollTo({
+    top: 0,
+    behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+  });
+}
+
 export function insertPersonCard(personCard) {
   const personCards = document.querySelector('.person-cards-js');
 
   if (!personCards.querySelector('.person-card-js')) personCards.replaceChildren();
-  personCards.append(personCard);
+  personCards.prepend(personCard);
+  scrollPageToTop();
 }
 
 export function insertPrayerCard(personCard, prayerCard) {
@@ -218,7 +239,8 @@ export function insertPrayerCard(personCard, prayerCard) {
     prayerCardsSection.replaceChildren();
   }
 
-  prayerCardsSection.append(prayerCard);
+  prayerCardsSection.prepend(prayerCard);
+  scrollPrayerCardsToTop(prayerCardsSection);
 }
 
 export async function renderPersonCards(
