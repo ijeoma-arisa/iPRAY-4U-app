@@ -12,6 +12,9 @@ import {
   showMutationFeedback,
 } from './mutation-feedback.js';
 
+const DISPLAY_UPDATE_FAILED_MESSAGE =
+  'Your change was saved, but the page display could not be updated. Please refresh.';
+
 function clearFormError(errorElement) {
   errorElement.textContent = '';
   errorElement.hidden = true;
@@ -127,13 +130,15 @@ async function handlePrayerRequestInput({ onSuccess }){
     const prayerRoute = personExists ? 
         `${GET_PEOPLE_URL}/${prayerRequestForm.dataset.personId}/prayers`:
         GET_PEOPLE_URL
-        
+    let savedData;
+
     try {
       const response = await fetchWithCsrf(prayerRoute, options);
-      await mutationResponse(
+      const result = await mutationResponse(
         response,
         'Unable to save prayer request. Please try again.',
       );
+      savedData = result.data;
     } catch (error) {
       if (isFormCorrectableMutationError(error)) {
         showFormError(formError, error.message);
@@ -152,6 +157,7 @@ async function handlePrayerRequestInput({ onSuccess }){
 
     const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
     const redirectsToDashboard = !document.querySelector('.person-cards-js');
+    const personId = prayerRequestForm.dataset.personId;
     addPrayerRequestModal.close();
 
     if (redirectsToDashboard) {
@@ -161,16 +167,23 @@ async function handlePrayerRequestInput({ onSuccess }){
     }
 
     try {
-      await onSuccess();
+      await onSuccess({
+        type: personExists ? 'add-prayer' : 'add-person',
+        data: savedData,
+        personId,
+      });
       showMutationFeedback(
         'Prayer request added.',
         'success',
         { autoDismiss: true },
       );
     } catch (error) {
-      console.error('Prayer request was added, but the page could not refresh.', error);
+      console.error(
+        'Prayer request was saved, but the page display could not be updated.',
+        error,
+      );
       showMutationFeedback(
-        'Prayer request was added, but the page could not refresh. Please try again.',
+        DISPLAY_UPDATE_FAILED_MESSAGE,
         'error',
         { forceGlobal: true },
       );
@@ -199,6 +212,7 @@ function initDeleteModalListeners({ onSuccess }){
     const route = deleteItemModal.dataset.route;
     const itemId = deleteItemModal.dataset.itemId;
     const itemType = deleteItemModal.dataset.itemType;
+    const personId = deleteItemModal.dataset.personId;
     deleteItemModal.dataset.submitting = 'true';
     clearMutationFeedback();
     const pendingState = setMutationPending(
@@ -224,23 +238,25 @@ function initDeleteModalListeners({ onSuccess }){
       restoreMutationControl(confirmDeleteButton, pendingState);
     }
 
-    document.getElementById(itemId)?.remove();
     deleteItemModal.close();
 
     const successMessage = itemType === 'person'
       ? 'Person deleted.'
       : 'Prayer request deleted.';
-    const refreshFailureMessage = itemType === 'person'
-      ? 'Person was deleted, but the page could not refresh. Please try again.'
-      : 'Prayer request was deleted, but the page could not refresh. Please try again.';
-
     try {
-      await onSuccess();
+      await onSuccess({
+        type: itemType === 'person' ? 'delete-person' : 'delete-prayer',
+        itemId,
+        personId,
+      });
       showMutationFeedback(successMessage, 'success', { autoDismiss: true });
     } catch (error) {
-      console.error(refreshFailureMessage, error);
+      console.error(
+        'Deletion was saved, but the page display could not be updated.',
+        error,
+      );
       showMutationFeedback(
-        refreshFailureMessage,
+        DISPLAY_UPDATE_FAILED_MESSAGE,
         'error',
         { forceGlobal: true },
       );
@@ -315,13 +331,15 @@ async function handleEditPrayerInput({ onSuccess }){
     const personId = editPrayerForm.dataset.personId;
     const prayerId = editPrayerForm.dataset.prayerId;
     const prayerRoute = `${GET_PEOPLE_URL}/${personId}/prayers/${prayerId}`;
+    let savedData;
 
     try {
       const response = await fetchWithCsrf(prayerRoute, options);
-      await mutationResponse(
+      const result = await mutationResponse(
         response,
         'Unable to update prayer request. Please try again.',
       );
+      savedData = result.data;
     } catch (error) {
       if (isFormCorrectableMutationError(error)) {
         showFormError(formError, error.message);
@@ -344,17 +362,21 @@ async function handleEditPrayerInput({ onSuccess }){
     document.querySelector('.edit-prayer-modal-js').close();
 
     try {
-      await onSuccess();
+      await onSuccess({
+        type: 'edit-prayer',
+        data: savedData,
+        personId,
+        prayerId,
+      });
       showMutationFeedback(
         'Prayer request updated.',
         'success',
         { autoDismiss: true },
       );
     } catch (error) {
-      const message = 'Prayer request was updated, but the page could not refresh. Please try again.';
-      console.error(message, error);
+      console.error(DISPLAY_UPDATE_FAILED_MESSAGE, error);
       showMutationFeedback(
-        message,
+        DISPLAY_UPDATE_FAILED_MESSAGE,
         'error',
         { forceGlobal: true },
       );
@@ -432,13 +454,15 @@ async function handleEditPersonInput({ onSuccess }){
     const personId = editPersonForm.dataset.personId;
 
     const personRoute = `${GET_PEOPLE_URL}/${personId}`;
+    let savedData;
 
     try {
       const response = await fetchWithCsrf(personRoute, options);
-      await mutationResponse(
+      const result = await mutationResponse(
         response,
         'Unable to update person. Please try again.',
       );
+      savedData = result.data;
     } catch (error) {
       if (isFormCorrectableMutationError(error)) {
         showFormError(formError, error.message);
@@ -461,17 +485,16 @@ async function handleEditPersonInput({ onSuccess }){
     document.querySelector('.edit-person-modal-js').close();
 
     try {
-      await onSuccess();
+      await onSuccess({ type: 'edit-person', data: savedData, personId });
       showMutationFeedback(
         'Person updated.',
         'success',
         { autoDismiss: true },
       );
     } catch (error) {
-      const message = 'Person was updated, but the page could not refresh. Please try again.';
-      console.error(message, error);
+      console.error(DISPLAY_UPDATE_FAILED_MESSAGE, error);
       showMutationFeedback(
-        message,
+        DISPLAY_UPDATE_FAILED_MESSAGE,
         'error',
         { forceGlobal: true },
       );

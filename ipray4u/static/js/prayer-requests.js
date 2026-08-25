@@ -1,8 +1,21 @@
 import { initModals, openModal } from './modals.js';
-import { renderPersonCards } from './person-cards.js';
-import { renderRelationshipButtons, initRelationshipButtonsRowListener } from './relationships.js';
+import {
+  createPersonCard,
+  createPrayerCard,
+  insertPersonCard,
+  insertPrayerCard,
+  loadPrayers,
+  renderPersonCards,
+  showPeopleEmptyState,
+  showPrayerEmptyState,
+  updatePersonCard,
+  updatePrayerCard,
+} from './person-cards.js';
+import {
+  initRelationshipButtonsRowListener,
+  renderRelationshipButtons,
+} from './relationships.js';
 import { GET_PEOPLE_URL } from './api/endpoints.js';
-import { buildPeopleApiUrl } from './utils.js';
 import { fetchWithCsrf } from './api/client.js';
 import {
   clearMutationFeedback,
@@ -14,6 +27,8 @@ import {
   showQueuedMutationSuccess,
 } from './mutation-feedback.js';
 
+const DISPLAY_UPDATE_FAILED_MESSAGE =
+  'Your change was saved, but the page display could not be updated. Please refresh.';
 
 function displayTime(){
   const currentTime = document.querySelector('.current-date-js');
@@ -41,7 +56,86 @@ function initPageLoadListeners(){
   });
 }
 
-function initPrayerEventListeners({ onSuccess }) {
+function personMatchesCurrentFilter(person) {
+  const selectedRelationship = new URLSearchParams(window.location.search).get('rel');
+  return !selectedRelationship
+    || person.relationship.toLowerCase() === selectedRelationship.toLowerCase();
+}
+
+function findPersonCard(personId) {
+  return [...document.querySelectorAll('.person-card-js')]
+    .find(personCard => personCard.dataset.personId === String(personId));
+}
+
+function findPrayerCard(personCard, prayerId) {
+  return [...personCard.querySelectorAll('.prayer-card-js')]
+    .find(prayerCard => prayerCard.dataset.prayerId === String(prayerId));
+}
+
+async function applyLocalizedMutation({ type, data, personId, itemId }) {
+  const personCards = document.querySelector('.person-cards-js');
+
+  if (type === 'add-person') {
+    if (!personMatchesCurrentFilter(data)) return;
+
+    // The current POST /api/people response does not include its default prayer.
+    const prayers = Array.isArray(data.prayers)
+      ? data.prayers
+      : await loadPrayers(data.id);
+    const newPersonCard = createPersonCard(data, prayers);
+
+    insertPersonCard(newPersonCard);
+    return;
+  }
+
+  const targetPersonId = personId || data?.person_id || itemId;
+  const personCard = findPersonCard(targetPersonId);
+
+  if (type === 'edit-person') {
+    const updatedPersonCard = findPersonCard(data.id);
+
+    if (!personMatchesCurrentFilter(data)) {
+      updatedPersonCard?.remove();
+      showPeopleEmptyState(personCards);
+      return;
+    }
+
+    if (!updatedPersonCard) throw new Error(`Unable to find person ${data.id}`);
+
+    updatePersonCard(updatedPersonCard, data);
+    return;
+  }
+
+  if (type === 'delete-person') {
+    if (!personCard) throw new Error(`Unable to find person ${itemId}`);
+    personCard.remove();
+    showPeopleEmptyState(personCards);
+    return;
+  }
+  if (!personCard) throw new Error(`Unable to find person ${targetPersonId}`);
+
+  if (type === 'add-prayer') {
+    const newPrayerCard = createPrayerCard(
+      data,
+      personCard.dataset.personId,
+    );
+
+    insertPrayerCard(personCard, newPrayerCard);
+  } else if (type === 'edit-prayer') {
+    const prayerCard = findPrayerCard(personCard, data.id);
+    if (!prayerCard) throw new Error(`Unable to find prayer ${data.id}`);
+
+    updatePrayerCard(prayerCard, data, personCard.dataset.personId);
+  } else if (type === 'delete-prayer') {
+    const prayerCard = findPrayerCard(personCard, itemId);
+    if (!prayerCard) throw new Error(`Unable to find prayer ${itemId}`);
+
+    prayerCard.remove();
+    showPrayerEmptyState(personCard);
+  }
+}
+
+function initPrayerEventListeners() {
   const personCards = document.querySelector('.person-cards-js');
   const deleteItemModal = document.querySelector('.delete-item-modal-js');
   const deleteTitle = document.querySelector('.delete-title-js');
@@ -67,7 +161,8 @@ function initPrayerEventListeners({ onSuccess }) {
       itemToDelete.textContent = personCard.dataset.personName;
 
       deleteItemModal.dataset.route = personRoute;
-      deleteItemModal.dataset.itemId = personCard.id;
+      deleteItemModal.dataset.itemId = personId;
+      deleteItemModal.dataset.personId = personId;
       deleteItemModal.dataset.itemType = 'person';
       clearMutationFeedback();
 
@@ -83,7 +178,8 @@ function initPrayerEventListeners({ onSuccess }) {
       itemToDelete.textContent = prayerCard.dataset.prayerText;
 
       deleteItemModal.dataset.route = prayerRoute;
-      deleteItemModal.dataset.itemId = prayerCard.id;
+      deleteItemModal.dataset.itemId = prayerId;
+      deleteItemModal.dataset.personId = personId;
       deleteItemModal.dataset.itemType = 'prayer request';
       clearMutationFeedback();
 
@@ -95,7 +191,7 @@ function initPrayerEventListeners({ onSuccess }) {
       const prayerId = prayerCard.dataset.prayerId;
       const prayerRoute = `${personRoute}/prayers/${prayerId}`;
 
-      const toggledHasPrayed = prayerCard.dataset.hasPrayed === "true" ? false : true;
+      const toggledHasPrayed = prayerCard.dataset.hasPrayed !== 'true';
       clearMutationFeedback();
       const pendingName = toggledHasPrayed
         ? 'Marking prayer request as prayed'
@@ -115,12 +211,14 @@ function initPrayerEventListeners({ onSuccess }) {
         body: JSON.stringify(data)
       };
       
+      let savedPrayer;
       try {
         const response = await fetchWithCsrf(prayerRoute, options);
-        await mutationResponse(
+        const result = await mutationResponse(
           response,
           'Unable to update prayer request. Please try again.',
         );
+        savedPrayer = result.data;
       } catch (error) {
         restoreMutationControl(markPrayedButton, pendingState);
         showMutationFeedback(
@@ -133,30 +231,33 @@ function initPrayerEventListeners({ onSuccess }) {
         return;
       }
 
-      const successMessage = toggledHasPrayed
+      const successMessage = savedPrayer.has_prayed
         ? 'Prayer request marked as prayed.'
         : 'Prayer request marked as unprayed.';
-      const refreshFailureMessage = toggledHasPrayed
-        ? 'Prayer request was marked as prayed, but the page could not refresh. Please try again.'
-        : 'Prayer request was marked as unprayed, but the page could not refresh. Please try again.';
 
       try {
-        const url = `${GET_PEOPLE_URL}${window.location.search}`;
-        await onSuccess(url);
+        restoreMutationControl(markPrayedButton, pendingState);
+        updatePrayerCard(prayerCard, savedPrayer, personId);
         showMutationFeedback(
           successMessage,
           'success',
           { autoDismiss: true },
         );
       } catch (error) {
-        console.error(refreshFailureMessage, error);
+        console.error(
+          'Prayer update was saved, but the page display could not be updated.',
+          error,
+        );
         showMutationFeedback(
-          refreshFailureMessage,
+          DISPLAY_UPDATE_FAILED_MESSAGE,
           'error',
           { forceGlobal: true },
         );
       } finally {
-        if (markPrayedButton.isConnected) {
+        const mutationIsStillPending =
+          markPrayedButton.dataset.mutationPending === 'true';
+
+        if (markPrayedButton.isConnected && mutationIsStillPending) {
           restoreMutationControl(markPrayedButton, pendingState);
         }
       }
@@ -172,12 +273,8 @@ function initPage(){
   initPageLoadListeners();
   initRelationshipButtonsRowListener();
   
-  initPrayerEventListeners({
-    onSuccess: (url) => renderPersonCards(url, false, true),
-  });
-  initModals({
-    onSuccess: () => renderPersonCards(buildPeopleApiUrl(), false, true),
-  });
+  initPrayerEventListeners();
+  initModals({ onSuccess: applyLocalizedMutation });
 }
 
 initPage();
