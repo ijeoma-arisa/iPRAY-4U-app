@@ -224,6 +224,21 @@ function scrollPrayerCardsToTop(prayerCardsSection) {
   });
 }
 
+function scrollPersonCardIntoViewIfNeeded(personCard) {
+  const personCardBounds = personCard.getBoundingClientRect();
+  const navbar = document.querySelector('.nav-bar');
+  const visibleViewportTop = navbar?.getBoundingClientRect().bottom ?? 0;
+  const personCardTopIsVisible = personCardBounds.top >= visibleViewportTop
+    && personCardBounds.top < window.innerHeight;
+
+  if (personCardTopIsVisible) return;
+
+  personCard.scrollIntoView({
+    behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    block: 'start',
+  });
+}
+
 export function insertPersonCard(personCard) {
   const personCards = document.querySelector('.person-cards-js');
 
@@ -241,6 +256,7 @@ export function insertPrayerCard(personCard, prayerCard) {
 
   prayerCardsSection.prepend(prayerCard);
   scrollPrayerCardsToTop(prayerCardsSection);
+  scrollPersonCardIntoViewIfNeeded(personCard);
 }
 
 export async function renderPersonCards(
