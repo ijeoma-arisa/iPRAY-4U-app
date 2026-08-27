@@ -540,8 +540,10 @@ export function initCloseModalListeners(){
         event.clientY < bounds.top ||
         event.clientY > bounds.bottom
       );
+      const containsForm = modal.querySelector('.modal-form-js') !== null;
+      const dismissFromBackdrop = clickedBackdrop && !containsForm;
 
-      if (!closeModalButton && !clickedBackdrop) return;
+      if (!closeModalButton && !dismissFromBackdrop) return;
 
       modal.close();
     });
