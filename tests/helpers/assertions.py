@@ -50,6 +50,7 @@ def assert_person_data(data: dict, person: dict):
   assert isinstance(relationship_id, int)
   
   assert_relationship_data(relationship_id, person["relationship"])
+  assert data.get("relationship") == person["relationship"]
 
 def assert_prayer_data(data: dict, prayer: dict):
   assert isinstance(data.get("id"), int)

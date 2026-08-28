@@ -71,26 +71,42 @@ ON prayers(person_id);
 
 # People
 SELECT_ALL_PEOPLE_QUERY = """
-SELECT p.id, p.name, r.relationship
+SELECT
+      p.id,
+      p.name,
+      p.relationship_id,
+      r.relationship
 FROM people AS p
-JOIN relationships AS r ON p.relationship_id = r.id
+JOIN relationships AS r
+      ON p.relationship_id = r.id
 WHERE p.user_id = %s
-ORDER BY p.id ASC;
+ORDER BY p.id DESC;
 """
 
 SELECT_RELATIONSHIP_PEOPLE_QUERY = """
-SELECT p.id, p.name, r.relationship
+SELECT p.id,
+      p.name,
+      p.relationship_id,
+      r.relationship
 FROM people AS p
-JOIN relationships AS r ON p.relationship_id = r.id
-WHERE p.user_id = %s AND 
+JOIN relationships AS r
+      ON p.relationship_id = r.id
+WHERE p.user_id = %s AND
       r.relationship = %s
+ORDER BY p.id DESC;
 """
 
 SELECT_PERSON_QUERY = """
-SELECT * 
+SELECT
+      p.id,
+      p.name,
+      p.relationship_id,
+      r.relationship
 FROM people as p
-WHERE p.user_id = %s AND
-      id = %s 
+JOIN relationships AS r
+      ON p.relationship_id = r.id
+WHERE p.user_id = %s
+      AND p.id = %s
 """
 
 # Prayers
@@ -99,7 +115,7 @@ SELECT pr.*
 FROM prayers AS pr
 JOIN people as p ON pr.person_id = p.id
 WHERE p.user_id = %s
-ORDER BY pr.id ASC;
+ORDER BY pr.id DESC;
 """
 
 SELECT_ALL_PRAYERS_BY_PERSON_QUERY = """
@@ -108,22 +124,8 @@ FROM prayers AS pr
 JOIN people AS p ON pr.person_id = p.id 
 WHERE p.user_id = %s AND
       pr.person_id = %s
-ORDER BY pr.id ASC;
+ORDER BY pr.id DESC;
 """
-
-SELECT_PRAYER_QUERY = """
-SELECT * 
-FROM prayers 
-WHERE id = %s
-"""
-
-SELECT_PRAYER_BY_PERSON_QUERY = """
-SELECT * 
-FROM prayers 
-WHERE id = %s AND 
-      person_id = %s
-"""
-
 
 # Relationship
 SELECT_ALL_RELATIONSHIPS_QUERY = """

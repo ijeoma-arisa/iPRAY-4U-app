@@ -16,6 +16,123 @@
   opacity: 0.65;
 }
 
+.btn[aria-busy="true"] {
+  display: inline-grid;
+  place-items: center;
+}
+
+.mutation-spinner {
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: mutation-spin 700ms linear infinite;
+}
+
+.mutation-spinner-small {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+@keyframes mutation-spin {
+  to { transform: rotate(360deg); }
+}
+
+.mutation-feedback-region {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  bottom: 1.5rem;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  width: min(32rem, calc(100vw - 2rem));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.mutation-feedback-region:empty,
+.modal-mutation-feedback:empty {
+  display: none;
+}
+
+.modal-mutation-feedback {
+  width: 100%;
+}
+
+.modal-mutation-feedback:not(:empty) {
+  margin-top: 1rem;
+}
+
+.modal-mutation-feedback .mutation-feedback {
+  box-shadow: none;
+  text-align: left;
+}
+
+.mutation-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(63, 53, 46, 0.18);
+  pointer-events: auto;
+}
+
+.mutation-feedback p {
+  margin: 0;
+}
+
+.mutation-feedback-success {
+  background: #ecfdf3;
+  border-color: #abefc6;
+  color: #067647;
+}
+
+.mutation-feedback-error {
+  background: #fef3f2;
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.form-error {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #fecdca;
+  border-radius: 8px;
+  background: #fef3f2;
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.mutation-feedback-close {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mutation-feedback-close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .mutation-feedback-region {
+    width: calc(100vw - 1.5rem);
+  }
+}
+
 @media (hover: hover) {
   .btn:not(:disabled):hover {
     transform: scale(1.05);
@@ -55,9 +172,9 @@
 }
 
 @media (hover: hover) {
-  .add-prayer-button:hover, 
-  .save-button:hover,
-  .create-account-button:hover {
+  .add-prayer-button:not(:disabled):hover,
+  .save-button:not(:disabled):hover,
+  .create-account-button:not(:disabled):hover {
     background: var(--primary-hover);
   }
 }
@@ -321,6 +438,7 @@ label {
   align-items: center;
   background-color: white;
   border-radius: 12px;
+  scroll-margin-top: calc(64px + 2.3rem);
   border: 1px solid rgba(69, 43, 111, 0.12);
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
   transition: transform 180ms ease, box-shadow 180ms ease;
@@ -438,12 +556,12 @@ label {
 }
 
 @media (hover: hover) {
-  .mark-prayed-button:hover {
+  .mark-prayed-button:not(:disabled):hover {
     background-color: var(--darker-green);
   }
 }
 
-.mark-prayed-button:active {
+.mark-prayed-button:not(:disabled):active {
   background-color: var(--darker-green);
 }
 
@@ -454,9 +572,9 @@ label {
 }
 
 @media (hover: hover){
-  .edit-person-button:hover,
-  .edit-prayer-button:hover,
-  .deny-delete-button:hover {
+  .edit-person-button:not(:disabled):hover,
+  .edit-prayer-button:not(:disabled):hover,
+  .deny-delete-button:not(:disabled):hover {
     background-color: var(--darker-gray);
   }
 }
@@ -468,9 +586,9 @@ label {
 }
 
 @media (hover: hover){
-  .delete-person-button:hover, 
-  .delete-prayer-button:hover,
-  .confirm-delete-button:hover {
+  .delete-person-button:not(:disabled):hover,
+  .delete-prayer-button:not(:disabled):hover,
+  .confirm-delete-button:not(:disabled):hover {
     background-color: var(--darker-red);
   }
 }
@@ -550,6 +668,10 @@ label {
     height: 48px;
     width: auto;
     display: block;
+  }
+
+  .person-card {
+    scroll-margin-top: calc(48px + 2.1rem);
   }
 
   .current-date {
@@ -863,7 +985,8 @@ label {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton {
+  .skeleton,
+  .mutation-spinner {
     animation: none;
   }
 }

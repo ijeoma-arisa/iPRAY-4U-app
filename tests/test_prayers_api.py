@@ -135,6 +135,7 @@ def test_get_all_prayers(auth_client, sample_person):
     )
     
     assert len(data) == 2
+    assert [prayer["id"] for prayer in data] == [2, 1]
 
 
 def test_prayers_by_person_auth_required(client, sample_prayer):
@@ -176,6 +177,7 @@ def test_get_prayers_by_person(auth_client, sample_person):
     
     assert isinstance(data, list)
     assert len(data) == 4
+    assert [prayer["id"] for prayer in data] == [4, 3, 2, 1]
     
 # PATCH endpoint
 def test_update_prayer_auth_required(client, sample_prayer):

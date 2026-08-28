@@ -107,6 +107,7 @@
       <button type="button" class="btn confirm-delete-button confirm-delete-button-js">Delete</button>
       <button type="button" class="btn close-modal-js deny-delete-button deny-delete-button-js">Cancel</button>
     </div>
+    <div class="modal-mutation-feedback modal-mutation-feedback-js"></div>
   </dialog>
   <dialog class="modal modal-js edit-prayer-modal edit-prayer-modal-js">
     <button type="button" class="close-button close-modal-js" aria-label="Close">&times;</button>
@@ -121,8 +122,10 @@
           <label for="has-prayed">Prayed</label>
         </div>
       </div>
+      <p class="form-error edit-prayer-error-js" role="alert" hidden></p>
       <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
     </form>
+    <div class="modal-mutation-feedback modal-mutation-feedback-js"></div>
   </dialog>
   <dialog class="modal modal-js edit-person-modal edit-person-modal-js">
     <button type="button" class="close-button close-modal-js" aria-label="Close">&times;</button>
@@ -137,8 +140,10 @@
         <select id="relationship" name="relationship" class="relationship-dropdown-js" required>
         </select>
       </div>
+      <p class="form-error edit-person-error-js" role="alert" hidden></p>
       <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
     </form>
+    <div class="modal-mutation-feedback modal-mutation-feedback-js"></div>
   </dialog>
 </div>
 {% endblock %}

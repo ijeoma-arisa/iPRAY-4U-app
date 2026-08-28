@@ -1,10 +1,40 @@
 import { GET_PEOPLE_URL } from './api/endpoints.js';
 import { renderRelationshipDropdown } from './relationships.js';
 import { fetchWithCsrf } from './api/client.js';
+import {
+  clearMutationFeedback,
+  isFormCorrectableMutationError,
+  mutationErrorMessage,
+  mutationResponse,
+  queueMutationSuccess,
+  restoreMutationControl,
+  setMutationPending,
+  showMutationFeedback,
+} from './mutation-feedback.js';
+
+const DISPLAY_UPDATE_FAILED_MESSAGE =
+  'Your change was saved, but the page display could not be updated. Please refresh.';
+
+function clearFormError(errorElement) {
+  errorElement.textContent = '';
+  errorElement.hidden = true;
+}
+
+function showFormError(errorElement, message) {
+  errorElement.textContent = message;
+  errorElement.hidden = false;
+}
+
+function initFormErrorClearing(form, errorElement) {
+  form.addEventListener('input', () => {
+    if (!errorElement.hidden) clearFormError(errorElement);
+  });
+}
 
 export function openModal(modal) {
   if (modal.open) return;
 
+  modal.querySelector('.modal-mutation-feedback-js')?.replaceChildren();
   modal.showModal();
 }
 
@@ -26,9 +56,10 @@ function renderPrayerRequestModal() {
         <label for="prayer">Prayer Request</label>
         <textarea id="prayer" name="prayer" placeholder="Enter prayer here" rows="5" cols="20" required></textarea>
       </div>
-      <p class="prayer-request-error-js" role="alert" hidden></p>
+      <p class="form-error prayer-request-error-js" role="alert" hidden></p>
       <button type="submit" name="submit" class="btn save-button save-button-js">Save</button>
-    </form>`;
+    </form>
+    <div class="modal-mutation-feedback modal-mutation-feedback-js"></div>`;
 }
 
 function initPrayerRequestModalListeners(){
@@ -41,10 +72,8 @@ function initPrayerRequestModalListeners(){
       
       const personCard = event.target.closest('.person-card-js');
       const prayerRequestForm = document.querySelector('.prayer-request-form-js');
-      const errorMessage = prayerRequestForm.querySelector('.prayer-request-error-js');
-
-      errorMessage.hidden = true;
-      errorMessage.textContent = '';
+      const formError = prayerRequestForm.querySelector('.prayer-request-error-js');
+      clearFormError(formError);
       
       if (personCard){
         
@@ -68,6 +97,9 @@ function initPrayerRequestModalListeners(){
 
 async function handlePrayerRequestInput({ onSuccess }){
   const prayerRequestForm = document.querySelector('.prayer-request-form-js');
+  const formError = prayerRequestForm.querySelector('.prayer-request-error-js');
+
+  initFormErrorClearing(prayerRequestForm, formError);
 
   prayerRequestForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -75,12 +107,11 @@ async function handlePrayerRequestInput({ onSuccess }){
     if (prayerRequestForm.dataset.submitting === 'true') return;
 
     const saveButton = prayerRequestForm.querySelector('.save-button-js');
-    const errorMessage = prayerRequestForm.querySelector('.prayer-request-error-js');
-
     prayerRequestForm.dataset.submitting = 'true';
-    saveButton.disabled = true;
-    errorMessage.hidden = true;
-    errorMessage.textContent = '';
+    const pendingState = setMutationPending(saveButton, 'Saving prayer request', {
+      region: prayerRequestForm,
+    });
+    clearFormError(formError);
     
     const formData = {
       name: prayerRequestForm.elements.name.value,
@@ -99,27 +130,63 @@ async function handlePrayerRequestInput({ onSuccess }){
     const prayerRoute = personExists ? 
         `${GET_PEOPLE_URL}/${prayerRequestForm.dataset.personId}/prayers`:
         GET_PEOPLE_URL
-        
+    let savedData;
+
     try {
       const response = await fetchWithCsrf(prayerRoute, options);
-      const { status, message } = await response.json();
-
-      if (status === 'success') {
-        const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
-        addPrayerRequestModal.close();
-
-        const url = `${GET_PEOPLE_URL}${window.location.search}`;
-        onSuccess();
-      } else {
-        errorMessage.textContent = message || 'Unable to save. Please try again.';
-        errorMessage.hidden = false;
-      }
+      const result = await mutationResponse(
+        response,
+        'Unable to save prayer request. Please try again.',
+      );
+      savedData = result.data;
     } catch (error) {
-      errorMessage.textContent = 'Unable to save. Please try again.';
-      errorMessage.hidden = false;
+      if (isFormCorrectableMutationError(error)) {
+        showFormError(formError, error.message);
+        return;
+      }
+
+      showMutationFeedback(
+        mutationErrorMessage(error, 'Unable to save prayer request. Please try again.'),
+        'error',
+      );
+      return;
     } finally {
       delete prayerRequestForm.dataset.submitting;
-      saveButton.disabled = false;
+      restoreMutationControl(saveButton, pendingState);
+    }
+
+    const addPrayerRequestModal = document.querySelector('.add-prayer-request-modal-js');
+    const redirectsToDashboard = !document.querySelector('.person-cards-js');
+    const personId = prayerRequestForm.dataset.personId;
+    addPrayerRequestModal.close();
+
+    if (redirectsToDashboard) {
+      queueMutationSuccess('Prayer request added.');
+      await onSuccess();
+      return;
+    }
+
+    try {
+      await onSuccess({
+        type: personExists ? 'add-prayer' : 'add-person',
+        data: savedData,
+        personId,
+      });
+      showMutationFeedback(
+        'Prayer request added.',
+        'success',
+        { autoDismiss: true },
+      );
+    } catch (error) {
+      console.error(
+        'Prayer request was saved, but the page display could not be updated.',
+        error,
+      );
+      showMutationFeedback(
+        DISPLAY_UPDATE_FAILED_MESSAGE,
+        'error',
+        { forceGlobal: true },
+      );
     }
   });
 
@@ -140,18 +207,60 @@ function initDeleteModalListeners({ onSuccess }){
   deleteItemModal.addEventListener('click', async (event) => {
     const confirmDeleteButton = event.target.closest('.confirm-delete-button-js');
     if (!confirmDeleteButton) return;
+    if (deleteItemModal.dataset.submitting === 'true') return;
 
     const route = deleteItemModal.dataset.route;
     const itemId = deleteItemModal.dataset.itemId;
-    const item = document.getElementById(itemId);
-    
-    await fetchWithCsrf(route, {method: "DELETE"});
-    item?.remove();
+    const itemType = deleteItemModal.dataset.itemType;
+    const personId = deleteItemModal.dataset.personId;
+    deleteItemModal.dataset.submitting = 'true';
+    clearMutationFeedback();
+    const pendingState = setMutationPending(
+      confirmDeleteButton,
+      itemType === 'person' ? 'Deleting person' : 'Deleting prayer request',
+      { region: deleteItemModal },
+    );
 
-    const url = `${GET_PEOPLE_URL}${window.location.search}`;
-    onSuccess();
+    try {
+      const response = await fetchWithCsrf(route, {method: "DELETE"});
+      await mutationResponse(
+        response,
+        `Unable to delete ${itemType}. Please try again.`,
+      );
+    } catch (error) {
+      showMutationFeedback(
+        mutationErrorMessage(error, `Unable to delete ${itemType}. Please try again.`),
+        'error',
+      );
+      return;
+    } finally {
+      delete deleteItemModal.dataset.submitting;
+      restoreMutationControl(confirmDeleteButton, pendingState);
+    }
 
     deleteItemModal.close();
+
+    const successMessage = itemType === 'person'
+      ? 'Person deleted.'
+      : 'Prayer request deleted.';
+    try {
+      await onSuccess({
+        type: itemType === 'person' ? 'delete-person' : 'delete-prayer',
+        itemId,
+        personId,
+      });
+      showMutationFeedback(successMessage, 'success', { autoDismiss: true });
+    } catch (error) {
+      console.error(
+        'Deletion was saved, but the page display could not be updated.',
+        error,
+      );
+      showMutationFeedback(
+        DISPLAY_UPDATE_FAILED_MESSAGE,
+        'error',
+        { forceGlobal: true },
+      );
+    }
   
   });
 }
@@ -184,15 +293,29 @@ function initEditPrayerModalListeners(){
       editPrayerForm.elements['has-prayed'].checked = hasPrayed === 'true';
     }
 
+    clearFormError(
+      editPrayerModal.querySelector('.edit-prayer-error-js'),
+    );
     openModal(editPrayerModal);
   });
 }
 
 async function handleEditPrayerInput({ onSuccess }){
   const editPrayerForm = document.querySelector('.edit-prayer-form-js');
+  const formError = editPrayerForm.querySelector('.edit-prayer-error-js');
+
+  initFormErrorClearing(editPrayerForm, formError);
 
   editPrayerForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (editPrayerForm.dataset.submitting === 'true') return;
+
+    const saveButton = editPrayerForm.querySelector('.save-button-js');
+    editPrayerForm.dataset.submitting = 'true';
+    clearFormError(formError);
+    const pendingState = setMutationPending(saveButton, 'Updating prayer request', {
+      region: editPrayerForm,
+    });
 
     const formData = {
       prayer: editPrayerForm.elements.prayer.value,
@@ -208,17 +331,55 @@ async function handleEditPrayerInput({ onSuccess }){
     const personId = editPrayerForm.dataset.personId;
     const prayerId = editPrayerForm.dataset.prayerId;
     const prayerRoute = `${GET_PEOPLE_URL}/${personId}/prayers/${prayerId}`;
+    let savedData;
 
-    const response = await fetchWithCsrf(prayerRoute, options);
-    const { status, message } = await response.json();
+    try {
+      const response = await fetchWithCsrf(prayerRoute, options);
+      const result = await mutationResponse(
+        response,
+        'Unable to update prayer request. Please try again.',
+      );
+      savedData = result.data;
+    } catch (error) {
+      if (isFormCorrectableMutationError(error)) {
+        showFormError(formError, error.message);
+        return;
+      }
 
-    if (status === 'success') {
-      const editPrayerModal = document.querySelector('.edit-prayer-modal-js');
+      showMutationFeedback(
+        mutationErrorMessage(
+          error,
+          'Unable to update prayer request. Please try again.',
+        ),
+        'error',
+      );
+      return;
+    } finally {
+      delete editPrayerForm.dataset.submitting;
+      restoreMutationControl(saveButton, pendingState);
+    }
 
-      const url = `${GET_PEOPLE_URL}${window.location.search}`;
-      onSuccess();
+    document.querySelector('.edit-prayer-modal-js').close();
 
-      editPrayerModal.close();
+    try {
+      await onSuccess({
+        type: 'edit-prayer',
+        data: savedData,
+        personId,
+        prayerId,
+      });
+      showMutationFeedback(
+        'Prayer request updated.',
+        'success',
+        { autoDismiss: true },
+      );
+    } catch (error) {
+      console.error(DISPLAY_UPDATE_FAILED_MESSAGE, error);
+      showMutationFeedback(
+        DISPLAY_UPDATE_FAILED_MESSAGE,
+        'error',
+        { forceGlobal: true },
+      );
     }
   });
 }
@@ -253,15 +414,31 @@ function initEditPersonModalListeners(){
       editPersonForm.elements.relationship.value = personRelationship;
     }
 
+    clearFormError(
+      editPersonModal.querySelector('.edit-person-error-js'),
+    );
     openModal(editPersonModal);
   });
 }
 
 async function handleEditPersonInput({ onSuccess }){
   const editPersonForm = document.querySelector('.edit-person-form-js');
+  const formError = editPersonForm.querySelector('.edit-person-error-js');
+
+  initFormErrorClearing(editPersonForm, formError);
 
   editPersonForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (editPersonForm.dataset.submitting === 'true') return;
+
+    const saveButton = editPersonForm.querySelector('.save-button-js');
+    editPersonForm.dataset.submitting = 'true';
+    clearFormError(formError);
+    const pendingState = setMutationPending(
+      saveButton,
+      'Updating person',
+      { region: editPersonForm },
+    );
 
     const formData = {
       name: editPersonForm.elements.name.value,
@@ -277,15 +454,50 @@ async function handleEditPersonInput({ onSuccess }){
     const personId = editPersonForm.dataset.personId;
 
     const personRoute = `${GET_PEOPLE_URL}/${personId}`;
+    let savedData;
 
-    const response = await fetchWithCsrf(personRoute, options);
-    const { status, message } = await response.json();
+    try {
+      const response = await fetchWithCsrf(personRoute, options);
+      const result = await mutationResponse(
+        response,
+        'Unable to update person. Please try again.',
+      );
+      savedData = result.data;
+    } catch (error) {
+      if (isFormCorrectableMutationError(error)) {
+        showFormError(formError, error.message);
+        return;
+      }
 
-    if (status === 'success') {
-      onSuccess();
+      showMutationFeedback(
+        mutationErrorMessage(
+          error,
+          'Unable to update person. Please try again.',
+        ),
+        'error',
+      );
+      return;
+    } finally {
+      delete editPersonForm.dataset.submitting;
+      restoreMutationControl(saveButton, pendingState);
+    }
 
-      const editPersonModal = document.querySelector('.edit-person-modal-js');
-      editPersonModal.close();
+    document.querySelector('.edit-person-modal-js').close();
+
+    try {
+      await onSuccess({ type: 'edit-person', data: savedData, personId });
+      showMutationFeedback(
+        'Person updated.',
+        'success',
+        { autoDismiss: true },
+      );
+    } catch (error) {
+      console.error(DISPLAY_UPDATE_FAILED_MESSAGE, error);
+      showMutationFeedback(
+        DISPLAY_UPDATE_FAILED_MESSAGE,
+        'error',
+        { forceGlobal: true },
+      );
     }
   });
 }
@@ -328,8 +540,10 @@ export function initCloseModalListeners(){
         event.clientY < bounds.top ||
         event.clientY > bounds.bottom
       );
+      const containsForm = modal.querySelector('.modal-form-js') !== null;
+      const dismissFromBackdrop = clickedBackdrop && !containsForm;
 
-      if (!closeModalButton && !clickedBackdrop) return;
+      if (!closeModalButton && !dismissFromBackdrop) return;
 
       modal.close();
     });
