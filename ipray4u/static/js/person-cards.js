@@ -6,11 +6,24 @@ import {
 
 const PEOPLE_EMPTY_TEXT = 'No people found.';
 const PRAYERS_EMPTY_TEXT = 'No prayers found.';
+const filterCache = new Map();
+
+let activeFilterLoadController;
 
 class AuthenticationRedirectError extends Error {}
 
-export async function loadPrayers(personId) {
-  const response = await fetch(`${GET_PEOPLE_URL}/${personId}/prayers`);
+function isCurrentFilterLoad(filterLoadController) {
+  return (
+    !filterLoadController.signal.aborted
+    && activeFilterLoadController === filterLoadController
+  );
+}
+
+export async function loadPrayers(personId, signal) {
+  const response = await fetch(
+    `${GET_PEOPLE_URL}/${personId}/prayers`,
+    { signal },
+  );
 
   if (response.status === 401) {
     window.location.href = LOGIN_URL;
@@ -24,6 +37,15 @@ export async function loadPrayers(personId) {
   const { data: prayers } = await response.json();
 
   return prayers;
+}
+
+export function invalidatePersonFilterCache(...relationships) {
+  filterCache.delete(GET_PEOPLE_URL);
+
+  relationships.filter(Boolean).forEach((relationship) => {
+    const params = new URLSearchParams({ rel: relationship.toLowerCase() });
+    filterCache.delete(`${GET_PEOPLE_URL}?${params}`);
+  });
 }
 
 function renderPersonCardsLoadError(personCards, url) {
@@ -114,7 +136,7 @@ export function createPrayerCard(prayer, personId) {
   return updatePrayerCard(prayerCard, prayer, personId);
 }
 
-export function showPrayerEmptyState(personCard) {
+export function renderPrayerEmptyStateWhenEmpty(personCard) {
   const prayerCardsSection = personCard.querySelector('.prayer-cards-section');
   if (!prayerCardsSection.querySelector('.prayer-card-js')) {
     prayerCardsSection.textContent = PRAYERS_EMPTY_TEXT;
@@ -191,12 +213,12 @@ export function createPersonCard(person, prayers = []) {
     prayerCardsSection.append(prayerCard);
   });
 
-  if (!prayers.length) showPrayerEmptyState(personCard);
+  if (!prayers.length) renderPrayerEmptyStateWhenEmpty(personCard);
 
   return personCard;
 }
 
-export function showPeopleEmptyState(
+export function renderPeopleEmptyStateWhenEmpty(
   personCards = document.querySelector('.person-cards-js'),
 ) {
   if (!personCards.querySelector('.person-card-js')) {
@@ -265,6 +287,24 @@ export async function renderPersonCards(
   throwOnError = false,
 ) {
   const personCards = document.querySelector('.person-cards-js');
+  activeFilterLoadController?.abort();
+  activeFilterLoadController = undefined;
+
+  const cachedPeople = filterCache.get(url);
+  if (cachedPeople) {
+    const renderedPersonCards = cachedPeople.map(({ person, prayers }) => (
+      createPersonCard(person, prayers)
+    ));
+
+    personCards.replaceChildren(...renderedPersonCards);
+    renderPeopleEmptyStateWhenEmpty(personCards);
+    personCards.setAttribute('aria-busy', 'false');
+    return;
+  }
+
+  const filterLoadController = new AbortController();
+  const { signal } = filterLoadController;
+  activeFilterLoadController = filterLoadController;
 
   if (showSkeletons) {
     personCards.setAttribute('aria-busy', 'true');
@@ -272,7 +312,7 @@ export async function renderPersonCards(
   }
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal });
 
     if (response.status === 401) {
       window.location.href = LOGIN_URL;
@@ -284,24 +324,37 @@ export async function renderPersonCards(
     }
     
     const { data: persons } = await response.json();
-    const renderedPersonCards = [];
+    const loadedPeople = [];
 
     for (const person of persons) {
-      const prayers = await loadPrayers(person.id);
-      const personCard = createPersonCard(person, prayers);
-
-      renderedPersonCards.push(personCard);
+      const prayers = await loadPrayers(person.id, signal);
+      loadedPeople.push({ person, prayers });
     }
 
+    if (!isCurrentFilterLoad(filterLoadController)) return;
+
+    filterCache.set(url, loadedPeople);
+    const renderedPersonCards = loadedPeople.map(({ person, prayers }) => (
+      createPersonCard(person, prayers)
+    ));
+
     personCards.replaceChildren(...renderedPersonCards);
-    showPeopleEmptyState(personCards);
+    renderPeopleEmptyStateWhenEmpty(personCards);
     personCards.setAttribute('aria-busy', 'false');
   } catch (error) {
-    if (error instanceof AuthenticationRedirectError) return;
+    if (
+      error.name === 'AbortError'
+      || error instanceof AuthenticationRedirectError
+      || !isCurrentFilterLoad(filterLoadController)
+    ) return;
 
     console.error('Unable to load prayer requests', { url }, error);
     renderPersonCardsLoadError(personCards, url);
 
     if (throwOnError) throw error;
+  } finally {
+    if (activeFilterLoadController === filterLoadController) {
+      activeFilterLoadController = undefined;
+    }
   }
 }

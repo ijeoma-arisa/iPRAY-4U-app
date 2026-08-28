@@ -4,10 +4,11 @@ import {
   createPrayerCard,
   insertPersonCard,
   insertPrayerCard,
+  invalidatePersonFilterCache,
   loadPrayers,
+  renderPeopleEmptyStateWhenEmpty,
   renderPersonCards,
-  showPeopleEmptyState,
-  showPrayerEmptyState,
+  renderPrayerEmptyStateWhenEmpty,
   updatePersonCard,
   updatePrayerCard,
 } from './person-cards.js';
@@ -74,26 +75,33 @@ function findPrayerCard(personCard, prayerId) {
 
 async function applyLocalizedMutation({ type, data, personId, itemId }) {
   const personCards = document.querySelector('.person-cards-js');
+  const targetPersonId = personId || data?.person_id || itemId;
+  const existingPersonCard = findPersonCard(targetPersonId);
+  const oldRelationship = existingPersonCard?.dataset.personRelationship;
+  const newRelationship = data?.relationship;
+
+  invalidatePersonFilterCache(oldRelationship, newRelationship);
 
   if (type === 'add-person') {
     if (!personMatchesCurrentFilter(data)) return;
 
     const prayers = await loadPrayers(data.id);
+    if (!personMatchesCurrentFilter(data) || findPersonCard(data.id)) return;
+
     const newPersonCard = createPersonCard(data, prayers);
 
     insertPersonCard(newPersonCard);
     return;
   }
 
-  const targetPersonId = personId || data?.person_id || itemId;
-  const personCard = findPersonCard(targetPersonId);
+  const personCard = existingPersonCard;
 
   if (type === 'edit-person') {
     const updatedPersonCard = findPersonCard(data.id);
 
     if (!personMatchesCurrentFilter(data)) {
       updatedPersonCard?.remove();
-      showPeopleEmptyState(personCards);
+      renderPeopleEmptyStateWhenEmpty(personCards);
       return;
     }
 
@@ -106,7 +114,7 @@ async function applyLocalizedMutation({ type, data, personId, itemId }) {
   if (type === 'delete-person') {
     if (!personCard) throw new Error(`Unable to find person ${itemId}`);
     personCard.remove();
-    showPeopleEmptyState(personCards);
+    renderPeopleEmptyStateWhenEmpty(personCards);
     return;
   }
   if (!personCard) throw new Error(`Unable to find person ${targetPersonId}`);
@@ -128,7 +136,7 @@ async function applyLocalizedMutation({ type, data, personId, itemId }) {
     if (!prayerCard) throw new Error(`Unable to find prayer ${itemId}`);
 
     prayerCard.remove();
-    showPrayerEmptyState(personCard);
+    renderPrayerEmptyStateWhenEmpty(personCard);
   }
 }
 
@@ -216,6 +224,7 @@ function initPrayerEventListeners() {
           'Unable to update prayer request. Please try again.',
         );
         savedPrayer = result.data;
+        invalidatePersonFilterCache(personCard.dataset.personRelationship);
       } catch (error) {
         restoreMutationControl(markPrayedButton, pendingState);
         showMutationFeedback(
@@ -230,7 +239,7 @@ function initPrayerEventListeners() {
 
       const successMessage = savedPrayer.has_prayed
         ? 'Prayer request marked as prayed.'
-        : 'Prayer request marked as unprayed.';
+        : 'Prayer request marked as not prayed.';
 
       try {
         restoreMutationControl(markPrayedButton, pendingState);
