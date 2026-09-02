@@ -76,10 +76,10 @@ export function updatePrayerCard(
   const prayerTextValue = prayerCard.querySelector('.prayer-text-value-js');
   prayerTextValue.textContent = prayer.prayer;
 
-  const prayerTextContainer = prayerCard.querySelector('.prayer-text');
+  const prayerStatus = prayerCard.querySelector('.prayer-status');
   const prayedBadge = prayerCard.querySelector('.prayed-badge');
   if (prayer.has_prayed && !prayedBadge) {
-    prayerTextContainer.insertAdjacentHTML(
+    prayerStatus.insertAdjacentHTML(
       'beforeend',
       '<span class="prayed-badge">Prayed!</span>',
     );
@@ -110,6 +110,7 @@ export function createPrayerCard(prayer, personId) {
       <div class="prayer-text">
         <span class="prayer-text-value prayer-text-value-js"></span>
       </div>
+      <div class="prayer-status"></div>
       <div class="update-prayer-buttons">
         <button
           type="button"
@@ -182,6 +183,13 @@ export function createPersonCard(person, prayers = []) {
           <div class="person-buttons">
             <button
               type="button"
+              class="btn add-prayer-button add-prayer-button-js"
+              aria-label="Add Prayer"
+            >
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
               class="btn edit-person-button edit-person-button-js"
             >
               <i class="fa-solid fa-pencil" aria-hidden="true"></i>
@@ -196,12 +204,6 @@ export function createPersonCard(person, prayers = []) {
         </div>
       </div>
       <div class="prayer-cards-section"></div>
-      <button
-        type="button"
-        class="btn add-prayer-button add-prayer-button-js"
-      >
-        Add Prayer
-      </button>
     </div>
   `);
 

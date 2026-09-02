@@ -178,7 +178,7 @@ main {
 }
 
 .prayer-requests-panel {
-  width: min(100%, 1100px);
+  width: min(100%, 960px);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
