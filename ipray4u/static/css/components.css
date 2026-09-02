@@ -1044,7 +1044,7 @@ label {
   .skeleton-prayer-card {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0.25rem;
+    gap: 0.5rem;
     padding: 0.6rem 0.65rem;
   }
 
