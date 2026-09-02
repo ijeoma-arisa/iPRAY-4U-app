@@ -795,7 +795,7 @@ label {
   }
 
   .prayer-card:not(.skeleton-prayer-card) {
-    gap: 0.25rem;
+    gap: 0.5rem;
     padding: 0.6rem 0.65rem;
   }
 
