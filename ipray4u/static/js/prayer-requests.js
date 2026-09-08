@@ -6,6 +6,7 @@ import {
   insertPrayerCard,
   invalidatePersonFilterCache,
   loadPrayers,
+  prefersReducedMotion,
   renderPeopleEmptyStateWhenEmpty,
   renderPersonCards,
   renderPrayerEmptyStateWhenEmpty,
@@ -73,6 +74,47 @@ function findPrayerCard(personCard, prayerId) {
     .find(prayerCard => prayerCard.dataset.prayerId === String(prayerId));
 }
 
+function scrollPrayerCardIntoViewIfNeeded(prayerCard) {
+  requestAnimationFrame(() => {
+    const prayerCardBounds = prayerCard.getBoundingClientRect();
+
+    const prayerCardsSection = prayerCard.closest('.prayer-cards-section');
+    const sectionBounds = prayerCardsSection.getBoundingClientRect();
+    const sectionIsScrollable = prayerCardsSection.scrollHeight
+      > prayerCardsSection.clientHeight;
+
+    const cardIsClippedBySection = sectionIsScrollable && (
+      prayerCardBounds.top < sectionBounds.top
+      || prayerCardBounds.bottom > sectionBounds.bottom
+    );
+
+    const navbar = document.querySelector('.nav-bar');
+    const visibleViewportTop = navbar?.getBoundingClientRect().bottom ?? 0;
+    const visibleTop = cardIsClippedBySection
+      ? sectionBounds.top
+      : visibleViewportTop;
+
+    const visibleBottom = cardIsClippedBySection
+      ? sectionBounds.bottom
+      : window.innerHeight;
+
+    const scrollDistance = prayerCardBounds.top < visibleTop
+      ? prayerCardBounds.top - visibleTop
+      : Math.max(0, prayerCardBounds.bottom - visibleBottom);
+
+    if (scrollDistance === 0) return;
+
+    const scrollTarget = cardIsClippedBySection
+      ? prayerCardsSection
+      : window;
+
+    scrollTarget.scrollBy({
+      top: scrollDistance,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
+  });
+}
+
 async function applyLocalizedMutation({ type, data, personId, itemId }) {
   const personCards = document.querySelector('.person-cards-js');
   const targetPersonId = personId || data?.person_id || itemId;
@@ -131,6 +173,7 @@ async function applyLocalizedMutation({ type, data, personId, itemId }) {
     if (!prayerCard) throw new Error(`Unable to find prayer ${data.id}`);
 
     updatePrayerCard(prayerCard, data, personCard.dataset.personId);
+    scrollPrayerCardIntoViewIfNeeded(prayerCard);
   } else if (type === 'delete-prayer') {
     const prayerCard = findPrayerCard(personCard, itemId);
     if (!prayerCard) throw new Error(`Unable to find prayer ${itemId}`);

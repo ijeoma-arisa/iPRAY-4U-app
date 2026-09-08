@@ -1,4 +1,4 @@
-const PRAYER_CARD_SKELETON_COUNT = 3;
+const PRAYER_CARD_SKELETON_COUNT = 2;
 
 // Keep this generated skeleton markup structurally aligned with prayer-requests.html.
 export function createRelationshipButtonSkeletonsHTML(count = 4) {
@@ -40,13 +40,13 @@ export function createPersonCardSkeletonsHTML(count = 3) {
           <div class="skeleton-person-actions">
             <div class="skeleton skeleton-person-action"></div>
             <div class="skeleton skeleton-person-action"></div>
+            <div class="skeleton skeleton-person-action"></div>
           </div>
         </div>
       </div>
       <div class="prayer-cards-section skeleton-prayer-cards-section">
         ${prayerCardsHTML}
       </div>
-      <div class="skeleton skeleton-add-prayer"></div>
     </div>`).join('');
 }
 
