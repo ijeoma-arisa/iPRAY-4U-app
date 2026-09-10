@@ -12,15 +12,26 @@ function playLaunchDemo() {
   });
 }
 
+function restartLaunchDemo() {
+  if (!launchDemoVideo) {
+    return;
+  }
+
+  // iOS Safari can leave an interrupted video in a stalled state.
+  // Reload the media before resuming to recover playback reliably.
+  launchDemoVideo.load();
+  playLaunchDemo();
+}
+
 function handleVisibilityChange() {
   if (document.visibilityState === 'visible'){
-    requestAnimationFrame(playLaunchDemo());
+    requestAnimationFrame(restartLaunchDemo);
   }
 }
 
 function initDemoVideoListeners() {
-  window.addEventListener('pageshow', playLaunchDemo);
-  document.addEventListener('visibilitychange', handleVisibilityChange)
+  window.addEventListener('pageshow', restartLaunchDemo);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 }
 
 function initPage() {

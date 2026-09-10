@@ -39,6 +39,10 @@ html, body {
   margin:0;
 }
 
+html {
+  background: var(--app-bg);
+}
+
 body {
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
   color: var(--text-main);

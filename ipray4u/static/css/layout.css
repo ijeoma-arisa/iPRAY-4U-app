@@ -4,10 +4,9 @@ main {
 }
 
 /* Homepage */
-.homepage-body,
-.homepage {
-  background-color: var(--primary-hover);
-  background: var(--homepage-bg);
+html.homepage-root,
+.homepage-body {
+  background: var(--primary-hover);
 }
 
 .homepage {
@@ -17,6 +16,7 @@ main {
   align-items: center;
   gap: 2rem;
   padding: 2rem 1rem;
+  background: var(--homepage-bg);
   color: var(--text-main);
 }
 
