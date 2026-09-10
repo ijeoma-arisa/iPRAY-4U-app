@@ -40,8 +40,22 @@
         <a class="btn btn-outline" href="{{ url_for('auth.login_user') }}">
           Log In
         </a>
+        
       {% endif %}
 
+      {% if not session.get("user_id") %}
+        <div class="launch-demo">
+          <video
+            class="launch-demo-video"
+            src="{{ url_for('static', filename='videos/demos/homepage-mobile-demo.mp4') }}"
+            autoplay
+            muted
+            loop
+            playsinline
+            poster="{{ url_for('static', filename='images/demos/homepage-mobile-demo-poster.png') }}"
+          ></video>
+        </div>
+      {% endif %}
     </div>
   </section>
 </main>

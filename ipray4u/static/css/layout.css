@@ -80,6 +80,17 @@ main {
   gap: 0.75rem;
 }
 
+.launch-demo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.launch-demo-video {
+  width: min(100%, 260px);
+  height: auto;
+  border-radius: 16px;
+}
 
 /* Auth Pages */
 
