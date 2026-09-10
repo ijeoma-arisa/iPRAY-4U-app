@@ -10,12 +10,19 @@ function playLaunchDemo() {
   launchDemoVideo.play().catch(() => {});
 }
 
-function initLaunchDemoVideo() {
+function handleVisibilityChange() {
+  if (document.visibilityState === 'visible'){
+    playLaunchDemo();
+  }
+}
+
+function initDemoVideoListeners() {
   window.addEventListener('pageshow', playLaunchDemo);
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 }
 
 function initPage() {
-  initLaunchDemoVideo();
+  initDemoVideoListeners();
 
   initPrayerRequestModal({
     onSuccess: () => window.location.href = '/prayer-requests'

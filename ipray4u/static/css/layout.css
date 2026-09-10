@@ -4,6 +4,10 @@ main {
 }
 
 /* Homepage */
+.homepage-body,
+.homepage {
+  background: var(--homepage-bg);
+}
 
 .homepage {
   min-height: 100vh;
@@ -11,12 +15,7 @@ main {
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-
   padding: 2rem 1rem;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 42%),
-    linear-gradient(180deg, var(--primary), var(--primary-hover));
-
   color: var(--text-main);
 }
 
@@ -182,6 +181,11 @@ main {
 }
 
 /* Prayer Requests Page */
+.prayer-requests-body,
+.prayer-requests-page {
+  background-color: var(--app-bg);
+}
+
 .prayer-requests-page {
   min-height: 100vh;
   display: flex;
