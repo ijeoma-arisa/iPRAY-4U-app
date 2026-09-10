@@ -7,12 +7,14 @@ function playLaunchDemo() {
     return;
   }
 
-  launchDemoVideo.play().catch(() => {});
+  launchDemoVideo.play().catch((error) => {
+    console.error('Launch demo playback failed:', error);
+  });
 }
 
 function handleVisibilityChange() {
   if (document.visibilityState === 'visible'){
-    playLaunchDemo();
+    requestAnimationFrame(playLaunchDemo());
   }
 }
 

@@ -6,6 +6,7 @@ main {
 /* Homepage */
 .homepage-body,
 .homepage {
+  background-color: var(--primary-hover);
   background: var(--homepage-bg);
 }
 
