@@ -29,8 +29,14 @@ function handleVisibilityChange() {
   }
 }
 
+function handlePageShow(event) {
+  if (event.persisted) {
+    restartLaunchDemo();
+  }
+}
+
 function initDemoVideoListeners() {
-  window.addEventListener('pageshow', restartLaunchDemo);
+  window.addEventListener('pageshow', handlePageShow);
   document.addEventListener('visibilitychange', handleVisibilityChange);
 }
 
