@@ -265,6 +265,14 @@ html.homepage-root,
 }
 
 @media (min-width: 768px) {
+  .homepage { 
+    justify-content: center; 
+  }
+  
+  .launch-demo {
+    display: none;
+  }
+
   .prayer-requests-controls{
     flex-direction: row;
     justify-content: space-between;
