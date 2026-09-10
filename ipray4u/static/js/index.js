@@ -1,9 +1,26 @@
-import { renderPersonCards } from './person-cards.js';
 import { initPrayerRequestModal, initCloseModalListeners } from './modals.js';
-import { GET_PEOPLE_URL } from './api/endpoints.js';
 
-function initPage(){
-  initPrayerRequestModal({onSuccess: () => window.location.href = '/prayer-requests'});
+const launchDemoVideo = document.querySelector('.launch-demo-video');
+
+function playLaunchDemo() {
+  if (!launchDemoVideo) {
+    return;
+  }
+
+  launchDemoVideo.play().catch(() => {});
+}
+
+function initLaunchDemoVideo() {
+  window.addEventListener('pageshow', playLaunchDemo);
+}
+
+function initPage() {
+  initLaunchDemoVideo();
+
+  initPrayerRequestModal({
+    onSuccess: () => window.location.href = '/prayer-requests'
+  });
+
   initCloseModalListeners();
 }
 
