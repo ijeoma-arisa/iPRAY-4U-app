@@ -13,6 +13,8 @@
         src="{{ url_for('static', filename='images/branding/logo-icon.png') }}"
         alt="iPRAY 4U"
         class="launch-logo"
+        width="2048"
+        height="2048"
       >
     <div class="launch-copy">
       <h1>iPRAY 4U</h1>
@@ -52,15 +54,26 @@
 
   {% if not session.get("user_id") %}
     <div class="launch-demo">
-      <video
-        class="launch-demo-video"
-        src="{{ url_for('static', filename='videos/demos/homepage-mobile-demo.mp4') }}"
-        autoplay
-        muted
-        loop
-        playsinline
-        poster="{{ url_for('static', filename='images/demos/homepage-mobile-demo-poster.png') }}"
-      ></video>
+      <div class="launch-demo-media">
+        <img
+          class="launch-demo-poster"
+          src="{{ url_for('static', filename='images/demos/homepage-mobile-demo-poster.png') }}"
+          alt=""
+          aria-hidden="true"
+          width="720"
+          height="1472"
+        >
+
+        <video
+          class="launch-demo-video"
+          src="{{ url_for('static', filename='videos/demos/homepage-mobile-demo.mp4') }}"
+          autoplay
+          muted
+          loop
+          playsinline
+          poster="{{ url_for('static', filename='images/demos/homepage-mobile-demo-poster.png') }}"
+        ></video>
+      </div>
     </div>
   {% endif %}
 </main>

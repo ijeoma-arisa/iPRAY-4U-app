@@ -35,9 +35,17 @@ function handlePageShow(event) {
   }
 }
 
+function handleLaunchDemoPlaying() {
+  launchDemoVideo.classList.add('is-ready');
+}
+
 function initDemoVideoListeners() {
   window.addEventListener('pageshow', handlePageShow);
   document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  if (launchDemoVideo) {
+    launchDemoVideo.addEventListener('playing', handleLaunchDemoPlaying);
+  }
 }
 
 function initPage() {
