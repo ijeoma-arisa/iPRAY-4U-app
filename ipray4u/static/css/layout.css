@@ -84,6 +84,7 @@ main {
   width: 100%;
   display: flex;
   justify-content: center;
+  margin-top: 0.75rem;
 }
 
 .launch-demo-video {
