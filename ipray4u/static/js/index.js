@@ -48,6 +48,12 @@ function initDemoVideoListeners() {
   
   if (launchDemoVideo) {
     launchDemoVideo.addEventListener('playing', handleLaunchDemoPlaying);
+
+    // Autoplay may start before this module finishes loading and registers the
+    // listener. Reconcile that already-playing state so the video is not hidden.
+    if (!launchDemoVideo.paused && launchDemoVideo.readyState >= 2) {
+      handleLaunchDemoPlaying();
+    }
   }
 }
 
