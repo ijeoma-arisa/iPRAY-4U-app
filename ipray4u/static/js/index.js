@@ -25,7 +25,7 @@ function restartLaunchDemo() {
 
 function handleVisibilityChange() {
   if (document.visibilityState === 'visible') {
-    requestAnimationFrame(restartLaunchDemo);
+    requestAnimationFrame(playLaunchDemo);
   }
 }
 
