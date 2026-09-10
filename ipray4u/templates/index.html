@@ -43,21 +43,22 @@
         
       {% endif %}
 
-      {% if not session.get("user_id") %}
-        <div class="launch-demo">
-          <video
-            class="launch-demo-video"
-            src="{{ url_for('static', filename='videos/demos/homepage-mobile-demo.mp4') }}"
-            autoplay
-            muted
-            loop
-            playsinline
-            poster="{{ url_for('static', filename='images/demos/homepage-mobile-demo-poster.png') }}"
-          ></video>
-        </div>
-      {% endif %}
     </div>
   </section>
+
+  {% if not session.get("user_id") %}
+    <div class="launch-demo">
+      <video
+        class="launch-demo-video"
+        src="{{ url_for('static', filename='videos/demos/homepage-mobile-demo.mp4') }}"
+        autoplay
+        muted
+        loop
+        playsinline
+        poster="{{ url_for('static', filename='images/demos/homepage-mobile-demo-poster.png') }}"
+      ></video>
+    </div>
+  {% endif %}
 </main>
 
 <dialog class="modal modal-js add-prayer-request-modal-js"></dialog>
