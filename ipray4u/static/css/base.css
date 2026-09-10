@@ -17,15 +17,10 @@
   --primary-hover: #7f66b8;
   --primary-soft: #f4efff;
 
-  --accent: #d9a86c;
 
-  --main-purple: #966fd6;
-  --light-purple: #c9b0f1;
   --darker-purple: #452b6f;
   --main-blue: rgb(57, 186, 189);
-  --light-blue: rgb(148, 246, 248);
   --darker-blue: rgb(8, 90, 91);
-  --light-gray: #ccc;
   --gray: #6d6d6d;
   --darker-gray: #3c3c3c;
   --main-red: rgb(255, 82, 82);
@@ -33,20 +28,27 @@
   --darkest-red: rgb(108, 30, 30);
   --main-green: rgb(66, 189, 57);
   --darker-green: rgb(41, 115, 36);
-  --main-yellow: rgb(255, 216, 76);
-  --darker-yellow: rgb(202, 172, 65);
+
+  --homepage-bg:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 42%),
+    linear-gradient(180deg, var(--primary), var(--primary-hover));
 }
 
 html, body {
-  height: 100%;
+  min-height: 100%;
   margin:0;
+}
+
+html {
+  background: var(--app-bg);
 }
 
 body {
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
-  background: var(--app-bg);
   color: var(--text-main);
 }
+
+
 
 a {
   color: inherit;
