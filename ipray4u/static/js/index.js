@@ -24,7 +24,7 @@ function restartLaunchDemo() {
 }
 
 function handleVisibilityChange() {
-  if (document.visibilityState === 'visible'){
+  if (document.visibilityState === 'visible') {
     requestAnimationFrame(restartLaunchDemo);
   }
 }
@@ -32,20 +32,14 @@ function handleVisibilityChange() {
 function handlePageShow(event) {
   if (event.persisted) {
     restartLaunchDemo();
+    return;
   }
-}
-
-function handleLaunchDemoPlaying() {
-  launchDemoVideo.classList.add('is-ready');
+  playLaunchDemo();
 }
 
 function initDemoVideoListeners() {
   window.addEventListener('pageshow', handlePageShow);
   document.addEventListener('visibilitychange', handleVisibilityChange);
-
-  if (launchDemoVideo) {
-    launchDemoVideo.addEventListener('playing', handleLaunchDemoPlaying);
-  }
 }
 
 function initPage() {
