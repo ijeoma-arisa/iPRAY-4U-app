@@ -88,9 +88,13 @@ html.homepage-root,
 }
 
 .launch-demo-video {
+  display: block;
   width: min(100%, 340px);
   height: auto;
+  aspect-ratio: 720 / 1472;
+  background: var(--primary-hover);
   border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(69, 43, 111, 0.18);
 }
 
 /* Auth Pages */
