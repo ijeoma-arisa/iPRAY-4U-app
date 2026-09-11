@@ -116,6 +116,13 @@ html.homepage-root,
   opacity: 1;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .launch-demo-video {
+    display: none;
+    transition: none;
+  }
+}
+
 /* Auth Pages */
 
 .auth-page {
