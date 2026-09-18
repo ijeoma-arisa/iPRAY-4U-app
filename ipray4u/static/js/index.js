@@ -1,26 +1,23 @@
 import { initPrayerRequestModal, initCloseModalListeners } from './modals.js';
 import { prefersReducedMotion } from './utils.js';
 
-const launchDemoVideo = document.querySelector('.launch-demo-video');
+const launchDemoVideos = document.querySelectorAll('.launch-demo-video');
 
 function playLaunchDemo() {
-  if (!launchDemoVideo) {
-    return;
-  }
-
-  launchDemoVideo.play().catch((error) => {
-    console.error('Launch demo playback failed:', error);
+  launchDemoVideos.forEach((video) => {
+    video.play().catch((error) => {
+      console.error('Launch demo playback failed:', error);
+    });
   });
 }
 
 function restartLaunchDemo() {
-  if (!launchDemoVideo) {
-    return;
-  }
-
   // iOS Safari can leave an interrupted video in a stalled state.
   // Reload the media before resuming to recover playback reliably.
-  launchDemoVideo.load();
+  launchDemoVideos.forEach((video) => {
+    video.load();
+  });
+
   playLaunchDemo();
 }
 
@@ -39,18 +36,22 @@ function handlePageShow(event) {
   playLaunchDemo();
 }
 
-function handleLaunchDemoPlaying() {
+function handleLaunchDemoPlaying(event) {
+  const launchDemoVideo = event.currentTarget;
   launchDemoVideo.classList.add('is-ready');
 }
 
 function initDemoVideoListeners() {
-  if (!launchDemoVideo || prefersReducedMotion()) {
+  if (!launchDemoVideos.length || prefersReducedMotion()) {
     return;
   }
 
   window.addEventListener('pageshow', handlePageShow);
   document.addEventListener('visibilitychange', handleVisibilityChange);
-  launchDemoVideo.addEventListener('playing', handleLaunchDemoPlaying);
+
+  launchDemoVideos.forEach((video) => {
+    video.addEventListener('playing', handleLaunchDemoPlaying);
+  });
 
   playLaunchDemo();
 }

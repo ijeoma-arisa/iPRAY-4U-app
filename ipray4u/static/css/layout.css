@@ -20,8 +20,17 @@ html.homepage-root,
   color: var(--text-main);
 }
 
+.launch-layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
 .launch-card {
   width: min(100%, 430px);
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -85,6 +94,10 @@ html.homepage-root,
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.launch-demo-desktop {
+  display: none;
 }
 
 .launch-demo-media {
@@ -272,14 +285,6 @@ html.homepage-root,
 }
 
 @media (min-width: 768px) {
-  .homepage { 
-    justify-content: center; 
-  }
-  
-  .launch-demo {
-    display: none;
-  }
-
   .prayer-requests-controls{
     flex-direction: row;
     justify-content: space-between;
@@ -292,6 +297,52 @@ html.homepage-root,
 
   .relationship-buttons-row {
     justify-content: flex-end;
+  }
+}
+
+@media (min-width: 800px) {
+  .launch-layout {
+    width: calc(100% - 2rem);
+  }
+
+  .launch-demo-mobile {
+    display: none;
+  }
+
+  .launch-demo-desktop {
+    display: flex;
+    width: calc(100% - 2rem);
+    max-width: 800px;
+  }
+
+  .launch-demo-desktop .launch-demo-media {
+    width: 100%;
+    aspect-ratio: 1200 / 844;
+  }
+}
+
+@media (min-width: 1240px) {
+  .homepage {
+    justify-content: center;
+  }
+
+  .launch-layout {
+    max-width: 1280px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+  }
+
+  .launch-card {
+    flex: 0 0 400px;
+    margin-inline: 0;
+  }
+
+  .launch-demo-desktop {
+    width: 100%;
+    flex: 1 0 640px;
+    min-width: 640px;
   }
 }
 
