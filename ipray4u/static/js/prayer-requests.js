@@ -6,13 +6,13 @@ import {
   insertPrayerCard,
   invalidatePersonFilterCache,
   loadPrayers,
-  prefersReducedMotion,
   renderPeopleEmptyStateWhenEmpty,
   renderPersonCards,
   renderPrayerEmptyStateWhenEmpty,
   updatePersonCard,
   updatePrayerCard,
 } from './person-cards.js';
+import { prefersReducedMotion } from './utils.js';
 import {
   initRelationshipButtonsRowListener,
   renderRelationshipButtons,

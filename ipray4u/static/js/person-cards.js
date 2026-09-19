@@ -3,6 +3,7 @@ import {
   createPersonCardSkeletonsHTML,
   createPersonCardsLoadErrorHTML,
 } from './loading-states.js';
+import { prefersReducedMotion } from './utils.js';
 
 const PEOPLE_EMPTY_TEXT = 'No people found.';
 const PRAYERS_EMPTY_TEXT = 'No prayers found.';
@@ -226,12 +227,6 @@ export function renderPeopleEmptyStateWhenEmpty(
   if (!personCards.querySelector('.person-card-js')) {
     personCards.textContent = PEOPLE_EMPTY_TEXT;
   }
-}
-
-export function prefersReducedMotion() {
-  return window.matchMedia(
-    '(prefers-reduced-motion: reduce)',
-  ).matches;
 }
 
 function scrollPageToTop() {
