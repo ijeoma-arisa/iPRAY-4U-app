@@ -23,6 +23,9 @@ def init_db():
       cursor.execute(schema.CREATE_PROFILES_TABLE)
       cursor.execute(schema.CREATE_PEOPLE_TABLE)
       cursor.execute(schema.CREATE_PRAYERS_TABLE)
+
+      if current_app.config["TESTING"]:
+        cursor.execute(schema.MIGRATE_PRAYERS_CREATED_AT)
       
       # Create indexes
       cursor.execute(schema.CREATE_INDEX_ON_PEOPLE_USER_ID)

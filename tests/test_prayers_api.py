@@ -4,6 +4,7 @@ from .helpers.assertions import (
     assert_valid_delete_response,
     assert_prayer_data,
     assert_prayers_list,
+    assert_timezone_aware_timestamp,
 )
 from .helpers.sample_data import generate_prayer_json, update_existing_json_fields
 from .helpers.urls import get_prayers_url, PRAYERS_URL
@@ -47,11 +48,13 @@ def test_add_valid_prayer_default_has_prayed_field(auth_client, sample_person):
     prayer = generate_prayer_json("Good grades")        
     response = auth_client.post(prayers_url, json=prayer)
     
-    assert_success_response(
+    data = assert_success_response(
         response,
         expected_message=POST_PRAYER_SUCCESS_MSG,
         expected_status=201
     )
+
+    assert_timezone_aware_timestamp(data["created_at"])
     
 def test_add_valid_prayer_set_has_prayed_field(auth_client, sample_person):
     person_id = sample_person["id"]
@@ -106,6 +109,18 @@ def test_add_invalid_prayer_invalid_prayer_field(auth_client, sample_person):
     )
 
 # GET endpoint
+def test_default_prayer_created_with_person_has_timestamp(auth_client, sample_person):
+    response = auth_client.get(get_prayers_url(sample_person["id"]))
+    prayers = assert_success_response(
+        response,
+        expected_message=get_success("Prayers"),
+        data_type=list
+    )
+
+    assert len(prayers) == 1
+    assert_timezone_aware_timestamp(prayers[0]["created_at"])
+
+
 def test_get_all_prayers_auth_required(client, sample_prayer):
     _ = sample_prayer
 
@@ -136,6 +151,8 @@ def test_get_all_prayers(auth_client, sample_person):
     
     assert len(data) == 2
     assert [prayer["id"] for prayer in data] == [2, 1]
+    for prayer in data:
+        assert_timezone_aware_timestamp(prayer["created_at"])
 
 
 def test_prayers_by_person_auth_required(client, sample_prayer):
@@ -178,6 +195,25 @@ def test_get_prayers_by_person(auth_client, sample_person):
     assert isinstance(data, list)
     assert len(data) == 4
     assert [prayer["id"] for prayer in data] == [4, 3, 2, 1]
+    for prayer in data:
+        assert_timezone_aware_timestamp(prayer["created_at"])
+
+
+def test_get_legacy_prayer_returns_null_created_at(auth_client, legacy_prayer):
+    for url in (
+        PRAYERS_URL,
+        get_prayers_url(legacy_prayer["person_id"])
+    ):
+        response = auth_client.get(url)
+        data = assert_success_response(
+            response,
+            expected_message=get_success("Prayers"),
+            data_type=list
+        )
+        returned_prayer = next(
+            prayer for prayer in data if prayer["id"] == legacy_prayer["id"]
+        )
+        assert returned_prayer["created_at"] is None
     
 # PATCH endpoint
 def test_update_prayer_auth_required(client, sample_prayer):
@@ -204,6 +240,7 @@ def test_update_prayer_valid_prayer_only(auth_client, sample_prayer):
     prayer_id = sample_prayer["id"]
     prayer_url = get_prayers_url(person_id, prayer_id)
     
+    original_created_at = sample_prayer["created_at"]
     updated_prayer_field = {"prayer": "Peace of mind"}
     update_existing_json_fields(updated_prayer_field, sample_prayer)
     
@@ -215,6 +252,7 @@ def test_update_prayer_valid_prayer_only(auth_client, sample_prayer):
     )
     
     assert_prayer_data(prayer_data, sample_prayer)
+    assert prayer_data["created_at"] == original_created_at
     
     
 def test_update_prayer_valid_has_prayed_only(auth_client, sample_prayer):   
@@ -222,6 +260,7 @@ def test_update_prayer_valid_has_prayed_only(auth_client, sample_prayer):
     prayer_id = sample_prayer["id"]
     prayer_url = get_prayers_url(person_id, prayer_id)
     
+    original_created_at = sample_prayer["created_at"]
     updated_has_prayed_field = {"has_prayed": True}
     update_existing_json_fields(updated_has_prayed_field, sample_prayer)
     
@@ -233,6 +272,7 @@ def test_update_prayer_valid_has_prayed_only(auth_client, sample_prayer):
     )
     
     assert_prayer_data(prayer_data, sample_prayer)
+    assert prayer_data["created_at"] == original_created_at
 
 
 def test_update_prayer_valid_all_fields(auth_client, sample_prayer):
@@ -240,6 +280,7 @@ def test_update_prayer_valid_all_fields(auth_client, sample_prayer):
     prayer_id = sample_prayer["id"]
     prayer_url = get_prayers_url(person_id, prayer_id) 
     
+    original_created_at = sample_prayer["created_at"]
     updated_prayer_and_has_prayed_fields = {
         "prayer": "Peace of mind",
         "has_prayed": True
@@ -255,6 +296,28 @@ def test_update_prayer_valid_all_fields(auth_client, sample_prayer):
     )
     
     assert_prayer_data(prayer_data, sample_prayer)
+    assert prayer_data["created_at"] == original_created_at
+
+
+def test_update_legacy_prayer_preserves_null_created_at(
+    auth_client, legacy_prayer
+):
+    prayer_url = get_prayers_url(
+        legacy_prayer["person_id"],
+        legacy_prayer["id"]
+    )
+    response = auth_client.patch(
+        prayer_url,
+        json={"prayer": "Updated legacy prayer", "has_prayed": True}
+    )
+    prayer_data = assert_success_response(
+        response,
+        expected_message=patch_success("Prayer")
+    )
+
+    assert prayer_data["created_at"] is None
+    assert prayer_data["prayer"] == "Updated legacy prayer"
+    assert prayer_data["has_prayed"] is True
 
 def test_update_prayer_missing_all_fields(auth_client, sample_prayer):
     person_id = sample_prayer["person_id"]

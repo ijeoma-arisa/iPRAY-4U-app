@@ -117,6 +117,24 @@ def sample_prayer(auth_client, sample_person):
   return prayers[0]
 
 @pytest.fixture
+def legacy_prayer(app, sample_person):
+  person_id = sample_person["id"]
+
+  with app.app_context():
+    db = get_db_connection()
+    prayer = db.execute(
+      """
+      INSERT INTO prayers (person_id, prayer, created_at)
+      VALUES (%s, %s, NULL)
+      RETURNING *
+      """,
+      (person_id, "Legacy prayer",)
+    ).fetchone()
+    db.commit()
+
+  return dict(prayer)
+
+@pytest.fixture
 def auth_form_data(test_user):
   return {
     "email": test_user["email"],
