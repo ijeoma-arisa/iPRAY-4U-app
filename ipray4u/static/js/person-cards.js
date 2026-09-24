@@ -63,6 +63,38 @@ function createElementFromHTML(html) {
   return template.content.firstElementChild;
 }
 
+export function formatPrayerCreatedAt(timestamp) {
+  if (typeof timestamp !== 'string' || !timestamp.trim()) return null;
+
+  const createdAt = new Date(timestamp);
+  if (Number.isNaN(createdAt.getTime())) return null;
+
+  return new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(createdAt);
+}
+
+function updatePrayerCreatedAt(prayerCard, prayer) {
+  if (!Object.hasOwn(prayer, 'created_at')) return;
+
+  const dateDisplay = prayerCard.querySelector('.prayer-created-at-js');
+  const time = dateDisplay.querySelector('time');
+  const formattedDate = formatPrayerCreatedAt(prayer.created_at);
+
+  if (formattedDate === null) {
+    dateDisplay.hidden = true;
+    time.textContent = '';
+    time.removeAttribute('datetime');
+    return;
+  }
+
+  time.textContent = formattedDate;
+  time.setAttribute('datetime', prayer.created_at);
+  dateDisplay.hidden = false;
+}
+
 export function updatePrayerCard(
   prayerCard,
   prayer,
@@ -76,6 +108,7 @@ export function updatePrayerCard(
 
   const prayerTextValue = prayerCard.querySelector('.prayer-text-value-js');
   prayerTextValue.textContent = prayer.prayer;
+  updatePrayerCreatedAt(prayerCard, prayer);
 
   const prayerStatus = prayerCard.querySelector('.prayer-status');
   const prayedBadge = prayerCard.querySelector('.prayed-badge');
@@ -110,6 +143,9 @@ export function createPrayerCard(prayer, personId) {
     <div class="prayer-card prayer-card-js">
       <div class="prayer-text">
         <span class="prayer-text-value prayer-text-value-js"></span>
+        <p class="prayer-created-at prayer-created-at-js" hidden>
+          <span>Added </span><time></time>
+        </p>
       </div>
       <div class="prayer-status"></div>
       <div class="update-prayer-buttons">

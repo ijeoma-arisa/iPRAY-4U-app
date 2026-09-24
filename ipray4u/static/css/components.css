@@ -580,6 +580,12 @@ label {
   min-width: 0;
 }
 
+.prayer-created-at {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 .update-prayer-buttons {
   display: flex;
   flex-shrink: 0;
