@@ -28,6 +28,79 @@ function timeElement(card) {
   return dateDisplay(card).querySelector('time');
 }
 
+function statusBadge(card) {
+  return card.querySelector('.prayer-status-badge');
+}
+
+describe('prayer status badges', () => {
+  beforeEach(() => {
+    document.body.replaceChildren();
+  });
+
+  it('displays the prayed badge for a prayed prayer', () => {
+    const card = createPrayerCard(prayer({ has_prayed: true }), 3);
+
+    expect(statusBadge(card).textContent).toBe('Prayed');
+    expect(statusBadge(card).classList.contains('prayed-badge')).toBe(true);
+    expect(statusBadge(card).classList.contains('not-prayed-badge')).toBe(false);
+  });
+
+  it('displays the not-prayed badge for a prayer that is not prayed', () => {
+    const card = createPrayerCard(prayer(), 3);
+
+    expect(statusBadge(card).textContent).toBe('Not Prayed');
+    expect(statusBadge(card).classList.contains('not-prayed-badge')).toBe(true);
+    expect(statusBadge(card).classList.contains('prayed-badge')).toBe(false);
+  });
+
+  it('defaults a newly created prayer without has_prayed to not prayed', () => {
+    const newPrayer = prayer();
+    delete newPrayer.has_prayed;
+
+    const card = createPrayerCard(newPrayer, 3);
+
+    expect(card.dataset.hasPrayed).toBe('false');
+    expect(statusBadge(card).textContent).toBe('Not Prayed');
+    expect(statusBadge(card).classList.contains('not-prayed-badge')).toBe(true);
+  });
+
+  it('updates the badge immediately when toggling between states', () => {
+    const initialPrayer = prayer();
+    const card = createPrayerCard(initialPrayer, 3);
+    const originalBadge = statusBadge(card);
+
+    updatePrayerCard(card, { ...initialPrayer, has_prayed: true });
+
+    expect(card.dataset.hasPrayed).toBe('true');
+    expect(statusBadge(card)).toBe(originalBadge);
+    expect(statusBadge(card).textContent).toBe('Prayed');
+    expect(statusBadge(card).classList.contains('prayed-badge')).toBe(true);
+    expect(statusBadge(card).classList.contains('not-prayed-badge')).toBe(false);
+
+    updatePrayerCard(card, { ...initialPrayer, has_prayed: false });
+
+    expect(card.dataset.hasPrayed).toBe('false');
+    expect(statusBadge(card)).toBe(originalBadge);
+    expect(statusBadge(card).textContent).toBe('Not Prayed');
+    expect(statusBadge(card).classList.contains('not-prayed-badge')).toBe(true);
+    expect(statusBadge(card).classList.contains('prayed-badge')).toBe(false);
+    expect(card.querySelectorAll('.prayer-status-badge')).toHaveLength(1);
+  });
+
+  it('renders the correct badges when cards are reconstructed from cached data', () => {
+    const personCard = createPersonCard(
+      { id: 3, name: 'Avery', relationship: 'Friends' },
+      [prayer({ id: 7, has_prayed: true }), prayer({ id: 8 })],
+    );
+    const badges = [...personCard.querySelectorAll('.prayer-status-badge')];
+
+    expect(badges.map((badge) => badge.textContent)).toEqual([
+      'Prayed',
+      'Not Prayed',
+    ]);
+  });
+});
+
 describe('prayer creation dates', () => {
   beforeEach(() => {
     document.body.replaceChildren();
