@@ -63,36 +63,72 @@ function createElementFromHTML(html) {
   return template.content.firstElementChild;
 }
 
+export function formatPrayerCreatedAt(timestamp) {
+  if (typeof timestamp !== 'string' || !timestamp.trim()) return null;
+
+  const createdAt = new Date(timestamp);
+  if (Number.isNaN(createdAt.getTime())) return null;
+
+  return new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(createdAt);
+}
+
+function updatePrayerCreatedAt(prayerCard, prayer) {
+  if (!Object.hasOwn(prayer, 'created_at')) return;
+
+  const dateDisplay = prayerCard.querySelector('.prayer-created-at-js');
+  const time = dateDisplay.querySelector('time');
+  const formattedDate = formatPrayerCreatedAt(prayer.created_at);
+
+  if (formattedDate === null) {
+    dateDisplay.hidden = true;
+    time.textContent = '';
+    time.removeAttribute('datetime');
+    return;
+  }
+
+  time.textContent = formattedDate;
+  time.setAttribute('datetime', prayer.created_at);
+  dateDisplay.hidden = false;
+}
+
 export function updatePrayerCard(
   prayerCard,
   prayer,
   personId = prayerCard.dataset.personId,
 ) {
+  const hasPrayed = prayer.has_prayed === true;
+
   prayerCard.id = `prayer-${prayer.id}`;
   prayerCard.dataset.personId = personId;
   prayerCard.dataset.prayerId = prayer.id;
   prayerCard.dataset.prayerText = prayer.prayer;
-  prayerCard.dataset.hasPrayed = String(prayer.has_prayed);
+  prayerCard.dataset.hasPrayed = String(hasPrayed);
 
   const prayerTextValue = prayerCard.querySelector('.prayer-text-value-js');
   prayerTextValue.textContent = prayer.prayer;
+  updatePrayerCreatedAt(prayerCard, prayer);
 
   const prayerStatus = prayerCard.querySelector('.prayer-status');
-  const prayedBadge = prayerCard.querySelector('.prayed-badge');
-  if (prayer.has_prayed && !prayedBadge) {
-    prayerStatus.insertAdjacentHTML(
-      'beforeend',
-      '<span class="prayed-badge">Prayed!</span>',
-    );
-  } else if (!prayer.has_prayed) {
-    prayedBadge?.remove();
+  let statusBadge = prayerStatus.querySelector('.prayer-status-badge');
+  if (!statusBadge) {
+    statusBadge = document.createElement('span');
+    statusBadge.classList.add('prayer-status-badge');
+    prayerStatus.replaceChildren(statusBadge);
   }
+
+  statusBadge.classList.toggle('prayed-badge', hasPrayed);
+  statusBadge.classList.toggle('not-prayed-badge', !hasPrayed);
+  statusBadge.textContent = hasPrayed ? 'Prayed' : 'Not Prayed';
 
   const markPrayedButton = prayerCard.querySelector('.mark-prayed-button-js');
   markPrayedButton.setAttribute(
     'aria-label',
-    prayer.has_prayed
-      ? 'Mark prayer request as unprayed'
+    hasPrayed
+      ? 'Mark prayer request as not prayed'
       : 'Mark prayer request as prayed',
   );
 
@@ -110,6 +146,9 @@ export function createPrayerCard(prayer, personId) {
     <div class="prayer-card prayer-card-js">
       <div class="prayer-text">
         <span class="prayer-text-value prayer-text-value-js"></span>
+        <p class="prayer-created-at prayer-created-at-js" hidden>
+          <span>Added </span><time></time>
+        </p>
       </div>
       <div class="prayer-status"></div>
       <div class="update-prayer-buttons">

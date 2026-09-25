@@ -243,7 +243,7 @@ function initPrayerEventListeners() {
       clearMutationFeedback();
       const pendingName = toggledHasPrayed
         ? 'Marking prayer request as prayed'
-        : 'Marking prayer request as unprayed';
+        : 'Marking prayer request as not prayed';
       const pendingState = setMutationPending(markPrayedButton, pendingName, {
         region: prayerCard,
         compact: true,

@@ -580,6 +580,12 @@ label {
   min-width: 0;
 }
 
+.prayer-created-at {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 .update-prayer-buttons {
   display: flex;
   flex-shrink: 0;
@@ -674,18 +680,27 @@ label {
   color: #93370d;
 }
 
-.prayed-badge {
+.prayer-status-badge {
   display: inline-flex;
   align-items: center;
   width: fit-content;
   margin-top: 0.4rem;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.prayed-badge {
   background: #ecfdf3;
   color: #067647;
   border: 1px solid #abefc6;
-  font-size: 0.8rem;
-  font-weight: 700;
+}
+
+.not-prayed-badge {
+  background: #f3f4f6;
+  color: var(--darker-gray);
+  border: 1px solid #d1d5db;
 }
 
 @media (max-width: 767px) {
@@ -811,7 +826,7 @@ label {
     align-self: center;
   }
 
-  .prayed-badge {
+  .prayer-status-badge {
     margin-top: 0;
     padding-inline: 0.3rem;
     white-space: nowrap;

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from ipray4u.models import Relationship
 
 def assert_valid_delete_response(response):
@@ -52,6 +54,12 @@ def assert_person_data(data: dict, person: dict):
   assert_relationship_data(relationship_id, person["relationship"])
   assert data.get("relationship") == person["relationship"]
 
+def assert_timezone_aware_timestamp(value):
+  assert isinstance(value, str)
+  parsed = datetime.fromisoformat(value)
+  assert parsed.tzinfo is not None
+  assert parsed.utcoffset() is not None
+
 def assert_prayer_data(data: dict, prayer: dict):
   assert isinstance(data.get("id"), int)
   assert data.get("prayer") == prayer["prayer"]
@@ -59,7 +67,15 @@ def assert_prayer_data(data: dict, prayer: dict):
   
   person_id = data.get("person_id")
   assert isinstance(person_id, int)
-  
+
+  assert "created_at" in data
+  if "created_at" not in prayer:
+    assert_timezone_aware_timestamp(data["created_at"])
+  elif prayer["created_at"] is None:
+    assert data["created_at"] is None
+  else:
+    assert data["created_at"] == prayer["created_at"]
+    assert_timezone_aware_timestamp(data["created_at"])
   
 def assert_prayers_list(data_list: list, prayers_list: list):
   assert len(data_list) == len(prayers_list)
