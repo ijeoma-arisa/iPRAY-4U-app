@@ -49,6 +49,11 @@ export function createPersonCardSkeletonsHTML(count = 3) {
             <div class="skeleton skeleton-person-action"></div>
           </div>
         </div>
+        <div class="prayer-stats skeleton-prayer-stats">
+          <span class="skeleton skeleton-prayer-stat skeleton-prayer-stat-total"></span>
+          <span class="skeleton skeleton-prayer-stat skeleton-prayer-stat-prayed"></span>
+          <span class="skeleton skeleton-prayer-stat skeleton-prayer-stat-not-prayed"></span>
+        </div>
       </div>
       <div class="prayer-cards-section skeleton-prayer-cards-section">
         ${prayerCardsHTML}

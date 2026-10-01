@@ -458,7 +458,7 @@ label {
   flex-shrink: 0;
   align-items: center;
   padding: 0.5rem;
-  gap: 1.25rem;
+  gap: 0.5rem;
 }
 
 .person-header {
@@ -489,6 +489,17 @@ label {
 .person-title p {
   margin-top: 0.2rem;
   color: var(--text-muted);
+}
+
+.prayer-stats {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.3;
 }
 
 .person-buttons {
@@ -990,6 +1001,24 @@ label {
   max-width: 80%;
   height: 1.05rem;
   border-radius: 5px;
+}
+
+.skeleton-prayer-stat {
+  display: block;
+  height: 1.04rem;
+  border-radius: 5px;
+}
+
+.skeleton-prayer-stat-total {
+  width: 2.8rem;
+}
+
+.skeleton-prayer-stat-prayed {
+  width: 3.4rem;
+}
+
+.skeleton-prayer-stat-not-prayed {
+  width: 5.1rem;
 }
 
 .skeleton-person-actions {

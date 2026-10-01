@@ -11,6 +11,7 @@ import {
   renderPrayerEmptyStateWhenEmpty,
   updatePersonCard,
   updatePrayerCard,
+  updatePrayerStats,
 } from './person-cards.js';
 import { prefersReducedMotion } from './utils.js';
 import {
@@ -179,6 +180,7 @@ async function applyLocalizedMutation({ type, data, personId, itemId }) {
     if (!prayerCard) throw new Error(`Unable to find prayer ${itemId}`);
 
     prayerCard.remove();
+    updatePrayerStats(personCard);
     renderPrayerEmptyStateWhenEmpty(personCard);
   }
 }

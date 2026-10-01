@@ -95,6 +95,27 @@ function updatePrayerCreatedAt(prayerCard, prayer) {
   dateDisplay.hidden = false;
 }
 
+export function updatePrayerStats(personCard) {
+  const prayerCards = [...personCard.querySelectorAll('.prayer-card-js')];
+  const prayed = prayerCards.filter(
+    prayerCard => prayerCard.dataset.hasPrayed === 'true',
+  ).length;
+  const total = prayerCards.length;
+  const notPrayed = total - prayed;
+
+  personCard.querySelector('.prayer-stats-total-js').textContent = total;
+  personCard.querySelector('.prayer-stats-prayed-js').textContent = prayed;
+  personCard.querySelector('.prayer-stats-not-prayed-js').textContent = notPrayed;
+
+  const prayerStats = personCard.querySelector('.prayer-stats-js');
+  prayerStats.setAttribute(
+    'aria-label',
+    `${total} total, ${prayed} prayed, ${notPrayed} not prayed`,
+  );
+
+  return { total, prayed, notPrayed };
+}
+
 export function updatePrayerCard(
   prayerCard,
   prayer,
@@ -137,6 +158,9 @@ export function updatePrayerCard(
 
   const deletePrayerButton = prayerCard.querySelector('.delete-prayer-button-js');
   deletePrayerButton.setAttribute('aria-label', 'Delete prayer request');
+
+  const personCard = prayerCard.closest('.person-card-js');
+  if (personCard) updatePrayerStats(personCard);
 
   return prayerCard;
 }
@@ -242,6 +266,13 @@ export function createPersonCard(person, prayers = []) {
             </button>
           </div>
         </div>
+        <div class="prayer-stats prayer-stats-js">
+          <span><span class="prayer-stats-value prayer-stats-total-js">0</span> Total</span>
+          <span class="prayer-stats-separator" aria-hidden="true">&middot;</span>
+          <span><span class="prayer-stats-value prayer-stats-prayed-js">0</span> Prayed</span>
+          <span class="prayer-stats-separator" aria-hidden="true">&middot;</span>
+          <span><span class="prayer-stats-value prayer-stats-not-prayed-js">0</span> Not Prayed</span>
+        </div>
       </div>
       <div class="prayer-cards-section"></div>
     </div>
@@ -254,6 +285,8 @@ export function createPersonCard(person, prayers = []) {
     const prayerCard = createPrayerCard(prayer, person.id);
     prayerCardsSection.append(prayerCard);
   });
+
+  updatePrayerStats(personCard);
 
   if (!prayers.length) renderPrayerEmptyStateWhenEmpty(personCard);
 
@@ -313,6 +346,7 @@ export function insertPrayerCard(personCard, prayerCard) {
   }
 
   prayerCardsSection.prepend(prayerCard);
+  updatePrayerStats(personCard);
   scrollPrayerCardsToTop(prayerCardsSection);
   scrollPersonCardIntoViewIfNeeded(personCard);
 }
