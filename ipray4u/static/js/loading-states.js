@@ -15,6 +15,9 @@ function createPrayerCardSkeletonHTML() {
       <div class="skeleton-prayer-text">
         <div class="skeleton skeleton-prayer-text-placeholder"></div>
       </div>
+      <div class="skeleton-prayer-status">
+        <div class="skeleton skeleton-prayer-status-badge"></div>
+      </div>
       <div class="skeleton-prayer-actions">
         <div class="skeleton skeleton-prayer-action"></div>
         <div class="skeleton skeleton-prayer-action"></div>

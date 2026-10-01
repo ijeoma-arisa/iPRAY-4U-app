@@ -1006,6 +1006,9 @@ label {
 }
 
 .skeleton-prayer-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  row-gap: 0;
   min-height: 58px;
   align-items: flex-start;
   flex-shrink: 0;
@@ -1014,7 +1017,7 @@ label {
 
 .skeleton-prayer-text {
   display: flex;
-  flex: 1;
+  grid-area: 1 / 1;
   min-width: 0;
   align-items: center;
 }
@@ -1023,6 +1026,21 @@ label {
   width: 85%;
   height: 1.5rem;
   border-radius: 5px;
+}
+
+.skeleton-prayer-status {
+  grid-area: 2 / 1;
+}
+
+.skeleton-prayer-status-badge {
+  width: 4.5rem;
+  height: 1.45rem;
+  margin-top: 0.4rem;
+  border-radius: 999px;
+}
+
+.skeleton-prayer-actions {
+  grid-area: 1 / 2 / 3 / 3;
 }
 
 .skeleton-prayer-action {
@@ -1068,12 +1086,21 @@ label {
     width: 100%;
   }
 
+  .skeleton-prayer-status {
+    grid-area: 2 / 1;
+    align-self: center;
+  }
+
+  .skeleton-prayer-status-badge {
+    margin-top: 0;
+  }
+
   .skeleton-prayer-text-placeholder {
     width: 70%;
   }
 
   .skeleton-prayer-actions {
-    grid-column: 2;
+    grid-area: 2 / 2;
     justify-self: end;
     gap: 0.25rem;
   }
