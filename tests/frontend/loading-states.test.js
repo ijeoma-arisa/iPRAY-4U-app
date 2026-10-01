@@ -12,6 +12,15 @@ describe('prayer card loading skeletons', () => {
     expect(prayerCards).toHaveLength(4);
     prayerCards.forEach((card) => {
       expect(card.querySelectorAll('.skeleton-prayer-status-badge')).toHaveLength(1);
+      expect(card.querySelector('.skeleton-prayer-status-badge').classList)
+        .toContain('prayer-status-badge');
+      expect(card.querySelector('.skeleton-prayer-status').classList)
+        .toContain('prayer-status');
+      expect(card.querySelectorAll('.skeleton-prayer-date-placeholder')).toHaveLength(1);
+      expect(card.querySelector('.skeleton-prayer-date').classList)
+        .toContain('prayer-created-at');
+      expect(card.querySelector('.skeleton-prayer-actions').classList)
+        .toContain('update-prayer-buttons');
     });
   });
 });

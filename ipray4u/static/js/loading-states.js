@@ -12,13 +12,16 @@ export function createRelationshipButtonSkeletonsHTML(count = 4) {
 function createPrayerCardSkeletonHTML() {
   return `
     <div class="prayer-card skeleton-prayer-card">
-      <div class="skeleton-prayer-text">
+      <div class="prayer-text skeleton-prayer-text">
         <div class="skeleton skeleton-prayer-text-placeholder"></div>
+        <p class="prayer-created-at skeleton-prayer-date">
+          <span class="skeleton skeleton-prayer-date-placeholder"></span>
+        </p>
       </div>
-      <div class="skeleton-prayer-status">
-        <div class="skeleton skeleton-prayer-status-badge"></div>
+      <div class="prayer-status skeleton-prayer-status">
+        <div class="prayer-status-badge skeleton skeleton-prayer-status-badge">Not Prayed</div>
       </div>
-      <div class="skeleton-prayer-actions">
+      <div class="update-prayer-buttons skeleton-prayer-actions">
         <div class="skeleton skeleton-prayer-action"></div>
         <div class="skeleton skeleton-prayer-action"></div>
         <div class="skeleton skeleton-prayer-action"></div>

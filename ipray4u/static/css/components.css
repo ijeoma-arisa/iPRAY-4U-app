@@ -992,8 +992,7 @@ label {
   border-radius: 5px;
 }
 
-.skeleton-person-actions,
-.skeleton-prayer-actions {
+.skeleton-person-actions {
   display: flex;
   flex-shrink: 0;
   gap: 0.4rem;
@@ -1016,31 +1015,26 @@ label {
 }
 
 .skeleton-prayer-text {
-  display: flex;
   grid-area: 1 / 1;
-  min-width: 0;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .skeleton-prayer-text-placeholder {
   width: 85%;
-  height: 1.5rem;
+  height: 1lh;
   border-radius: 5px;
 }
 
-.skeleton-prayer-status {
-  grid-area: 2 / 1;
+.skeleton-prayer-date-placeholder {
+  display: block;
+  width: 6rem;
+  height: 1lh;
+  border-radius: 5px;
 }
 
 .skeleton-prayer-status-badge {
-  width: 4.5rem;
-  height: 1.45rem;
-  margin-top: 0.4rem;
-  border-radius: 999px;
-}
-
-.skeleton-prayer-actions {
-  grid-area: 1 / 2 / 3 / 3;
+  color: transparent;
+  border: 1px solid transparent;
 }
 
 .skeleton-prayer-action {
@@ -1086,23 +1080,12 @@ label {
     width: 100%;
   }
 
-  .skeleton-prayer-status {
-    grid-area: 2 / 1;
-    align-self: center;
-  }
-
-  .skeleton-prayer-status-badge {
-    margin-top: 0;
-  }
-
   .skeleton-prayer-text-placeholder {
     width: 70%;
   }
 
   .skeleton-prayer-actions {
-    grid-area: 2 / 2;
     justify-self: end;
-    gap: 0.25rem;
   }
 
   .skeleton-prayer-action {
