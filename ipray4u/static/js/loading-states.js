@@ -38,20 +38,22 @@ export function createPersonCardSkeletonsHTML(count = 3) {
   return Array.from({ length: count }, () => `
     <div class="person-card person-card-skeleton" aria-hidden="true">
       <div class="person-info-section skeleton-person-info-section">
+        <div class="skeleton-person-title">
+          <div class="skeleton skeleton-person-name"></div>
+        </div>
         <div class="skeleton-person-header">
-          <div class="skeleton-person-title">
-            <div class="skeleton skeleton-person-name"></div>
+          <div class="skeleton-person-metadata">
             <div class="skeleton skeleton-person-relationship"></div>
+            <div class="prayer-stats skeleton-prayer-stats">
+              <span class="skeleton skeleton-prayer-stats-total"></span>
+              <span class="skeleton skeleton-prayer-stats-state"></span>
+            </div>
           </div>
           <div class="skeleton-person-actions">
             <div class="skeleton skeleton-person-action"></div>
             <div class="skeleton skeleton-person-action"></div>
             <div class="skeleton skeleton-person-action"></div>
           </div>
-        </div>
-        <div class="prayer-stats skeleton-prayer-stats">
-          <span class="skeleton skeleton-prayer-stats-total"></span>
-          <span class="skeleton skeleton-prayer-stats-state"></span>
         </div>
       </div>
       <div class="prayer-cards-section skeleton-prayer-cards-section">

@@ -264,10 +264,16 @@ export function createPersonCard(person, prayers = []) {
   const personCard = createElementFromHTML(`
     <div class="person-card person-card-js">
       <div class="person-info-section">
+        <div class="person-title">
+          <h3 class="person-name-value-js"></h3>
+        </div>
         <div class="person-header">
-          <div class="person-title">
-            <h3 class="person-name-value-js"></h3>
+          <div class="person-metadata">
             <p class="person-relationship-value-js"></p>
+            <div class="prayer-stats prayer-stats-js">
+              <span class="prayer-stats-total prayer-stats-total-js">0 prayers</span>
+              <span class="prayer-stats-state prayer-stats-state-js" hidden></span>
+            </div>
           </div>
           <div class="person-buttons">
             <button
@@ -290,10 +296,6 @@ export function createPersonCard(person, prayers = []) {
               <i class="fa-solid fa-trash" aria-hidden="true"></i>
             </button>
           </div>
-        </div>
-        <div class="prayer-stats prayer-stats-js">
-          <span class="prayer-stats-total prayer-stats-total-js">0 prayers</span>
-          <span class="prayer-stats-state prayer-stats-state-js" hidden></span>
         </div>
       </div>
       <div class="prayer-cards-section"></div>

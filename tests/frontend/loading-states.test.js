@@ -14,7 +14,12 @@ describe('person card loading skeletons', () => {
       const header = card.querySelector('.skeleton-person-header');
       const stats = card.querySelector('.skeleton-prayer-stats');
 
-      expect(stats.previousElementSibling).toBe(header);
+      expect(header.previousElementSibling.classList)
+        .toContain('skeleton-person-title');
+      expect(stats.parentElement.classList)
+        .toContain('skeleton-person-metadata');
+      expect(stats.previousElementSibling.classList)
+        .toContain('skeleton-person-relationship');
       expect(stats.classList).toContain('prayer-stats');
       expect(stats.querySelectorAll('.skeleton-prayer-stats-total')).toHaveLength(1);
       expect(stats.querySelectorAll('.skeleton-prayer-stats-state')).toHaveLength(1);

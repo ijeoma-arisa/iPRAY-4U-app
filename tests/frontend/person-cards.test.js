@@ -65,7 +65,9 @@ describe('person prayer statistics', () => {
       stateHidden: true,
       ariaLabel: '0 prayers',
     });
-    expect(card.querySelector('.person-header + .prayer-stats-js'))
+    expect(card.querySelector('.person-title + .person-header'))
+      .not.toBeNull();
+    expect(card.querySelector('.person-metadata > .prayer-stats-js'))
       .not.toBeNull();
   });
 
