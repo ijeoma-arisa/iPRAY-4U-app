@@ -462,10 +462,10 @@ label {
 }
 
 .person-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  flex-direction: row;
   width: 100%;
-  align-items: start;
+  align-items: center;
   gap: 0.5rem;
 }
 
@@ -783,6 +783,8 @@ label {
   }
 
   .person-header {
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
   }
 
@@ -975,18 +977,17 @@ label {
 
 .skeleton-person-header,
 .skeleton-person-title {
+  display: flex;
   width: 100%;
 }
 
 .skeleton-person-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
+  flex-direction: row;
+  align-items: center;
   gap: 0.5rem;
 }
 
 .skeleton-person-title {
-  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.45rem;
