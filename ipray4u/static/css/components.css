@@ -458,7 +458,7 @@ label {
   flex-shrink: 0;
   align-items: center;
   padding: 0.5rem;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .person-header {
@@ -782,12 +782,6 @@ label {
     white-space: nowrap;
   }
 
-  .person-header {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
   .person-title {
     text-align: left;
   }
@@ -795,6 +789,37 @@ label {
   .person-buttons {
     flex-shrink: 0;
     gap: 0.4rem;
+  }
+
+  .person-info-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 0.5rem;
+  }
+
+  .person-header,
+  .skeleton-person-header {
+    display: contents;
+  }
+
+  .person-title,
+  .skeleton-person-title {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .prayer-stats {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .person-buttons,
+  .skeleton-person-actions {
+    grid-column: 2;
+    grid-row: 2;
   }
 
   .person-buttons .btn,
