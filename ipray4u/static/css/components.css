@@ -458,14 +458,14 @@ label {
   flex-shrink: 0;
   align-items: center;
   padding: 0.5rem;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .person-header {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   width: 100%;
-  align-items: center;
+  align-items: start;
   gap: 0.5rem;
 }
 
@@ -493,13 +493,35 @@ label {
 
 .prayer-stats {
   display: flex;
+  align-self: flex-start;
   align-items: center;
-  align-self: stretch;
-  flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: 0.35rem;
   color: var(--text-muted);
   font-size: 0.8rem;
   line-height: 1.3;
+}
+
+.prayer-stats-total {
+  color: var(--text-main);
+}
+
+.prayer-stats-state {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.prayer-stats-outstanding {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: var(--darker-gray);
+}
+
+.prayer-stats-complete {
+  background: #ecfdf3;
+  border-color: #abefc6;
+  color: #067647;
 }
 
 .person-buttons {
@@ -714,7 +736,7 @@ label {
   border: 1px solid #d1d5db;
 }
 
-@media (max-width: 767px) {
+  @media (max-width: 767px) {
   .launch-logo {
     width: 132px;
   }
@@ -761,8 +783,6 @@ label {
   }
 
   .person-header {
-    flex-direction: row;
-    flex-wrap: wrap;
     align-items: center;
   }
 
@@ -955,17 +975,18 @@ label {
 
 .skeleton-person-header,
 .skeleton-person-title {
-  display: flex;
   width: 100%;
 }
 
 .skeleton-person-header {
-  flex-direction: row;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 0.5rem;
 }
 
 .skeleton-person-title {
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.45rem;
@@ -974,10 +995,6 @@ label {
 .skeleton-person-info-section {
   width: 100%;
   padding: 0;
-}
-
-.skeleton-person-actions {
-  margin-inline-start: auto;
 }
 
 .skeleton-prayer-cards-section {
@@ -1003,22 +1020,16 @@ label {
   border-radius: 5px;
 }
 
-.skeleton-prayer-stat {
-  display: block;
+.skeleton-prayer-stats-total {
+  width: 4.25rem;
   height: 1.04rem;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 
-.skeleton-prayer-stat-total {
-  width: 2.8rem;
-}
-
-.skeleton-prayer-stat-prayed {
-  width: 3.4rem;
-}
-
-.skeleton-prayer-stat-not-prayed {
-  width: 5.1rem;
+.skeleton-prayer-stats-state {
+  width: 5.5rem;
+  height: 1.3rem;
+  border-radius: 999px;
 }
 
 .skeleton-person-actions {

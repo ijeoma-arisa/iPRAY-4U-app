@@ -103,15 +103,40 @@ export function updatePrayerStats(personCard) {
   const total = prayerCards.length;
   const notPrayed = total - prayed;
 
-  personCard.querySelector('.prayer-stats-total-js').textContent = total;
-  personCard.querySelector('.prayer-stats-prayed-js').textContent = prayed;
-  personCard.querySelector('.prayer-stats-not-prayed-js').textContent = notPrayed;
-
   const prayerStats = personCard.querySelector('.prayer-stats-js');
-  prayerStats.setAttribute(
-    'aria-label',
-    `${total} total, ${prayed} prayed, ${notPrayed} not prayed`,
-  );
+  const totalSummary = prayerStats.querySelector('.prayer-stats-total-js');
+  const stateSummary = prayerStats.querySelector('.prayer-stats-state-js');
+  const prayerLabel = total === 1 ? 'prayer' : 'prayers';
+
+  totalSummary.textContent = `${total} ${prayerLabel}`;
+
+  if (total === 0) {
+    stateSummary.hidden = true;
+    stateSummary.textContent = '';
+    stateSummary.classList.remove(
+      'prayer-stats-outstanding',
+      'prayer-stats-complete',
+    );
+    prayerStats.setAttribute('aria-label', '0 prayers');
+  } else if (notPrayed > 0) {
+    stateSummary.hidden = false;
+    stateSummary.textContent = `${notPrayed} not prayed`;
+    stateSummary.classList.add('prayer-stats-outstanding');
+    stateSummary.classList.remove('prayer-stats-complete');
+    prayerStats.setAttribute(
+      'aria-label',
+      `${total} ${prayerLabel}, ${notPrayed} not prayed`,
+    );
+  } else {
+    stateSummary.hidden = false;
+    stateSummary.textContent = '✓ All prayed';
+    stateSummary.classList.add('prayer-stats-complete');
+    stateSummary.classList.remove('prayer-stats-outstanding');
+    prayerStats.setAttribute(
+      'aria-label',
+      `${total} ${prayerLabel}, all prayed`,
+    );
+  }
 
   return { total, prayed, notPrayed };
 }
@@ -267,11 +292,8 @@ export function createPersonCard(person, prayers = []) {
           </div>
         </div>
         <div class="prayer-stats prayer-stats-js">
-          <span><span class="prayer-stats-value prayer-stats-total-js">0</span> Total</span>
-          <span class="prayer-stats-separator" aria-hidden="true">&middot;</span>
-          <span><span class="prayer-stats-value prayer-stats-prayed-js">0</span> Prayed</span>
-          <span class="prayer-stats-separator" aria-hidden="true">&middot;</span>
-          <span><span class="prayer-stats-value prayer-stats-not-prayed-js">0</span> Not Prayed</span>
+          <span class="prayer-stats-total prayer-stats-total-js">0 prayers</span>
+          <span class="prayer-stats-state prayer-stats-state-js" hidden></span>
         </div>
       </div>
       <div class="prayer-cards-section"></div>

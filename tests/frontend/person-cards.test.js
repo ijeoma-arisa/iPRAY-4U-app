@@ -35,10 +35,14 @@ function statusBadge(card) {
 }
 
 function stats(card) {
+  const summary = card.querySelector('.prayer-stats-js');
+  const state = summary.querySelector('.prayer-stats-state-js');
+
   return {
-    total: card.querySelector('.prayer-stats-total-js').textContent,
-    prayed: card.querySelector('.prayer-stats-prayed-js').textContent,
-    notPrayed: card.querySelector('.prayer-stats-not-prayed-js').textContent,
+    total: summary.querySelector('.prayer-stats-total-js').textContent,
+    state: state.textContent,
+    stateHidden: state.hidden,
+    ariaLabel: summary.getAttribute('aria-label'),
   };
 }
 
@@ -50,17 +54,36 @@ describe('person prayer statistics', () => {
     Element.prototype.scrollIntoView = () => {};
   });
 
-  it('always displays zero counts for a person without prayers', () => {
+  it('displays only the pluralized total for a person without prayers', () => {
     const card = createPersonCard(
       { id: 3, name: 'Avery', relationship: 'Friends' },
     );
 
-    expect(stats(card)).toEqual({ total: '0', prayed: '0', notPrayed: '0' });
-    expect(card.querySelector('.prayer-stats-js').getAttribute('aria-label'))
-      .toBe('0 total, 0 prayed, 0 not prayed');
+    expect(stats(card)).toEqual({
+      total: '0 prayers',
+      state: '',
+      stateHidden: true,
+      ariaLabel: '0 prayers',
+    });
+    expect(card.querySelector('.person-header + .prayer-stats-js'))
+      .not.toBeNull();
   });
 
-  it('derives mixed counts from the rendered prayer cards', () => {
+  it('uses singular grammar and shows an outstanding prayer', () => {
+    const card = createPersonCard(
+      { id: 3, name: 'Avery', relationship: 'Friends' },
+      [prayer()],
+    );
+
+    expect(stats(card)).toEqual({
+      total: '1 prayer',
+      state: '1 not prayed',
+      stateHidden: false,
+      ariaLabel: '1 prayer, 1 not prayed',
+    });
+  });
+
+  it('summarizes the total and outstanding prayers', () => {
     const card = createPersonCard(
       { id: 3, name: 'Avery', relationship: 'Friends' },
       [
@@ -70,22 +93,48 @@ describe('person prayer statistics', () => {
       ],
     );
 
-    expect(stats(card)).toEqual({ total: '3', prayed: '1', notPrayed: '2' });
+    expect(stats(card)).toEqual({
+      total: '3 prayers',
+      state: '2 not prayed',
+      stateHidden: false,
+      ariaLabel: '3 prayers, 2 not prayed',
+    });
+    expect(card.querySelector('.prayer-stats-state-js').classList)
+      .toContain('prayer-stats-outstanding');
   });
 
-  it('updates counts when a prayer is added locally', () => {
+  it('shows the completion state when all prayers have been prayed', () => {
     const card = createPersonCard(
       { id: 3, name: 'Avery', relationship: 'Friends' },
       [prayer({ id: 7, has_prayed: true })],
     );
-    document.querySelector('.person-cards-js').append(card);
 
-    insertPrayerCard(card, createPrayerCard(prayer({ id: 8 }), 3));
-
-    expect(stats(card)).toEqual({ total: '2', prayed: '1', notPrayed: '1' });
+    expect(stats(card)).toEqual({
+      total: '1 prayer',
+      state: '✓ All prayed',
+      stateHidden: false,
+      ariaLabel: '1 prayer, all prayed',
+    });
+    expect(card.querySelector('.prayer-stats-state-js').classList)
+      .toContain('prayer-stats-complete');
   });
 
-  it('updates prayed counts without changing total when status changes', () => {
+  it('updates the summary when a prayer is added locally', () => {
+    const card = createPersonCard(
+      { id: 3, name: 'Avery', relationship: 'Friends' },
+    );
+    document.querySelector('.person-cards-js').append(card);
+
+    insertPrayerCard(card, createPrayerCard(prayer(), 3));
+
+    expect(stats(card)).toMatchObject({
+      total: '1 prayer',
+      state: '1 not prayed',
+      stateHidden: false,
+    });
+  });
+
+  it('transitions between outstanding and all-prayed states', () => {
     const initialPrayer = prayer({ has_prayed: false });
     const card = createPersonCard(
       { id: 3, name: 'Avery', relationship: 'Friends' },
@@ -95,22 +144,35 @@ describe('person prayer statistics', () => {
     const prayerCard = card.querySelector('.prayer-card-js');
 
     updatePrayerCard(prayerCard, { ...initialPrayer, has_prayed: true });
-    expect(stats(card)).toEqual({ total: '1', prayed: '1', notPrayed: '0' });
+    expect(stats(card)).toMatchObject({
+      total: '1 prayer',
+      state: '✓ All prayed',
+      ariaLabel: '1 prayer, all prayed',
+    });
 
     updatePrayerCard(prayerCard, { ...initialPrayer, has_prayed: false });
-    expect(stats(card)).toEqual({ total: '1', prayed: '0', notPrayed: '1' });
+    expect(stats(card)).toMatchObject({
+      total: '1 prayer',
+      state: '1 not prayed',
+      ariaLabel: '1 prayer, 1 not prayed',
+    });
   });
 
-  it('updates counts after a prayer is removed locally', () => {
+  it('returns to zero prayers when the final prayer is removed locally', () => {
     const card = createPersonCard(
       { id: 3, name: 'Avery', relationship: 'Friends' },
-      [prayer({ id: 7, has_prayed: true }), prayer({ id: 8 })],
+      [prayer({ id: 7, has_prayed: true })],
     );
     card.querySelector('[data-prayer-id="7"]').remove();
 
     updatePrayerStats(card);
 
-    expect(stats(card)).toEqual({ total: '1', prayed: '0', notPrayed: '1' });
+    expect(stats(card)).toEqual({
+      total: '0 prayers',
+      state: '',
+      stateHidden: true,
+      ariaLabel: '0 prayers',
+    });
   });
 
   it('does not change counts when only prayer text is edited', () => {
@@ -126,7 +188,12 @@ describe('person prayer statistics', () => {
       prayer: 'Updated text',
     });
 
-    expect(stats(card)).toEqual({ total: '1', prayed: '1', notPrayed: '0' });
+    expect(stats(card)).toEqual({
+      total: '1 prayer',
+      state: '✓ All prayed',
+      stateHidden: false,
+      ariaLabel: '1 prayer, all prayed',
+    });
   });
 });
 

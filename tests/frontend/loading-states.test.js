@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createPersonCardSkeletonsHTML } from '../../ipray4u/static/js/loading-states.js';
 
 describe('person card loading skeletons', () => {
-  it('includes a three-part stats placeholder beneath every person header', () => {
+  it('includes a compact stats summary placeholder beneath every person header', () => {
     const container = document.createElement('div');
     container.innerHTML = createPersonCardSkeletonsHTML(2);
 
@@ -11,14 +11,14 @@ describe('person card loading skeletons', () => {
 
     expect(personCards).toHaveLength(2);
     personCards.forEach((card) => {
-      const infoSection = card.querySelector('.skeleton-person-info-section');
-      const stats = infoSection.querySelector('.skeleton-prayer-stats');
+      const header = card.querySelector('.skeleton-person-header');
+      const stats = card.querySelector('.skeleton-prayer-stats');
 
-      expect(stats.previousElementSibling.classList)
-        .toContain('skeleton-person-header');
+      expect(stats.previousElementSibling).toBe(header);
       expect(stats.classList).toContain('prayer-stats');
-      expect(stats.querySelectorAll('.skeleton-prayer-stat')).toHaveLength(3);
-      expect(stats.querySelectorAll('.skeleton')).toHaveLength(3);
+      expect(stats.querySelectorAll('.skeleton-prayer-stats-total')).toHaveLength(1);
+      expect(stats.querySelectorAll('.skeleton-prayer-stats-state')).toHaveLength(1);
+      expect(stats.querySelectorAll('.skeleton')).toHaveLength(2);
     });
   });
 
