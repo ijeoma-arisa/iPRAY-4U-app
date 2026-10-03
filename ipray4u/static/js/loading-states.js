@@ -12,10 +12,16 @@ export function createRelationshipButtonSkeletonsHTML(count = 4) {
 function createPrayerCardSkeletonHTML() {
   return `
     <div class="prayer-card skeleton-prayer-card">
-      <div class="skeleton-prayer-text">
+      <div class="prayer-text skeleton-prayer-text">
         <div class="skeleton skeleton-prayer-text-placeholder"></div>
+        <p class="prayer-created-at skeleton-prayer-date">
+          <span class="skeleton skeleton-prayer-date-placeholder"></span>
+        </p>
       </div>
-      <div class="skeleton-prayer-actions">
+      <div class="prayer-status skeleton-prayer-status">
+        <div class="prayer-status-badge skeleton skeleton-prayer-status-badge">Not Prayed</div>
+      </div>
+      <div class="update-prayer-buttons skeleton-prayer-actions">
         <div class="skeleton skeleton-prayer-action"></div>
         <div class="skeleton skeleton-prayer-action"></div>
         <div class="skeleton skeleton-prayer-action"></div>
@@ -32,10 +38,16 @@ export function createPersonCardSkeletonsHTML(count = 3) {
   return Array.from({ length: count }, () => `
     <div class="person-card person-card-skeleton" aria-hidden="true">
       <div class="person-info-section skeleton-person-info-section">
+        <div class="skeleton-person-title">
+          <div class="skeleton skeleton-person-name"></div>
+        </div>
         <div class="skeleton-person-header">
-          <div class="skeleton-person-title">
-            <div class="skeleton skeleton-person-name"></div>
+          <div class="skeleton-person-metadata">
             <div class="skeleton skeleton-person-relationship"></div>
+            <div class="prayer-stats skeleton-prayer-stats">
+              <span class="skeleton skeleton-prayer-stats-total"></span>
+              <span class="skeleton skeleton-prayer-stats-state"></span>
+            </div>
           </div>
           <div class="skeleton-person-actions">
             <div class="skeleton skeleton-person-action"></div>

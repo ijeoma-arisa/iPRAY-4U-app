@@ -456,9 +456,9 @@ label {
   flex-direction: column;
   width: 200px;
   flex-shrink: 0;
-  align-items: center;
+  align-items: stretch;
   padding: 0.5rem;
-  gap: 1.25rem;
+  gap: 0.5rem;
 }
 
 .person-header {
@@ -470,25 +470,64 @@ label {
 }
 
 .person-title {
+  width: 100%;
   text-align: left;
   min-width: 0;
-  max-width: 100%;
-}
-
-.person-title h3,
-.person-title p {
-  margin: 0;
 }
 
 .person-title h3 {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
-.person-title p {
-  margin-top: 0.2rem;
+.person-metadata {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.person-metadata p {
+  margin: 0;
   color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.prayer-stats {
+  display: flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.3;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.prayer-stats-total {
+  color: var(--text-main);
+}
+
+.prayer-stats-state {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.prayer-stats-outstanding {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: var(--darker-gray);
+}
+
+.prayer-stats-complete {
+  background: #ecfdf3;
+  border-color: #abefc6;
+  color: #067647;
 }
 
 .person-buttons {
@@ -703,7 +742,7 @@ label {
   border: 1px solid #d1d5db;
 }
 
-@media (max-width: 767px) {
+  @media (max-width: 767px) {
   .launch-logo {
     width: 132px;
   }
@@ -747,21 +786,6 @@ label {
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
     white-space: nowrap;
-  }
-
-  .person-header {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .person-title {
-    text-align: left;
-  }
-
-  .person-buttons {
-    flex-shrink: 0;
-    gap: 0.4rem;
   }
 
   .person-buttons .btn,
@@ -955,18 +979,21 @@ label {
 }
 
 .skeleton-person-title {
+  align-items: flex-start;
+}
+
+.skeleton-person-metadata {
+  display: flex;
+  flex: 1;
+  min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .skeleton-person-info-section {
   width: 100%;
   padding: 0;
-}
-
-.skeleton-person-actions {
-  margin-inline-start: auto;
 }
 
 .skeleton-prayer-cards-section {
@@ -992,8 +1019,19 @@ label {
   border-radius: 5px;
 }
 
-.skeleton-person-actions,
-.skeleton-prayer-actions {
+.skeleton-prayer-stats-total {
+  width: 4.25rem;
+  height: 1.04rem;
+  border-radius: 4px;
+}
+
+.skeleton-prayer-stats-state {
+  width: 5.5rem;
+  height: 1.3rem;
+  border-radius: 999px;
+}
+
+.skeleton-person-actions {
   display: flex;
   flex-shrink: 0;
   gap: 0.4rem;
@@ -1006,6 +1044,9 @@ label {
 }
 
 .skeleton-prayer-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  row-gap: 0;
   min-height: 58px;
   align-items: flex-start;
   flex-shrink: 0;
@@ -1013,16 +1054,26 @@ label {
 }
 
 .skeleton-prayer-text {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  align-items: center;
+  grid-area: 1 / 1;
+  align-items: flex-start;
 }
 
 .skeleton-prayer-text-placeholder {
   width: 85%;
-  height: 1.5rem;
+  height: 1lh;
   border-radius: 5px;
+}
+
+.skeleton-prayer-date-placeholder {
+  display: block;
+  width: 6rem;
+  height: 1lh;
+  border-radius: 5px;
+}
+
+.skeleton-prayer-status-badge {
+  color: transparent;
+  border: 1px solid transparent;
 }
 
 .skeleton-prayer-action {
@@ -1073,9 +1124,7 @@ label {
   }
 
   .skeleton-prayer-actions {
-    grid-column: 2;
     justify-self: end;
-    gap: 0.25rem;
   }
 
   .skeleton-prayer-action {

@@ -95,6 +95,52 @@ function updatePrayerCreatedAt(prayerCard, prayer) {
   dateDisplay.hidden = false;
 }
 
+export function updatePrayerStats(personCard) {
+  const prayerCards = [...personCard.querySelectorAll('.prayer-card-js')];
+  const prayed = prayerCards.filter(
+    prayerCard => prayerCard.dataset.hasPrayed === 'true',
+  ).length;
+  const total = prayerCards.length;
+  const notPrayed = total - prayed;
+
+  const prayerStats = personCard.querySelector('.prayer-stats-js');
+  const totalSummary = prayerStats.querySelector('.prayer-stats-total-js');
+  const stateSummary = prayerStats.querySelector('.prayer-stats-state-js');
+  const prayerLabel = total === 1 ? 'prayer' : 'prayers';
+
+  totalSummary.textContent = `${total} ${prayerLabel}`;
+
+  if (total === 0) {
+    stateSummary.hidden = true;
+    stateSummary.textContent = '';
+    stateSummary.classList.remove(
+      'prayer-stats-outstanding',
+      'prayer-stats-complete',
+    );
+    prayerStats.setAttribute('aria-label', '0 prayers');
+  } else if (notPrayed > 0) {
+    stateSummary.hidden = false;
+    stateSummary.textContent = `${notPrayed} not prayed`;
+    stateSummary.classList.add('prayer-stats-outstanding');
+    stateSummary.classList.remove('prayer-stats-complete');
+    prayerStats.setAttribute(
+      'aria-label',
+      `${total} ${prayerLabel}, ${notPrayed} not prayed`,
+    );
+  } else {
+    stateSummary.hidden = false;
+    stateSummary.textContent = '✓ All prayed';
+    stateSummary.classList.add('prayer-stats-complete');
+    stateSummary.classList.remove('prayer-stats-outstanding');
+    prayerStats.setAttribute(
+      'aria-label',
+      `${total} ${prayerLabel}, all prayed`,
+    );
+  }
+
+  return { total, prayed, notPrayed };
+}
+
 export function updatePrayerCard(
   prayerCard,
   prayer,
@@ -137,6 +183,9 @@ export function updatePrayerCard(
 
   const deletePrayerButton = prayerCard.querySelector('.delete-prayer-button-js');
   deletePrayerButton.setAttribute('aria-label', 'Delete prayer request');
+
+  const personCard = prayerCard.closest('.person-card-js');
+  if (personCard) updatePrayerStats(personCard);
 
   return prayerCard;
 }
@@ -215,10 +264,16 @@ export function createPersonCard(person, prayers = []) {
   const personCard = createElementFromHTML(`
     <div class="person-card person-card-js">
       <div class="person-info-section">
+        <div class="person-title">
+          <h3 class="person-name-value-js"></h3>
+        </div>
         <div class="person-header">
-          <div class="person-title">
-            <h3 class="person-name-value-js"></h3>
+          <div class="person-metadata">
             <p class="person-relationship-value-js"></p>
+            <div class="prayer-stats prayer-stats-js">
+              <span class="prayer-stats-total prayer-stats-total-js">0 prayers</span>
+              <span class="prayer-stats-state prayer-stats-state-js" hidden></span>
+            </div>
           </div>
           <div class="person-buttons">
             <button
@@ -254,6 +309,8 @@ export function createPersonCard(person, prayers = []) {
     const prayerCard = createPrayerCard(prayer, person.id);
     prayerCardsSection.append(prayerCard);
   });
+
+  updatePrayerStats(personCard);
 
   if (!prayers.length) renderPrayerEmptyStateWhenEmpty(personCard);
 
@@ -313,6 +370,7 @@ export function insertPrayerCard(personCard, prayerCard) {
   }
 
   prayerCardsSection.prepend(prayerCard);
+  updatePrayerStats(personCard);
   scrollPrayerCardsToTop(prayerCardsSection);
   scrollPersonCardIntoViewIfNeeded(personCard);
 }
