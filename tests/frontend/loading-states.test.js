@@ -1,6 +1,21 @@
 import { describe, expect, it } from 'vitest';
 
-import { createPersonCardSkeletonsHTML } from '../../ipray4u/static/js/loading-states.js';
+import {
+  createPersonCardSkeletonsHTML,
+  createRelationshipStatsSkeletonHTML,
+} from '../../ipray4u/static/js/loading-states.js';
+
+describe('relationship summary loading skeleton', () => {
+  it('includes one placeholder for each metric', () => {
+    const container = document.createElement('div');
+    container.innerHTML = createRelationshipStatsSkeletonHTML();
+
+    expect(container.querySelector('.relationship-stats-skeleton'))
+      .not.toBeNull();
+    expect(container.querySelectorAll('.skeleton-relationship-stat'))
+      .toHaveLength(3);
+  });
+});
 
 describe('person card loading skeletons', () => {
   it('includes a compact stats summary placeholder beneath every person header', () => {

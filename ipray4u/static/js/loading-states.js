@@ -9,6 +9,15 @@ export function createRelationshipButtonSkeletonsHTML(count = 4) {
     ></div>`).join('');
 }
 
+export function createRelationshipStatsSkeletonHTML() {
+  return `
+    <div class="relationship-stats-skeleton" aria-hidden="true">
+      <span class="skeleton skeleton-relationship-stat"></span>
+      <span class="skeleton skeleton-relationship-stat"></span>
+      <span class="skeleton skeleton-relationship-stat"></span>
+    </div>`;
+}
+
 function createPrayerCardSkeletonHTML() {
   return `
     <div class="prayer-card skeleton-prayer-card">

@@ -421,6 +421,31 @@ label {
   gap: 0.5rem;
 }
 
+.relationship-stats,
+.relationship-stats-skeleton {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  row-gap: 0.45rem;
+}
+
+.relationship-stats {
+  width: 100%;
+  column-gap: 0.625rem;
+  color: var(--gray);
+  font-size: 0.92rem;
+}
+
+.relationship-stats > span {
+  white-space: nowrap;
+}
+
+.relationship-stats > span + span::before {
+  content: "\00b7";
+  margin-inline-end: 0.625rem;
+  color: var(--text-muted);
+}
+
 .person-cards {
   width: 100%;
   display: flex;
@@ -956,6 +981,24 @@ label {
   width: 5.25rem;
   height: 2.65rem;
   border-radius: 6px;
+}
+
+.relationship-stats-skeleton {
+  width: 100%;
+  column-gap: 1.25rem;
+}
+
+.skeleton-relationship-stat {
+  width: 5.5rem;
+  height: 1lh;
+  border-radius: 4px;
+  background-color: #f0e8e0;
+  background-image: linear-gradient(
+    90deg,
+    #f0e8e0 0%,
+    #f6f1ec 45%,
+    #f0e8e0 90%
+  );
 }
 
 .person-card-skeleton {

@@ -2,6 +2,7 @@ import { GET_PEOPLE_URL, LOGIN_URL } from './api/endpoints.js';
 import {
   createPersonCardSkeletonsHTML,
   createPersonCardsLoadErrorHTML,
+  createRelationshipStatsSkeletonHTML,
 } from './loading-states.js';
 import { prefersReducedMotion } from './utils.js';
 
@@ -138,7 +139,41 @@ export function updatePrayerStats(personCard) {
     );
   }
 
+  updateRelationshipStats();
+
   return { total, prayed, notPrayed };
+}
+
+export function updateRelationshipStats(
+  relationshipStats = document.querySelector('.relationship-stats-js'),
+) {
+  if (!relationshipStats) return { people: 0, prayers: 0, notPrayed: 0 };
+
+  const personCards = [...document.querySelectorAll('.person-card-js')];
+  const prayerCards = personCards.flatMap(
+    personCard => [...personCard.querySelectorAll('.prayer-card-js')],
+  );
+  const people = personCards.length;
+  const prayers = prayerCards.length;
+  const notPrayed = prayerCards.filter(
+    prayerCard => prayerCard.dataset.hasPrayed !== 'true',
+  ).length;
+  const personLabel = people === 1 ? 'person' : 'people';
+  const prayerLabel = prayers === 1 ? 'prayer' : 'prayers';
+
+  relationshipStats.replaceChildren();
+  [
+    `${people} ${personLabel}`,
+    `${prayers} ${prayerLabel}`,
+    `${notPrayed} not prayed`,
+  ].forEach((text) => {
+    const metric = document.createElement('span');
+    metric.textContent = text;
+    relationshipStats.append(metric);
+  });
+  relationshipStats.setAttribute('aria-busy', 'false');
+
+  return { people, prayers, notPrayed };
 }
 
 export function updatePrayerCard(
@@ -320,6 +355,7 @@ export function createPersonCard(person, prayers = []) {
 export function renderPeopleEmptyStateWhenEmpty(
   personCards = document.querySelector('.person-cards-js'),
 ) {
+  updateRelationshipStats();
   if (!personCards.querySelector('.person-card-js')) {
     personCards.textContent = PEOPLE_EMPTY_TEXT;
   }
@@ -359,6 +395,7 @@ export function insertPersonCard(personCard) {
 
   if (!personCards.querySelector('.person-card-js')) personCards.replaceChildren();
   personCards.prepend(personCard);
+  updateRelationshipStats();
   scrollPageToTop();
 }
 
@@ -401,6 +438,11 @@ export async function renderPersonCards(
   activeFilterLoadController = filterLoadController;
 
   if (showSkeletons) {
+    const relationshipStats = document.querySelector('.relationship-stats-js');
+    if (relationshipStats) {
+      relationshipStats.setAttribute('aria-busy', 'true');
+      relationshipStats.innerHTML = createRelationshipStatsSkeletonHTML();
+    }
     personCards.setAttribute('aria-busy', 'true');
     personCards.innerHTML = createPersonCardSkeletonsHTML();
   }
