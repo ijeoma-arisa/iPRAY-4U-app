@@ -58,6 +58,17 @@
           {% endfor %}
         </div>
       </div>
+
+      <div
+        class="relationship-stats relationship-stats-js"
+        aria-busy="true"
+      >
+        <div class="relationship-stats-skeleton" aria-hidden="true">
+          {% for _ in range(3) %}
+            <span class="skeleton skeleton-relationship-stat"></span>
+          {% endfor %}
+        </div>
+      </div>
       
       <!-- Keep this server-rendered skeleton structure aligned with loading-states.js. -->
       <div
