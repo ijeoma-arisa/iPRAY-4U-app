@@ -2,6 +2,7 @@
 
 BEGIN;
 
+SET LOCAL lock_timeout = '5s';
 
 -- Section A: Reserve the My Prayers name and relationship
 ALTER TABLE public.people
@@ -52,14 +53,19 @@ BEGIN
 END;
 $$;
 
+-- Restrict direct execution of the update trigger function.
+REVOKE ALL ON FUNCTION public.protect_my_prayers_update()
+FROM PUBLIC, anon, authenticated, service_role;
+
 CREATE TRIGGER protect_my_prayers_update_trigger
 BEFORE UPDATE ON public.people
 FOR EACH ROW
 EXECUTE FUNCTION public.protect_my_prayers_update();
 
 
--- Section D: Protect My Prayers against deletion
--- DRAFT: Verify behavior against actual staging account-deletion cascades.
+-- Section D: Protect My Prayers against direct deletion
+-- Verified against staging: direct card and profile deletion are blocked,
+-- while auth user deletion successfully cascades.
 
 CREATE OR REPLACE FUNCTION public.protect_my_prayers_delete()
 RETURNS TRIGGER
@@ -68,7 +74,8 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
-    -- Allow deletion only when the owning auth user is no longer visible.
+    -- Block deletion while the owning auth user exists.
+    -- Allow deletion during account cleanup if the auth user is no longer visible.
     IF OLD.relationship_id = 4
        AND EXISTS (
            SELECT 1
@@ -83,6 +90,10 @@ BEGIN
     RETURN OLD;
 END;
 $$;
+
+-- Restrict direct execution of the privileged trigger function.
+REVOKE ALL ON FUNCTION public.protect_my_prayers_delete()
+FROM PUBLIC, anon, authenticated, service_role;
 
 CREATE TRIGGER protect_my_prayers_delete_trigger
 BEFORE DELETE ON public.people
@@ -133,6 +144,10 @@ BEGIN
     RAISE EXCEPTION 'Unsupported operation: %', TG_OP;
 END;
 $$;
+
+-- Restrict direct execution of the relationship trigger function.
+REVOKE ALL ON FUNCTION public.protect_me_relationship()
+FROM PUBLIC, anon, authenticated, service_role;
 
 CREATE TRIGGER protect_me_relationship_trigger
 BEFORE UPDATE OR DELETE ON public.relationships
