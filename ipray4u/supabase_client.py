@@ -1,15 +1,23 @@
 import os
-from supabase import create_client
 
-_supabase = None
+from flask import g
+from supabase import create_client
+from supabase.lib.client_options import SyncClientOptions
+
+SUPABASE_CLIENT_KEY = "supabase_client"
 
 def get_supabase():
-    global _supabase
-    
-    if _supabase is None:
+    if SUPABASE_CLIENT_KEY not in g:
         url = os.environ["SUPABASE_URL"]
         key = os.environ["SUPABASE_PUBLISHABLE_KEY"]
-        
-        _supabase = create_client(url, key)
-        
-    return _supabase
+
+        g.supabase_client = create_client(
+            url,
+            key,
+            options=SyncClientOptions(
+                auto_refresh_token=False,
+                persist_session=False,
+            ),
+        )
+
+    return g.supabase_client
