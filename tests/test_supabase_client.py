@@ -3,6 +3,7 @@ from threading import Barrier
 from types import SimpleNamespace
 
 import httpx
+import pytest
 from supabase_auth import SyncGoTrueClient
 
 from ipray4u.routes.auth import PASSWORD_RESET_TOKEN_HASH_KEY
@@ -58,6 +59,12 @@ class FakeSupabaseClient:
 
 class AuthenticationRejectedError(Exception):
     pass
+
+
+@pytest.fixture(autouse=True)
+def supabase_environment(monkeypatch):
+    monkeypatch.setenv("SUPABASE_URL", "https://test.supabase.invalid")
+    monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", "test-publishable-key")
 
 
 def test_get_supabase_reuses_client_within_request(app, mocker):
