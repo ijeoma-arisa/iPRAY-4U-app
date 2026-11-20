@@ -250,6 +250,7 @@ def test_reset_password_page_loads(client):
         b'data-password-toggle="password confirm-password"'
     ) == 2
     assert b">Show<" not in response.data
+    assert b"reset-password.js" in response.data
 
 
 def test_forgot_password_sends_reset_email(client, mock_supabase):
